@@ -1,6 +1,7 @@
 {
   "type": "service_account",
   "project_id": "steam-bee-376520",
+  "private_key_id": "87a452303461d3aa768cfc157b0e303fcc7bd995",
   "client_email": "storage@steam-bee-376520.iam.gserviceaccount.com",
   "client_id": "108854515697430888603",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
