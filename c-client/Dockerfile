@@ -4,30 +4,30 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy c-lib first and build it
-COPY ../c-lib ./c-lib/
+COPY c-lib ./c-lib/
 WORKDIR /app/c-lib
 RUN npm ci && npm run build
 
 # Return to app directory and copy package files
 WORKDIR /app
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY next.config.mjs ./
-COPY tailwind.config.ts ./
-COPY postcss.config.mjs ./
+COPY c-client/package*.json ./
+COPY c-client/tsconfig.json ./
+COPY c-client/next.config.mjs ./
+COPY c-client/tailwind.config.ts ./
+COPY c-client/postcss.config.mjs ./
 
 # Install dependencies with legacy peer deps to handle React 19 compatibility
 RUN npm install --legacy-peer-deps
 
 # Copy source code and other necessary files
-COPY app/ ./app/
-COPY components/ ./components/
-COPY providers/ ./providers/
-COPY services/ ./services/
-COPY stores/ ./stores/
-COPY utils/ ./utils/
-COPY public/ ./public/
-# COPY test/ ./test/
+COPY c-client/app/ ./app/
+COPY c-client/components/ ./components/
+COPY c-client/providers/ ./providers/
+COPY c-client/services/ ./services/
+COPY c-client/stores/ ./stores/
+COPY c-client/utils/ ./utils/
+COPY c-client/public/ ./public/
+# COPY c-client/test/ ./test/
 
 # Build the application
 RUN npm run build
@@ -38,7 +38,7 @@ FROM node:18-alpine AS production
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY c-client/package*.json ./
 
 # Copy built c-lib from builder stage
 COPY --from=builder /app/c-lib ./c-lib/
