@@ -11,7 +11,7 @@ COPY tailwind.config.ts ./
 COPY postcss.config.mjs ./
 
 # Install dependencies with legacy peer deps to handle React 19 compatibility
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy source code and other necessary files
 COPY app/ ./app/
@@ -35,7 +35,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies with legacy peer deps
-RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
+RUN npm install --only=production --legacy-peer-deps && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/.next/standalone ./
