@@ -35,6 +35,7 @@ COPY --from=builder /c-api/app/dist ./dist
 # Copy any additional files needed at runtime
 COPY fix.cjs ./
 
+#comment
 # Create a non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
