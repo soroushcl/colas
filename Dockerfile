@@ -1,7 +1,7 @@
 # Build stage for c-api
 FROM node:18-alpine AS builder
 
-WORKDIR /app/api/
+WORKDIR /api/app/
 
 # Copy package files
 COPY c-api/package*.json ./
@@ -21,7 +21,7 @@ RUN npm run build
 # Production stage
 FROM node:18-alpine AS production
 
-WORKDIR /app/api
+WORKDIR /api/app/
 
 # Copy package files
 COPY c-api/package*.json ./
@@ -33,7 +33,7 @@ RUN npm install --only=production && npm cache clean --force
 COPY --from=builder /c-api/app/dist ./dist
 
 # Copy any additional files needed at runtime
-COPY fix.cjs ./
+COPY c-api/fix.cjs ./
 
 #comment
 # Create a non-root user
