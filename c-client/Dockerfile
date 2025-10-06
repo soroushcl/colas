@@ -3,7 +3,13 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy c-lib first and build it
+COPY ../c-lib ./c-lib/
+WORKDIR /app/c-lib
+RUN npm ci && npm run build
+
+# Return to app directory and copy package files
+WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY next.config.mjs ./
@@ -33,6 +39,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+
+# Copy built c-lib from builder stage
+COPY --from=builder /app/c-lib ./c-lib/
 
 # Install only production dependencies with legacy peer deps
 RUN npm install --only=production --legacy-peer-deps && npm cache clean --force
