@@ -21,7 +21,7 @@ COPY services/ ./services/
 COPY stores/ ./stores/
 COPY utils/ ./utils/
 COPY public/ ./public/
-COPY test/ ./test/
+# COPY test/ ./test/
 
 # Build the application
 RUN npm run build
