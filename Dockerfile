@@ -1,19 +1,19 @@
 # Build stage for c-api
 FROM node:18-alpine AS builder
 
-WORKDIR /app/api
+WORKDIR /app/api/
 
 # Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY tsconfig.test.json ./
-COPY ../c-lib ../
+COPY c-api/package*.json ./
+COPY c-api/tsconfig.json ./
+COPY c-api/tsconfig.test.json ./
+COPY c-lib ../
 
 # Install dependencies
 RUN npm install
 
 # Copy source code
-COPY src/ ./src/
+COPY c-api/src/ ./src/
 
 # Build the application
 RUN npm run build
@@ -24,13 +24,13 @@ FROM node:18-alpine AS production
 WORKDIR /app/api
 
 # Copy package files
-COPY package*.json ./
+COPY c-api/package*.json ./
 
 # Install only production dependencies
 RUN npm install --only=production && npm cache clean --force
 
 # Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /c-api/app/dist ./dist
 
 # Copy any additional files needed at runtime
 COPY fix.cjs ./
