@@ -68,8 +68,8 @@ import { ForgotPasswordParams } from "@services/mailer/templates/stringTemplates
 import { OrderRepository } from '@auth/repositories/orderRepository';
 
 const googleLoginWithCode = async (code: string) => {
-  const CLIENT_ID = process.env['OAUTH2_GOOGLE_CLIENT_ID'] || '698941654245-kqd42a2aqdi8ooet57fk8vfjbq6dlm4o.apps.googleusercontent.com';
-  const CLIENT_SECRET = process.env['OAUTH2_GOOGLE_CLIENT_SECRET'] || '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';
+  const CLIENT_ID = process.env['OAUTH2_GOOGLE_CLIENT_ID'] || '';
+  const CLIENT_SECRET = process.env['OAUTH2_GOOGLE_CLIENT_SECRET'] || '';
   const REDIRECT_URI = process.env['COLA_URL'] || 'http://localhost:3000/auth/login'
 
   const client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
