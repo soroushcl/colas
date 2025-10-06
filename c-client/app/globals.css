@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: rgba(231, 235, 230, 0.90);
+  --gray-background: #F6FAF0;
+  --foreground: #171717;
+  --gray-foreground: #FAFCF7;
+  --gray-divider: #C8CCC6;
+  --system-primary: #133B16;
+  --system-secondary: #858CD6;
+  --system-foreground: #FAFCF7;
+  --system-accent: #E6F0D5;
+  --system-light-accent: #EAF2DA;
+  --system-visual-primary: #174D20;
+  --system-light-primary: #2B6B3B;
+  --system-light-secondary: #E0E5FF;
+  --system-dark-primary: #092409;
+  --system-dark-secondary: #5950B2;
+  --visual-light-amber: #F2E8DA;
+  --label-primary: #0A0D0A;
+  --label-secondary: #4E524E;
+  --label-tertiary: #8B8C8B;
+  --gray-disable: #959993;
+  --gray-placeholder: #E2E5DA;
+  --gray-icon: #888C85;
+  --semantic-red: #F23030;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-roca),  var(--font-felix), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}

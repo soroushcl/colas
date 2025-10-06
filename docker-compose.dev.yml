@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Shared library (built first as dependency)
+  c-lib:
+    build:
+      context: ./c-lib
+      dockerfile: Dockerfile
+    image: cola-lib:dev
+    container_name: cola-lib-dev
+    volumes:
+      - ./c-lib:/app
+      - /app/node_modules
+    # This service is used as a dependency, not run directly
+
+  # API service (development)
+  c-api:
+    build:
+      context: ./c-api
+      dockerfile: Dockerfile
+    image: cola-api:dev
+    container_name: cola-api-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+    volumes:
+      - ./c-api:/app
+      - /app/node_modules
+    depends_on:
+      - c-lib
+    networks:
+      - cola-network
+    restart: unless-stopped
+    command: npm run start-dev
+
+  # Client service (development)
+  c-client:
+    build:
+      context: ./c-client
+      dockerfile: Dockerfile
+    image: cola-client:dev
+    container_name: cola-client-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    volumes:
+      - ./c-client:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - c-api
+    networks:
+      - cola-network
+    restart: unless-stopped
+    command: npm run dev
+
+networks:
+  cola-network:
+    driver: bridge

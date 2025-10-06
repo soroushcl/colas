@@ -1,0 +1,36 @@
+import React from 'react';
+import {
+  AppRouterContext,
+  AppRouterInstance,
+} from 'next/dist/shared/lib/app-router-context.shared-runtime';
+
+export type AppRouterContextProviderMockProps = {
+  children: React.ReactNode;
+
+  /**
+   * This prop is used to override the default mock functions.
+  */
+  router?: Partial<AppRouterInstance>;
+};
+
+export const AppRouterContextProviderMock = ({
+  router,
+  children,
+}: AppRouterContextProviderMockProps): React.ReactNode => {
+
+  const mockedRouter: AppRouterInstance = {
+    back: jest.fn(),
+    forward: jest.fn(),
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    prefetch: jest.fn(),
+    ...router,
+  };
+
+  return (
+    <AppRouterContext.Provider value={mockedRouter}>
+      {children}
+    </AppRouterContext.Provider>
+  );
+};

@@ -1,0 +1,28 @@
+{
+  "name": "cola",
+  "version": "1.0.0",
+  "scripts": {
+    "install-lib": "cd c-lib && npm install",
+    "install-api": "cd c-api && npm install",
+    "install-client": "cd c-client && npm install",
+    "install-all": "npm install && npm run install-lib && npm run install-api && npm run install-client",
+    "test-lib": "cd c-lib && npm run test",
+    "test-api": "cd c-api && npm run test",
+    "test-client": "cd c-client && npm run test",
+    "test-all": "npm run test-lib && npm run test-api",
+    "build-lib": "cd c-lib && npm run build",
+    "build-api": "cd c-api && npm run build",
+    "build-client": "cd c-client && npm run build",
+    "build-all": "npm run build-lib && npm run build-api && npm run build-client",
+    "start-api": "cd c-api && npm run start",
+    "start-client": "cd c-client && npm run start",
+    "start-client-dev": "cd c-client && npm run dev",
+    "start": "concurrently \"npm:start-api\" \"npm:start-client\"",
+    "dev": "concurrently \"npm:start-api\" \"npm:start-client-dev\""
+  },
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

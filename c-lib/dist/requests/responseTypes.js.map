@@ -1,0 +1,1 @@
+{"version":3,"file":"responseTypes.js","sourceRoot":"","sources":["../../src/requests/responseTypes.ts"],"names":[],"mappings":"AAUA,MAAM,CAAC,MAAM,OAAO,GAAkC,CAAI,OAAU,EAAE,EAAE,CAAC,CAAC;IACxE,OAAO,EAAE,IAAI;IACb,OAAO;CACR,CAAC,CAAC;AAEH,MAAM,CAAC,MAAM,IAAI,GAA4B,CAAC,KAAa,EAAE,EAAE,CAAC,CAAC;IAC/D,OAAO,EAAE,KAAK;IACd,KAAK;CACN,CAAC,CAAC"}
