@@ -4,9 +4,9 @@ FROM node:18-alpine AS builder
 WORKDIR /api/
 
 # Copy package files
-COPY c-api/package*.json ./app
-COPY c-api/tsconfig.json ./app
-COPY c-api/tsconfig.test.json ./app
+COPY c-api/package*.json ./app/
+COPY c-api/tsconfig.json ./app/
+COPY c-api/tsconfig.test.json ./app/
 COPY c-lib ./
 
 # Install dependencies
