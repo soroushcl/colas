@@ -45,7 +45,6 @@ COPY --from=builder /app/c-lib/dist /app/api/node_modules/c-lib/dist
 
 # Copy any additional files needed at runtime
 
-#comment
 # Create a non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
