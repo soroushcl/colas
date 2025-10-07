@@ -31,7 +31,7 @@ COPY c-client/stores/ ./stores/
 COPY c-client/utils/ ./utils/
 COPY c-client/public/ ./public/
 # COPY test/ ./test/
-
+#comment
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51H5GpKDdRheeRVEyhPLPmcX3ig8OtJXwgykcnKRmkgHGo30AQtaYvO1eQYi7KT4o2gbmkwJhkMtFc0GAZ7O65pY50025HnNOI5
 ENV STRIPE_SECRET_KEY=sk_test_51H5GpKDdRheeRVEyPnd14Nkugl4JrbYqLqhnyr5UmdTFTU8rUa8UI0ftWBtIMugevS4C96W3mU5sxWUEXrt2vpob00DLozCo0g
 ENV STRIPE_WEBHOOK_KEY=whsec_hHJHFZs3epLOOhWK4T6B59QgZtZe22IW
