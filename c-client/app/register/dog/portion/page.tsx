@@ -41,8 +41,8 @@ const Home: React.FC = observer(() => {
         if (subscriptionData) {
             dogStore.currentStep += 1;
             router.push('/register/dog/subscription');
-            setLoading(false)
         }
+        setLoading(false)
     };
 
     useEffect(() => {
