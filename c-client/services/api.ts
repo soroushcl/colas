@@ -44,6 +44,7 @@ type fetch = typeof fetch;
 
 export default class FetchApi {
     private token: string | null = null;
+    
     constructor(
         private fetch: fetch = global.fetch.bind(global),
         public baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
@@ -102,7 +103,7 @@ export default class FetchApi {
     // Authentication
 
     login = async (email: User["email"], password: User["password"], rememberMe: boolean): Promise<loginResponseBody> => {
-        console.log("login called")
+        console.log("login called", process.env.NEXT_PUBLIC_API_URL)
         const res = await this.request<loginResponseBody, loginRequestBody>(`${this.baseUrl}/authentication/login`, {
             method: "POST",
             credentials: "include",
