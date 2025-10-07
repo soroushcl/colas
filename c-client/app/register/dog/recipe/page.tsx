@@ -111,7 +111,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`*${dogStore.dog.name}'s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} secondary secondaryButtonText='Click to choose other recipes' registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`*${dogStore.dog.name}'s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <RadioGroup type='card' options={recipes} multiSelect onSelect={handleSelect}/>
         </ProcessLayout>
     );
