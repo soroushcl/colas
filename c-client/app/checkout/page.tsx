@@ -327,8 +327,23 @@ const CheckoutPage: React.FC = observer(() => {
                             }}
                         />
                     </div>
-                    <div className='md:pb-16 flex flex-col justify-center'>
-                        <div className='md:bg-[url(/images/grass_tile.png)] bg-repeat h-16 -ml-32'></div>
+                    <div className='md:pb-16 flex flex-col justify-center relative'>
+                        <div className='md:bg-[url(/images/grass_tile.png)] bg-repeat h-16 -ml-32 z-10'>
+                        </div>
+                        <Image
+                            src="/images/activity-low.png"
+                            alt="Checkout Hero"
+                            width={256}
+                            height={256}
+                            className="hidden md:flex absolute left-[100px] -top-[116px] w-[256px] h-[256px] object-cover"
+                        />
+                        <Image
+                            src="/images/sad-dog.png"
+                            alt="Checkout Hero"
+                            width={256}
+                            height={256}
+                            className="hidden md:flex absolute right-[140px] -top-[124px] w-[256px] h-[256px] object-cover"
+                        />
                         <div className='md:bg-[url(/images/bg.png)]'>
                             {/* Expert */}
                             <div className='md:hidden flex flex-col gap-y-4 w-full text-white p-4 bg-[url(/images/bg.png)] outline-4 outline-offset-0 outline-dashed outline-system_primary'>
