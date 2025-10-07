@@ -48,9 +48,9 @@ export default function ProcessLayout({
                     <div className='my-0 mx-0 w-full flex flex-col justify-between grow max-h-full'>
                         <div className="flex flex-col justify-evenly items-center pt-4">
                             {renderTitle(title)}
-                            {subTitle && <p className="text-label_secondary text-center text-sm md:text-base max-w-96">{subTitle}</p>}
+                            {subTitle && <p className="text-label_secondary text-center text-sm md:text-base max-w-96 pt-4">{subTitle}</p>}
                         </div>
-                        <div className={`${isPayment ? "w-full md:max-w-2xl" : "max-w-80 md:max-w-96"} my-0 mx-auto bg-gray_background md:pb-11 py-0 pt-4 px-0 grow w-full max-h-full relative flex flex-col items-center gap`}>
+                        <div className={`${isPayment ? "w-full md:max-w-2xl" : "max-w-80 md:max-w-96"} my-0 mx-auto bg-gray_background md:pb-11 py-0 pt-12 px-0 grow w-full max-h-full relative flex flex-col items-center gap`}>
                             {children}
                             {img && <Image
                                 src={`/images/${img}`}

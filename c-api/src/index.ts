@@ -18,7 +18,7 @@ import { StripePaymentRepository } from './payment/repositories/StripePaymentRep
 // } from "./sampleModule";
 
 const corsOptions = {
-  origin: process.env['ALLOWED_ORIGINS'] || 'http://localhost:3000',
+  origin: process.env['ALLOWED_ORIGINS'] || 'https://api-v2.colaskitchen.com',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   exposedHeaders: 'Set-Cookie',
   credentials: true

@@ -42,7 +42,7 @@ const Home: React.FC = observer(() => {
     // }, [router, userStore.currentStep, userStore.dogCountStep]);
     return (
         <ProcessLayout title={"How many dogs do you have?"} subTitle={"You can register up to 4 dog"} handleSubmit={handleSubmit} disabled={!userStore.isCustomerDogCountValid} nextArrow mainButtonText={"Next"} img={'activity.png'}>
-            <div className='flex flex-row gap-6 md:gap-10'>
+            <div className='flex flex-row gap-6 md:gap-10 pt-12'>
                 {[1, 2, 3, 4].map(dogCount => {
                     return <button
                         type='button'
