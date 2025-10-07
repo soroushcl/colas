@@ -39,9 +39,9 @@ const Home: React.FC = observer(() => {
         const subscriptionData = await dogStore.createDogSubscription();
         console.log("here")
         if (subscriptionData) {
-            setLoading(false)
             dogStore.currentStep += 1;
             router.push('/register/dog/subscription');
+            setLoading(false)
         }
     };
 

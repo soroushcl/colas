@@ -44,9 +44,9 @@ const Home: React.FC = observer(() => {
         setLoading(true)
         const res = await dogStore.registerDog(userStore.user.id)
         if (res) {
-            setLoading(false)
             router.push('/register/dog/nutrition');
             console.log(res)
+            setLoading(false)
         }
     };
 
