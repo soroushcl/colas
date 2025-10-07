@@ -15,6 +15,7 @@ WORKDIR /app/api
 COPY c-api/package*.json ./
 COPY c-api/tsconfig.json ./
 COPY c-api/tsconfig.test.json ./
+COPY c-api/fix.cjs ./
 
 # Install dependencies
 RUN npm install
@@ -40,7 +41,6 @@ RUN npm install --only=production && npm cache clean --force
 COPY --from=builder /c-api/app/dist ./dist
 
 # Copy any additional files needed at runtime
-COPY c-api/fix.cjs ./
 
 #comment
 # Create a non-root user
