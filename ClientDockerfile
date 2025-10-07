@@ -47,6 +47,7 @@ COPY c-client/package*.json ./
 RUN npm install --only=production --legacy-peer-deps && npm cache clean --force
 
 # Copy built application from builder stage
+#comment
 COPY --from=builder /app/client/.next/standalone ./
 COPY --from=builder /app/client/.next/static ./.next/static
 COPY --from=builder /app/client/public ./public
