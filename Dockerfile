@@ -39,6 +39,7 @@ RUN npm install --only=production && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/api/dist ./dist
+COPY --from=builder /app/c-lib/dist ../c-lib/dist
 
 # Copy any additional files needed at runtime
 
