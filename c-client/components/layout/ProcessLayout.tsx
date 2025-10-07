@@ -19,7 +19,7 @@ interface ProcessLayoutProps {
     nextArrow?: boolean;
     secondaryIcon?: boolean;
     isPayment?: boolean;
-    registeredDogs?: {dog: Dog, recipes: Recipe[], subscription: Subscription}[]
+    registeredDogs?: { dog: Dog, recipes: Recipe[], subscription: Subscription }[]
 }
 
 export default function ProcessLayout({
@@ -40,10 +40,10 @@ export default function ProcessLayout({
 }: ProcessLayoutProps) {
     return (
         <>
-            <Header registeredDogs={registeredDogs && registeredDogs.length > 0 ? registeredDogs : undefined}/>
+            <Header registeredDogs={registeredDogs && registeredDogs.length > 0 ? registeredDogs : undefined} />
 
-            <div className={`${isPayment ? "max-w-[640px] overflow-x-hidden" : "max-w-4xl"} my-0 md:my-10 mx-auto bg-gray_background p-0 w-full md:rounded-3xl fill-gray_background md:shadow-md md:drop-shadow-md flex flex-col flex-1 max-h-full`}>
-
+            <div className={`${isPayment ? "max-w-[640px] overflow-x-hidden" : "max-w-2xl"} my-0 md:my-10 mx-auto bg-gray_background p-0 w-full md:rounded-3xl fill-gray_background md:shadow-md md:drop-shadow-md flex flex-col flex-1 max-h-full`}>
+                
                 <form onSubmit={handleSubmit} className={`flex flex-col justify-between items-center grow ${isPayment ? "md:pt-0" : "md:py-14"} max-h-full`} >
                     <div className='my-0 mx-0 w-full flex flex-col justify-between grow max-h-full'>
                         <div className="flex flex-col justify-evenly items-center pt-4">
@@ -51,6 +51,7 @@ export default function ProcessLayout({
                             {subTitle && <p className="text-label_secondary text-center text-sm md:text-base max-w-96 pt-4">{subTitle}</p>}
                         </div>
                         <div className={`${isPayment ? "w-full md:max-w-2xl" : "max-w-80 md:max-w-96"} my-0 mx-auto bg-gray_background md:pb-11 py-0 pt-12 px-0 grow w-full max-h-full relative flex flex-col items-center gap`}>
+
                             {children}
                             {img && <Image
                                 src={`/images/${img}`}
