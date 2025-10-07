@@ -1,5 +1,8 @@
-import dotenv from 'dotenv';
-dotenv.config()
+// import dotenv from 'dotenv';
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development") {
+  await import("dotenv/config");
+}
+// dotenv.config()
 import express from 'express';
 import cors from 'cors';
 import repositoryFactory from './repositoryFactory.js';

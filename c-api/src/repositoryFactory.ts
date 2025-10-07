@@ -1,5 +1,8 @@
-import dotenv from 'dotenv';
-dotenv.config()
+// import dotenv from 'dotenv';
+// dotenv.config()
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development") {
+  await import("dotenv/config");
+}
 import { Db, MongoClient } from "mongodb";
 import { DogMongoRepository, RecipeMongoRepository, UserMongoRepository, SubscriptionMongoRepository, OrderMongoRepository } from "@auth/index.js";
 import { StripeCustomerMongoRepository } from "@auth/repositories/stripeCustomerRepository/index.js";
