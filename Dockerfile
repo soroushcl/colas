@@ -38,7 +38,7 @@ COPY c-api/package*.json ./
 RUN npm install --only=production && npm cache clean --force
 
 # Copy built application from builder stage
-COPY --from=builder /c-api/app/dist ./dist
+COPY --from=builder /app/dist ./dist
 
 # Copy any additional files needed at runtime
 
