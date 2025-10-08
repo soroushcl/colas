@@ -9,12 +9,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     isSmall?: boolean;
     isBig?: boolean;
     st?: string;
+    rightText?: string;
 }
 
-const LargeInput: React.FC<InputProps> = observer(({ testid, error, hasImage, isSmall, isBig, st, ...rest }) => {
+const LargeInput: React.FC<InputProps> = observer(({ testid, error, hasImage, isSmall, isBig, st, rightText, ...rest }) => {
     return (
         <>
-            <div className={`relative h-24 ${isBig ? "w-full" : ""} ${isSmall ? "w-1/2" : ""} mx-0`}>
+            <div className={`relative h-24 ${isBig ? "w-full" : ""} ${isSmall ? "w-1/2" : ""} mx-0 font-felix font-light`}>
                 <input
                     {...rest}
                     className={`w-full mx-auto ${st == 'green' ? "bg-[#4E6755] text-gray_divider focus:text-gray_divider disabled:text-gray_divider border-none" : "bg-gray_foreground"} fill-gray_foreground border border-gray_disable text-label_primary text-xl rounded-2xl py-4 px-6 placeholder:text-label_secondary outline-none stroke-[0.5px]
@@ -45,6 +46,11 @@ const LargeInput: React.FC<InputProps> = observer(({ testid, error, hasImage, is
                     alt="search"
                     className="absolute right-4 top-[18px]"
                 />}
+                {rightText && <p
+                    className="absolute right-4 top-[18px] text-label_tertiary text-xl font-normal font-felix"
+                >
+                    {rightText}
+                    </p>}
                 {error && <p className='text-semantic_red text-xs pl-6 pt-1' data-testid='error-text'>
                     {error}
                 </p>}
