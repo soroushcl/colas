@@ -67,7 +67,7 @@ const Home: React.FC = observer(() => {
         { name: 'Protein', value: parseFloat(recipe.crudeProtein.toFixed(2)), max: 50, unit: "g" },
         { name: 'Fat', value: parseInt(recipe.fat.replace("Min", "").replace("%", "")), max: 70, unit: "%" },
         { name: 'Carbohydrates', value: 30, max: 300, unit: "%" },
-        { name: 'Calories', value: parseFloat(recipe.calorie.toFixed(2)), max: 2500, unit: "cal" },
+        { name: 'Calories', value: parseFloat(recipe.calorie.toFixed(0)), max: 2500, unit: "cal" },
     ] : [
         { name: 'Protein', value: 0, max: 50, unit: "g" },
         { name: 'Fat', value: 0, max: 70, unit: "%" },
@@ -126,7 +126,7 @@ const Home: React.FC = observer(() => {
     return (
         <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s* Nutrition Analysis`} subTitle={`${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}'s ideal recipe would consist of:`} handleSubmit={handleSubmit} disabled={!recipe} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <div className="w-full flex flex-col items-center justify-center">
-                <div className='w-full py-1 px-4 flex flex-row justify-between items-center bg-gray_forground rounded-xl border border-gray_divider'>
+                <div className='w-full py-1 px-4 flex flex-row justify-between items-center bg-gray_foreground rounded-xl border border-gray_divider'>
                     <div className='flex flex-row justify-between items-center'>
                         <Image
                             src={`/images/heart.png`}
@@ -141,7 +141,7 @@ const Home: React.FC = observer(() => {
                         </div>
                     </div>
                     <div>
-                        <span className='text-system_primary text-lg font-bold'>{`${recipe ? recipe.calorie.toFixed(2) : 0} `}</span>
+                        <span className='text-system_primary text-lg font-bold'>{`${recipe ? recipe.calorie.toFixed(0) : 0} `}</span>
                         <span className='text-system_light_primary text-xs'>{`cal / day`}</span>
                     </div>
 

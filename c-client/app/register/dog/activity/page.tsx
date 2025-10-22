@@ -14,19 +14,19 @@ const Home: React.FC = observer(() => {
     const router = useRouter();
     const options: Option[] = [
         {
-            cardImage: 'low.svg',
+            cardImage: 'activity-low.svg',
             title: "Low",
             secondarySubtitle: `Sleepy Guy`,
             selected: dogStore.dog.activityLevel == activityLevel.low,
         },
         {
-            cardImage: 'activity.png',
+            cardImage: 'activity-medium.svg',
             title: "Normal",
             secondarySubtitle: `Fetches The Paper`,
             selected: dogStore.dog.activityLevel == activityLevel.normal,
         },
         {
-            cardImage: 'high.svg',
+            cardImage: 'activity-high.svg',
             title: "High",
             secondarySubtitle: `Won’t Fall Asleep`,
             selected: dogStore.dog.activityLevel == activityLevel.high,

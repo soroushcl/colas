@@ -15,20 +15,23 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             cardImage: 'under.svg',
-            title: shape.underweight,
-            secondarySubtitle: `Not excited about food`,
+            title: 'Under Weight',
+            subtitle: 'Visible ribs & spine',
+            secondarySubtitle: `Time to gain some healthy weight`,
             selected: dogStore.dog.shape == shape.underweight,
         },
         {
             cardImage: 'fit.svg',
-            title: shape.fit,
-            secondarySubtitle: `Fetches The Paper`,
+            title: 'Ideal Weight',
+            subtitle: 'Nice waistline & belly tuck',
+            secondarySubtitle: `We will maintain this weight!`,
             selected: dogStore.dog.shape == shape.fit,
         },
         {
             cardImage: 'over.svg',
-            title: shape.overweight,
-            secondarySubtitle: `Won’t Fall Asleep`,
+            title: 'Over Weight',
+            subtitle: 'Need pressure to feel the ribs',
+            secondarySubtitle: `A healthy weight-loss plan is due`,
             selected: dogStore.dog.shape == shape.overweight,
         },
     ];

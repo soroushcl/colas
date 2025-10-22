@@ -10,11 +10,13 @@ export interface Option {
   selectedCardImage?: string;
   value?: string;
   selected: boolean;
+  handlePrimarySelect?: () => void;
+  handleSecondarySelect?: () => void;
 }
 
 interface MultiSelectRadioGroupProps {
   options: Option[];
-  onSelect: (updatedOptions: Option[]) => void; // Callback with updated options
+  onSelect?: (updatedOptions: Option[]) => void; // Callback with updated options
   multiSelect?: boolean; // Flag for multi-select mode
   type?: string;
 }
@@ -41,7 +43,7 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
 
   if (type !== "card") {
     return (
-      < div className="w-80 flex flex-col gap-6" >
+      < div className="w-[340px] md:w-[384px] flex flex-col gap-6" >
         {
           options.map((option, index) => (
 
@@ -58,12 +60,12 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
                   width={96}
                   height={96}
                   alt={option.title}
-                  className="w-[96px] h-[96px] rounded-full object-scale-down"
+                  className="w-[96px] h-[96px] object-scale-down p-1"
                 />
               )}
 
               {/* Card Content */}
-              <div className={`flex flex-col flex-grow gap-1 ${!option.cardImage ? "p-4" : "py-4"}`}>
+              <div className={`flex flex-col flex-grow gap-1 ${!option.cardImage ? "p-4" : "py-4 pl-1"}`}>
                 <h3 className={`font-semibold text-lg ${option.selected ? "text-system_primary" : "text-system_dark_primary"}`}>{option.title}</h3>
                 {option.subtitle && (
                   <p className={`text-sm mb-2 ${option.selected ? "text-system_primary" : "text-label_primary"}`}>{option.subtitle}</p>
@@ -99,7 +101,7 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
       < div className="flex flex-col gap-6" >
         {
           options.map((option, index) => (
-            <div key={index} onClick={() => handleSelect(index)}>
+            <div key={index} >
               <MainCard 
                 title={option.title} 
                 subtitle={option.subtitle!} 
@@ -107,7 +109,8 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
                 cardImage={option.cardImage!} 
                 selected={option.selected}
                 selectedCardImage={option.selectedCardImage}
-                onSelect={() => handleSelect(index)}
+                onPrimarySelect={() => handleSelect(index)}
+                onSecondarySelect={option.handleSecondarySelect}
               />
             </div>
           ))}

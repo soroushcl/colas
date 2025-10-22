@@ -17,7 +17,7 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             title: "Yes",
-            secondarySubtitle: `we want to avoid...`,
+            secondarySubtitle: `We want to avoid...`,
             selected: dogStore.dog.isAllergic,
         },
         {
@@ -82,7 +82,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`Food Allergies`} subTitle={`Does *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Have Any Food Allergies?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={!dogStore.dog.isAllergic ? `sad.svg` : undefined} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`Food Allergies`} subTitle={`Does ${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)} Have Any Food Allergies?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={!dogStore.dog.isAllergic ? `sad.svg` : undefined} registeredDogs={userStore.registeredDogs}>
             <div className='flex flex-col align-center items-center grow gap-10'>
                 <RadioGroup
                     options={options}

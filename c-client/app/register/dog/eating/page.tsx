@@ -14,21 +14,21 @@ const Home: React.FC = observer(() => {
     const router = useRouter();
     const options: Option[] = [
         {
-            cardImage: 'picky-eater.svg',
+            cardImage: 'picky-eater.png',
             title: eatingHabit.picky,
             secondarySubtitle: `Not excited about food`,
             selected: dogStore.dog.eating == eatingHabit.picky,
         },
         {
-            cardImage: 'good-eater.svg',
+            cardImage: 'good-eater.png',
             title: eatingHabit.good,
-            secondarySubtitle: `Fetches The Paper`,
+            secondarySubtitle: `As long as it's a favorite!`,
             selected: dogStore.dog.eating == eatingHabit.good,
         },
         {
-            cardImage: 'great-eater.svg',
+            cardImage: 'great-eater.png',
             title: eatingHabit.great,
-            secondarySubtitle: `Won’t Fall Asleep`,
+            secondarySubtitle: `Will eat anything & everything`,
             selected: dogStore.dog.eating == eatingHabit.great,
         },
     ];

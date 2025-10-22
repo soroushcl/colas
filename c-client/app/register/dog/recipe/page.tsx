@@ -7,50 +7,58 @@ import { useStores } from '@/stores/StoreContext';
 import React from 'react';
 import RadioGroup, { Option } from '@/components/radio-button/RadioGroup';
 // import { getEnumKeyByValue } from '@/utils/enumHelper';
-import { protein } from 'c-lib';
+import { protein, Recipe } from 'c-lib';
+import RecipePopup from '@/components/popups/RecipePopup';
 
 
 const Home: React.FC = observer(() => {
     const { dogStore, userStore } = useStores();
     // const { mainButtondisabled } = regStore;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const router = useRouter();
+    
     const baseRecipes: Option[] = [
         {
             title: 'Hearty Beef',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
             cardImage: '/images/recipe_Beef.png',
-            selectedCardImage: '/images/Beef-half-h.png',
+            selectedCardImage: '/images/recipe_Beef.png',
             value: 'Beef',
-            selected: true
+            selected: true,
+            handleSecondarySelect: () => handleSecondary(dogStore.recipes[0])
         },
         {
             title: 'Juicy Chicken',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
             cardImage: '/images/recipe_Chicken.png',
-            selectedCardImage: '/images/Chicken-half-h.png',
+            selectedCardImage: '/images/recipe_Chicken.png',
             value: 'Chicken',
-            selected: false
+            selected: false,
+            handleSecondarySelect: () => handleSecondary(dogStore.recipes[1])
         },
         {
             title: 'Tasty Salmon',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
             cardImage: '/images/recipe_Salmon.png',
-            selectedCardImage: '/images/Salmon-half-h.png',
+            selectedCardImage: '/images/recipe_Salmon.png',
             value: 'Salmon',
-            selected: true
+            selected: true,
+
+            handleSecondarySelect: () => handleSecondary(dogStore.recipes[2])
         },
         {
             title: 'Lean Turkey',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
             cardImage: '/images/recipe_Turkey.png',
-            selectedCardImage: '/images/Turkey-half-h.png',
+            selectedCardImage: '/images/recipe_Turkey.png',
             value: 'Turkey',
-            selected: false
+            selected: false,
+            handleSecondarySelect: () => handleSecondary(dogStore.recipes[3])
         },
     ];
 
@@ -76,6 +84,17 @@ const Home: React.FC = observer(() => {
         dogStore.subscription.selectedRecipes = selectedRecipes as unknown as protein[];
         console.log("selectedRecipes", dogStore.subscription.selectedRecipes)
     };
+    const handleSecondary = (selected: Recipe) => {
+        console.log("selected: ", selected)
+        setIsPopupOpen(true)
+        return
+    }
+
+    const handleClosePopup = () => {
+        setIsPopupOpen(false)
+        return
+    }
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -98,7 +117,7 @@ const Home: React.FC = observer(() => {
             selected: r.value ? proteinValues.has(r.value) : false
         }));
         setRecipes(initialized);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     if (isAuthenticated) {
         return <p>Redirecting to home...</p>;
@@ -112,7 +131,14 @@ const Home: React.FC = observer(() => {
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
         <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
-            <RadioGroup type='card' options={recipes} multiSelect onSelect={handleSelect}/>
+            <RadioGroup type='card' options={recipes} multiSelect onSelect={handleSelect} />
+            {isPopupOpen && <RecipePopup
+                title={`${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s Health Needs`}
+                // onOpen={handleOpenPopup}
+                onClose={handleClosePopup}
+                isOpen={isPopupOpen}
+            />
+            }
         </ProcessLayout>
     );
 });
