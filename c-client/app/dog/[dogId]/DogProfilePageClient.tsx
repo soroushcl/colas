@@ -28,7 +28,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
   })
   const recipe = recipes.toString().substring(0, recipes.toString().length)
   const [dogData] = useState({
-    name: registeredDog.dog.name,
+    name: registeredDog.dog.name.charAt(0).toUpperCase() + registeredDog.dog.name.slice(1),
     breed: registeredDog.dog.breed,
     age: new Date(registeredDog.dog.age).toDateString(),
     gender: registeredDog.dog.gender,

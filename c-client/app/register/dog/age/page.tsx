@@ -41,7 +41,7 @@ const Home: React.FC = observer(() => {
     //     }
     //   }, [router, dogStore.currentStep, dogStore.ageStep]);
     return (
-        <ProcessLayout title={`When is *${dogStore.dog.name}* Birthday?`} subTitle={"We use this for life-stage calculation"} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`When is *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Birthday?`} subTitle={"We use this for life-stage calculation"} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <LargeInput
                 type="date"
                 placeholder={`Birthday`}

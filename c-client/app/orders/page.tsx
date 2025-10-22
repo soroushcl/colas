@@ -40,7 +40,8 @@ export default function OrderPage() {
   const futureOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string }[] = []
   for (let i = 0; i < userStore.registeredDogs.length; i++) {
     userStore.registeredDogs[i].activeOrders.map(r => {
-      const dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
+      let dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
+      dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
       const status = r.status
       const portions = r.detail.type
       const recipeNames = r.detail.selectedRecipes.map((r) => {
@@ -62,7 +63,8 @@ export default function OrderPage() {
   const oldOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string }[] = []
   for (let i = 0; i < userStore.registeredDogs.length; i++) {
     userStore.registeredDogs[i].oldOrders.map(r => {
-      const dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
+      let dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
+      dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
       const status = r.status
       const portions = r.detail.type
       const recipeNames = r.detail.selectedRecipes.map((r: number | string) => {

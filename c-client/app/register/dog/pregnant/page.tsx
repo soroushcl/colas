@@ -14,12 +14,12 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             title: "Yes",
-            subtitle: `*${dogStore.dog.name}* is Pregnant`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* is Pregnant`,
             selected: dogStore.dog.isPregnant,
         },
         {
             title: "No",
-            subtitle: `*${dogStore.dog.name}* isn't Pregnant`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* isn't Pregnant`,
             selected: !dogStore.dog.isPregnant,
         },
     ];
@@ -61,7 +61,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`Is *${dogStore.dog.name}* Pregnant?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={'activity.png'} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`Is *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Pregnant?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={'activity.png'} registeredDogs={userStore.registeredDogs}>
             <div className='flex flex-row gap-6 md:gap-10'>
                 <RadioGroup
                     options={options}

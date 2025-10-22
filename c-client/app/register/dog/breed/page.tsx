@@ -75,7 +75,7 @@ const Home: React.FC = observer(() => {
   }, [router, dogStore.currentStep, dogStore.breedStep]);
   if (loading) {
     return (
-      <ProcessLayout title={`What's *${dogStore.dog.name}* ‌breed?`} subTitle={"Loading breeds..."} handleSubmit={handleSubmit} disabled={true} nextArrow mainButtonText={"Next"} img='breed_dog.png' registeredDogs={userStore.registeredDogs}>
+      <ProcessLayout title={`What's *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* ‌breed?`} subTitle={"Loading breeds..."} handleSubmit={handleSubmit} disabled={true} nextArrow mainButtonText={"Next"} img='breed_dog.png' registeredDogs={userStore.registeredDogs}>
         <div className="flex justify-center items-center py-8">
           <div className="text-gray-600">Loading dog breeds...</div>
         </div>
@@ -85,7 +85,7 @@ const Home: React.FC = observer(() => {
 
   if (error) {
     return (
-      <ProcessLayout title={`What's *${dogStore.dog.name}* ‌breed?`} subTitle={"Error loading breeds"} handleSubmit={handleSubmit} disabled={true} nextArrow mainButtonText={"Next"} img='breed_dog.png'>
+      <ProcessLayout title={`What's *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* ‌breed?`} subTitle={"Error loading breeds"} handleSubmit={handleSubmit} disabled={true} nextArrow mainButtonText={"Next"} img='breed_dog.png'>
         <div className="flex justify-center items-center py-8">
           <div className="text-red-600">{error}</div>
         </div>
@@ -94,7 +94,7 @@ const Home: React.FC = observer(() => {
   }
 
   return (
-    <ProcessLayout title={`What's *${dogStore.dog.name}* ‌breed?`} subTitle={"Choose Mutt if you don't know."} handleSubmit={handleSubmit} disabled={!dogStore.isDogBreedValid} nextArrow mainButtonText={"Next"} img='breed_dog.png'>
+    <ProcessLayout title={`What's *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* ‌breed?`} subTitle={"Choose Mutt if you don't know."} handleSubmit={handleSubmit} disabled={!dogStore.isDogBreedValid} nextArrow mainButtonText={"Next"} img='breed_dog.png'>
       <SearchableSelect
         options={breeds}
         placeholder="Breed"

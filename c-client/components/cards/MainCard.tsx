@@ -33,7 +33,7 @@ const MainCard: React.FC<CardProps> = ({ title, subtitle, description, cardImage
                 }`}
         >
             <div className={`${selected ? "w-[120px] h-[120px]" : "w-[84px] h-[84px]"} rounded-full `}>
-                <Image src={imageToShow} alt={title} width={120} height={120} className={`${selected ? "w-[120px] h-[120px] -ml-0 rounded-3xl" : "w-[84px] h-[84px]"}`} />
+                <Image src={imageToShow} alt={title} width={120} height={120} className={`${selected ? "w-[60px] h-[120px] -ml-0 rounded-3xl rotate-180" : "w-[84px] h-[84px]"}`} />
             </div>
             <div className="flex-1 ml-4">
                 <h3 className="text-lg font-semibold">{title}</h3>

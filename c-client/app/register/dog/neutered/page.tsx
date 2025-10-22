@@ -15,12 +15,12 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             title: "Yes",
-            subtitle: `*${dogStore.dog.name}* is ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* is ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
             selected: dogStore.dog.isNeutered,
         },
         {
             title: "No",
-            subtitle: `*${dogStore.dog.name}* isn't ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* isn't ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
             selected: !dogStore.dog.isNeutered,
         },
     ];
@@ -67,7 +67,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`Is *${dogStore.dog.name}* Neutered?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={'activity.png'} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`Is *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Neutered?`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={'activity.png'} registeredDogs={userStore.registeredDogs}>
             <div className='flex flex-row gap-6 md:gap-10'>
                 <RadioGroup
                     onSelect={handleSelect}

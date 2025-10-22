@@ -12,6 +12,9 @@ interface DogCardProps {
 }
 
 export default function DogCard({ variant, name, href, subtitle, onRegisterClick }: DogCardProps) {
+  const dogName = name
+    ? name.charAt(0).toUpperCase() + name.slice(1)
+    : undefined;
   if (variant === "profile") {
   // if (variant === "register") {
     return (
@@ -23,14 +26,14 @@ export default function DogCard({ variant, name, href, subtitle, onRegisterClick
           {href ? (
             <Link href={href} className="min-w-[66px] h-[32px] bg-system_light_secondary px-3 py-1 rounded-full text-xs font-medium mb-1 flex items-center justify-center">
               <p className="text-system_dark_secondary text-xs font-bold">
-                {name ?? "Profile"}
+                {dogName ?? "Profile"}
               </p>
               <Image src="/images/chevrons1.png" alt="Table Dog" width={16} height={32} className='object-contain w-[8px] h-[16px]' />
             </Link>
           ) : (
             <div className="min-w-[66px] h-[32px] bg-system_light_secondary px-3 py-1 rounded-full text-xs font-medium mb-1 flex items-center justify-center">
               <p className="text-system_dark_secondary text-xs font-bold">
-                {name ?? "Profile"}
+                {dogName ?? "Profile"}
               </p>
               <Image src="/images/chevrons1.png" alt="Table Dog" width={16} height={32} className='object-contain w-[8px] h-[16px]' />
             </div>
@@ -71,7 +74,7 @@ export default function DogCard({ variant, name, href, subtitle, onRegisterClick
           <Image src="/images/add_dog.png" alt="Table Dog" width={48} height={48} className='object-contain w-[48px] h-[48px] md:w-[64px] md:h-[64px]' />
         </div>
         <div className="flex-1 md:flex md:flex-col-reverse md:justify-start md:gap-1">
-          <p className="text-xs md:text-sm font-bold text-system_light_primary mb-1">{name ?? "Add pooch"}</p>
+          <p className="text-xs md:text-sm font-bold text-system_light_primary mb-1">{dogName ?? "Add pooch"}</p>
           <p className="text-xs md:text-sm font-normal text-system_light_primary">{subtitle ?? "Up to 4"}</p>
         </div>
       </div>

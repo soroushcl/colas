@@ -14,12 +14,12 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             title: "Yes",
-            subtitle: `*${dogStore.dog.name}* is Nursing`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* is Nursing`,
             selected: dogStore.dog.isNursing,
         },
         {
             title: "No",
-            subtitle: `*${dogStore.dog.name}* isn't Nursing`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* isn't Nursing`,
             selected: !dogStore.dog.isNursing,
         },
     ];
@@ -61,7 +61,7 @@ const Home: React.FC = observer(() => {
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
         <ProcessLayout
-            title={`Is *${dogStore.dog.name}* Nursing?`}
+            title={`Is *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Nursing?`}
             handleSubmit={handleSubmit}
             disabled={false}
             nextArrow mainButtonText={"Next"}

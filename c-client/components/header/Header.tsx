@@ -29,12 +29,12 @@ export default function Header({
     const options: Option[] = [
         {
             title: "Yes",
-            subtitle: `*${dogStore.dog.name}* is ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* is ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
             selected: dogStore.dog.isNeutered,
         },
         {
             title: "No",
-            subtitle: `*${dogStore.dog.name}* isn't ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
+            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* isn't ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
             selected: !dogStore.dog.isNeutered,
         },
     ];
@@ -336,7 +336,7 @@ export default function Header({
                 className='absolute top-[12px] md:top-[32px] right-[24px] md:right-[32px] px-4 gap-1 h-[24px] rounded-full bg-system_secondary flex justify-evenly items-center cursor-pointer'
                 onClick={() => setPopupOpen(true)}
             >
-                <p className='text-sm text-system_accent'>{registeredDogs[0].dog.name}</p>
+                <p className='text-sm text-system_accent'>{registeredDogs[0].dog.name.charAt(0).toUpperCase() + registeredDogs[0].dog.name.slice(1)}</p>
                 <Image
                     src="/images/chevrons4.png"
                     width={10}
@@ -353,7 +353,7 @@ export default function Header({
                             return (
                                 <div className='flex justify-between rounded-2xl bg-white border border-gray_divider p-4 shadow-lg' key={"dog-" + index}>
                                     <div>
-                                        <p className='text-lg text-system_dark_primary font-bold'>{r.dog.name}</p>
+                                        <p className='text-lg text-system_dark_primary font-bold'>{r.dog.name.charAt(0).toUpperCase() + r.dog.name.slice(1)}</p>
                                         <p className='text-sm text-system_dark_primary'>{r.dog.breed + ", " + r.dog.gender + ", ..."}</p>
                                     </div>
                                     <button onClick={() => handleOpenEditPopup(index)}>

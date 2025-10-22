@@ -239,7 +239,7 @@ export class UserStore {
             let dog = dogs.filter((d: any) => d.id == orders[i].dog)[0]
             console.log("upcomingOrder 2", dog.name, orders[i].dog, dogs)
             if (!upcomingOrder.dogs.includes(dog.name)) {
-              upcomingOrder.dogs.push(dog.name)
+              upcomingOrder.dogs.push(dog.name.charAt(0).toUpperCase() + dog.name.slice(1))
             }
             console.log("upcomingOrder 3", orders[i].detail.info, orders[i].detail.info.length)
             for (let j = 0; j < orders[i].detail.info.length; j++) {

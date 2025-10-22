@@ -20,8 +20,8 @@ const Home: React.FC = observer(() => {
             title: 'Hearty Beef',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe_1.png',
-            selectedCardImage: '/images/selected_recipe_1.png',
+            cardImage: '/images/recipe_Beef.png',
+            selectedCardImage: '/images/Beef-half-h.png',
             value: 'Beef',
             selected: true
         },
@@ -29,8 +29,8 @@ const Home: React.FC = observer(() => {
             title: 'Juicy Chicken',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe_2.png',
-            selectedCardImage: '/images/selected_recipe_2.png',
+            cardImage: '/images/recipe_Chicken.png',
+            selectedCardImage: '/images/Chicken-half-h.png',
             value: 'Chicken',
             selected: false
         },
@@ -38,8 +38,8 @@ const Home: React.FC = observer(() => {
             title: 'Tasty Salmon',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe_3.png',
-            selectedCardImage: '/images/selected_recipe_3.png',
+            cardImage: '/images/recipe_Salmon.png',
+            selectedCardImage: '/images/Salmon-half-h.png',
             value: 'Salmon',
             selected: true
         },
@@ -47,8 +47,8 @@ const Home: React.FC = observer(() => {
             title: 'Lean Turkey',
             subtitle: 'For Picky Eaters',
             secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe_4.png',
-            selectedCardImage: '/images/selected_recipe_4.png',
+            cardImage: '/images/recipe_Turkey.png',
+            selectedCardImage: '/images/Turkey-half-h.png',
             value: 'Turkey',
             selected: false
         },
@@ -111,7 +111,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`*${dogStore.dog.name}'s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}'s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <RadioGroup type='card' options={recipes} multiSelect onSelect={handleSelect}/>
         </ProcessLayout>
     );

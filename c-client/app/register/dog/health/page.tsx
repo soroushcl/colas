@@ -82,7 +82,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={!dogStore.dog.hasHealthIssue ? `Does *${dogStore.dog.name}* have any health issues?` : `Select any health issues...`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={!dogStore.dog.hasHealthIssue ? `sad.svg` : undefined} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={!dogStore.dog.hasHealthIssue ? `Does *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* have any health issues?` : `Select any health issues...`} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} img={!dogStore.dog.hasHealthIssue ? `sad.svg` : undefined} registeredDogs={userStore.registeredDogs}>
             <div className='flex flex-col align-center items-center grow gap-10'>
                 <RadioGroup
                     options={options}

@@ -50,7 +50,7 @@ const Home: React.FC = observer(() => {
                     return <LargeInput
                         type="text"
                         placeholder={`#${index + 1} Name`}
-                        value={userStore.currentRegisteringDog == index ? dogStore.dog.name : index < userStore.currentRegisteringDog ? userStore.registeredDogs[index].dog.name : ""}
+                        value={userStore.currentRegisteringDog == index ? dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1) : index < userStore.currentRegisteringDog ? userStore.registeredDogs[index].dog.name.charAt(0).toUpperCase() + userStore.registeredDogs[index].dog.name.slice(1) : ""}
                         onChange={(e) => { dogStore.dog.name = e.target.value }}
                         key={index}
                         // isSmall={userStore.user.dogCount && (userStore.user.dogCount > 1) ? true : false}
