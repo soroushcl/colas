@@ -15,19 +15,19 @@ const Home: React.FC = observer(() => {
   // const [, setSelectedOption] = useState("");
 
   const options = [
-    "alberta",
-    "british columbia",
-    "manitoba",
-    "new brunswick",
-    "newfoundland and labrador",
-    "nova scotia",
-    "ontario",
-    "prince edward island",
-    "quebec",
-    "saskatchewan",
-    "northwest territories",
-    "nunavut",
-    "yukon",
+    "Alberta",
+    "British Columbia",
+    "Manitoba",
+    "New Brunswick",
+    "Newfoundland and Labrador",
+    "Nova Scotia",
+    "Ontario",
+    "Prince Edward Island",
+    "Quebec",
+    "Saskatchewan",
+    "Northwest Territories",
+    "Nunavut",
+    "Yukon",
   ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

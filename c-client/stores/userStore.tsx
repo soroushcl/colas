@@ -154,7 +154,7 @@ export class UserStore {
   }
 
   get isCustomerStateValid() {
-    return (this.user.state == 'ontario') || (this.user.state == 'quebec');
+    return (this.user.state == 'Ontario') || (this.user.state == 'Quebec');
   }
   get isCustomerDogCountValid() {
     return (this.user.dogCount !== 0);

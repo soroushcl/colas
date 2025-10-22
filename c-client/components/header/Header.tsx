@@ -325,11 +325,12 @@ export default function Header({
         <div className='relative'>
             <div className='relative py-0 px-40 bg-gray_background flex justify-center h-[48px] md:h-[88px] items-center gap-2.5 md:shadow-header md:backdrop-blur-xl'>
                 <Image
-                    src="/images/logo2.png"
-                    width={72}
-                    height={33}
+                    src="/images/logo.png"
+                    width={66}
+                    height={20}
                     sizes="100vw"
                     alt="Picture of the author"
+                    className='w-[66px] h-[20px]'
                 />
             </div>
             {registeredDogs && <div

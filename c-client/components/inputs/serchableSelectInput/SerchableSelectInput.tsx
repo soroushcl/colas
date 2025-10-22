@@ -123,7 +123,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       />
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1">
+        <div className="absolute top-[76px] left-0 right-0 z-50 mt-1">
           <ul className="bg-white border rounded-2xl border-gray_divider shadow-lg max-h-60 overflow-y-auto scrollbar-custom">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
