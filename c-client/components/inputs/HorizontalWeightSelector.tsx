@@ -104,7 +104,7 @@ const HorizontalWeightSelector: React.FC<HorizontalWeightSelectorProps> = ({
                 document.removeEventListener('touchend', handleTouchEnd);
             };
         }
-    }, [isDragging, dragStart]);
+    }, [isDragging, dragStart, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
     // const currentPosition = getPositionFromValue(value);
     // const indicatorPosition = (currentPosition / (weights.length - 1)) * 100;

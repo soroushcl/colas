@@ -51,7 +51,7 @@ const Home: React.FC = observer(() => {
             // key={index}
             />
             <p className='text-label_primary text-xl md:text-2xl font-normal pt-16'>& current weight?</p>
-            <p className='text-label_secondary text-sm md:text-base font-normal pt-4 pb-16'>No worries we listen & we don't judge</p>
+            <p className='text-label_secondary text-sm md:text-base font-normal pt-4 pb-16'>No worries we listen & we don&apos;t judge</p>
             <LargeInput
                 type='number'
                 placeholder='Pooch weight'

@@ -12,7 +12,7 @@ export interface PopupProps {
 
 const RecipePopup: React.FC<PopupProps> = ({
     title,
-    onSubmit,
+    // onSubmit,
     // onOpen,
     onClose,
     isOpen,
