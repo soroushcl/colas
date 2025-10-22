@@ -15,7 +15,7 @@ const Home: React.FC = observer(() => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         dogStore.currentStep += 1
-        router.push('/register/dog/neutered');
+        router.push('/register/dog/castration');
         // const res = await dogStore.updateCustomer()
         // if (res) {
         //     console.log(res)

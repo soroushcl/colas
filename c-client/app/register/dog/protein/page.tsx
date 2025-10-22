@@ -50,7 +50,7 @@ const Home: React.FC = observer(() => {
         ]);
         
         if (res) {
-            router.push('/register/dog/nutrition');
+            router.push('/register/dog/report');
             console.log(res)
             setLoading(false)
         }

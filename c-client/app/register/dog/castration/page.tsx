@@ -40,7 +40,7 @@ const Home: React.FC = observer(() => {
             router.push('/register/dog/activity');
         } else {
             dogStore.currentStep += 1
-            router.push('/register/dog/pregnant');
+            router.push('/register/dog/pregnancy');
         }
         // const res = await dogStore.updateCustomer()
         // if (res) {
