@@ -6,6 +6,7 @@ import './style.css'
 interface SearchableSelectProps {
   options: string[];
   selected?: string;
+  error?: string;
   placeholder?: string;
   isSmall?: boolean;
   isBig?: boolean;
@@ -16,6 +17,7 @@ interface SearchableSelectProps {
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   options,
   selected,
+  error,
   placeholder = "Select an option",
   isSmall,
   isBig,
@@ -50,13 +52,13 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => 
+        setHighlightedIndex(prev =>
           prev < filteredOptions.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => 
+        setHighlightedIndex(prev =>
           prev > 0 ? prev - 1 : filteredOptions.length - 1
         );
         break;
@@ -110,6 +112,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       {/* Input Field */}
       <LargeInput
         type="text"
+        error={error}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={() => setIsOpen(true)}
@@ -129,11 +132,10 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
               filteredOptions.map((option, index) => (
                 <li
                   key={index}
-                  className={`h-12 px-3 py-2 text-label_primary flex items-center cursor-pointer border-gray_divider first:border-none border-t ${
-                    index === highlightedIndex 
-                      ? 'bg-blue-100' 
+                  className={`h-12 px-3 py-2 text-label_primary flex items-center cursor-pointer border-gray_divider first:border-none border-t ${index === highlightedIndex
+                      ? 'bg-blue-100'
                       : 'hover:bg-gray-100'
-                  }`}
+                    }`}
                   onClick={() => handleSelect(option)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   tabIndex={0}

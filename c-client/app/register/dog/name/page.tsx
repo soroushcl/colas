@@ -43,7 +43,7 @@ const Home: React.FC = observer(() => {
         }
     }, [router, dogStore.currentStep, dogStore.nameStep]);
     return (
-        <ProcessLayout title={"What's your pup’s name?"} handleSubmit={handleSubmit} disabled={!dogStore.isDogNameValid} nextArrow mainButtonText={"Next"} img={'activity.png'} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={"What's your pup’s name?"} handleSubmit={handleSubmit} disabled={!dogStore.isDogNameValid} nextArrow mainButtonText={"Next"} img={'activity-2.png'} registeredDogs={userStore.registeredDogs}>
             <div className={`${(userStore.user.dogCount && userStore.user.dogCount > 1 ? "grid grid-cols-2 gap-2" : "flex flex-row gap-6")}`}>
                 {new Array(userStore.user.dogCount).fill(0).map((dog, index) => {
                     {/* {new Array(2).fill(0).map((_, index) => { */ }

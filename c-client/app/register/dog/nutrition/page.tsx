@@ -124,7 +124,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}'s* Nutrition Analysis`} subTitle={`${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}'s ideal recipe would consist of:`} handleSubmit={handleSubmit} disabled={!recipe} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s* Nutrition Analysis`} subTitle={`${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}'s ideal recipe would consist of:`} handleSubmit={handleSubmit} disabled={!recipe} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <div className="w-full flex flex-col items-center justify-center">
                 <div className='w-full py-1 px-4 flex flex-row justify-between items-center bg-gray_forground rounded-xl border border-gray_divider'>
                     <div className='flex flex-row justify-between items-center'>

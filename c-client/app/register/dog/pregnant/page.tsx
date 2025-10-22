@@ -14,12 +14,12 @@ const Home: React.FC = observer(() => {
     const options: Option[] = [
         {
             title: "Yes",
-            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* is Pregnant`,
+            subtitle: `${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)} is Pregnant`,
             selected: dogStore.dog.isPregnant,
         },
         {
             title: "No",
-            subtitle: `*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* isn't Pregnant`,
+            subtitle: `${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)} isn't Pregnant`,
             selected: !dogStore.dog.isPregnant,
         },
     ];

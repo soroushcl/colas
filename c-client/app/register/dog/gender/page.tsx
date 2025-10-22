@@ -41,7 +41,7 @@ const Home: React.FC = observer(() => {
     //     }
     // }, [router, dogStore.currentStep, dogStore.genderStep]);
     return (
-        <ProcessLayout title={`Select *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}* Gender`} subTitle={"Dogs have different caloric needs based on their gender"} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
+        <ProcessLayout title={`Select *${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s* Gender`} subTitle={"Dogs have different caloric needs based on their gender"} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <div className='flex flex-row gap-6 md:gap-10'>
                 {[0, 1].map(dogGender => {
                     return <div

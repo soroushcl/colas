@@ -63,13 +63,16 @@ const Home: React.FC = observer(() => {
       <SearchableSelect
         options={options}
         selected={userStore.user.state}
-        placeholder="State"
+        placeholder="Province"
         onSelect={(value) => {
           // setSelectedOption(value);
           userStore.user.state = value
           console.log("Selected:", value);
         }}
       />
+      <p className='w-[305px] text-center text-semantic_red font-normal text-base'>
+        {(userStore.isCustomerStateValid || !userStore.user.state) ? "" : "Sorry! We currently only serve Ontario & Quebec doggos."}
+      </p>
     </ProcessLayout>
 
   );
