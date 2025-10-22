@@ -77,7 +77,6 @@ const Home: React.FC = observer(() => {
                     totalPrice={dogStore.subscription.dailyPrice * dogStore.subscription.recurring}
                     discountRate={!dogStore.subscription.discounts[0] ? 20 : dogStore.subscription.discounts[0].discount}
                     isActive={true}
-                    onToggle={() => { }}
                 />
                 <div className='flex flex-col items-center justify-center pt-10'>
                     <div className='flex flex-row items-center justify-center'>

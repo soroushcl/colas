@@ -9,13 +9,15 @@ interface CardProps {
     totalPrice: number;
     discountRate: number;
     isActive: boolean;
-    onToggle: () => void;
+    onToggle?: () => void;
 }
 
 const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan, meals, totalPrice, isActive, discountRate, onToggle }) => {
 
     const toggleSwitch = () => {
-        onToggle();
+        if (onToggle) {
+            onToggle();
+        }
         console.log("toggleSwitch SubscriptionCard clicked isActive: ", isActive)
     };
 
@@ -33,7 +35,7 @@ const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan,
                 </div>
                 {/* Switch Button - Top Right */}
                 <div className='flex items-center'>
-                    <button
+                    {onToggle && <button
                         onClick={toggleSwitch}
                         type='button'
                         className={`w-12 h-6 rounded-full border  transition-colors duration-200 ease-in-out ${isActive
@@ -46,6 +48,7 @@ const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan,
                                 }`}
                         />
                     </button>
+                    }
                 </div>
             </div>
 
@@ -72,7 +75,7 @@ const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan,
                             <div className='h-px mx-4 border-t border-dotted border-gray_divider grow'></div>
                             <div className='flex flex-row justify-between items-center gap-1'>
                                 <span className={`text-xs text-system_primary font-light line-through ${isActive ? '' : ''}`}>{totalPrice.toFixed(2)}</span>
-                                <span className={`text-sm font-bold ${isActive ? 'text-system_light_primary' : ' text-label-secondary'}`}>{(totalPrice * (100 - discountRate)/100).toFixed(2)}{"$"}</span>
+                                <span className={`text-sm font-bold ${isActive ? 'text-system_light_primary' : ' text-label-secondary'}`}>{(totalPrice * (100 - discountRate) / 100).toFixed(2)}{"$"}</span>
                             </div>
                         </div>
                     </div>
