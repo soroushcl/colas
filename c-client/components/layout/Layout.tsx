@@ -21,7 +21,7 @@ export default function Layout({
 
                 <ServiceProvider api={api}>
                     <StoreProvider >
-                        <div className='my-0 mx-auto min-h-screen flex flex-col justify-between relative bg-gray_background'>
+                        <div className='my-0 mx-auto min-h-screen flex flex-col justify-between relative bg-background'>
                             <Image
                                 src={`/images/bg-protein.png`}
                                 width={200}
