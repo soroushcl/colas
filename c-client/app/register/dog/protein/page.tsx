@@ -77,19 +77,19 @@ const Home: React.FC = observer(() => {
                             <div className={`w-full md:max-w-[700px] my-0 mx-auto bg-system_accent md:bg-gray_background md:my-8 py-0 px-0 grow w-full max-h-full relative flex flex-col items-center gap md:rounded-3xl  overflow-hidden`}>
                                 <div className='flex flex-col w-full h-full grow'>
                                     <div className='grow flex flex-col'>
-                                        <div className='w-full h-[44vh] md:h-[38vh] bg-system_dark_primary text-system_accent font-normal text-center pt-24'>
+                                        <div className='w-full h-[42vh] md:h-[38vh] bg-system_dark_primary text-system_accent font-normal text-center flex flex-col items-center justify-center'>
                                             <p className='text-3xl mb-4'>All done!</p>
                                             <p className='text-sm md:text-2xl '>Preparing the perfect fresh meal plan for your pup...</p>
                                         </div>
                                         <div className='w-full absolute top-[27vh] md:top-[22vh]'>
                                             <Image
                                                 src={`/images/large_bowl.png`}
-                                                width={344}
-                                                height={344}
-                                                className="object-fill w-[316px] h-[316px] md:w-[344px] md:h-[344px] mx-auto "
+                                                width={788}
+                                                height={788}
+                                                className="object-fill w-[32vh] h-[32vh] mx-auto "
                                                 alt={"Cola"} />
                                         </div>
-                                        <div className='w-full h-[44vh] md:h-[38vh] text-center pt-48 flex flex-col items-center justify-between bg-system_accent md:bg-gray_background'>
+                                        <div className='w-full h-[42vh] md:h-[38vh] text-center flex flex-col items-center justify-end gap-4 bg-system_accent md:bg-gray_background'>
                                             <p className='max-w-[400px] text-base md:text-2xl text-system_dark_primary font-normal mx-auto'>Pooch parents report their dogs are no longer picky eaters after using our services!</p>
                                             <div className='w-full flex flex-col items-center'>
                                                 <Image

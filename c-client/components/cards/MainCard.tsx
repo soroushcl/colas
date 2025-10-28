@@ -40,7 +40,7 @@ const MainCard: React.FC<CardProps> = ({ title, subtitle, description, cardImage
         >
             <Image src={imageToShow} alt={title} width={140} height={140} className={`${selected ? "w-[140px] h-[140px] -ml-[48px] rounded-3xl" : "w-[84px] h-[84px]"}`} />
             <div className="flex-1 ml-1 md:ml-4">
-                <h3 className="text-lg font-semibold">{title}</h3>
+                <h3 className="font-roca text-lg font-semibold">{title}</h3>
                 <p className="text-sm">{subtitle}</p>
                 <p className={`text-xs ${selected ? 'text-system_light_accent' : 'text-label_secondary'}`}>{description}</p>
             </div>

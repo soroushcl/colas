@@ -38,7 +38,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-roca),  var(--font-felix), Arial, Helvetica, sans-serif;
+  font-family: var(--font-felix),  var(--font-felix), Arial, Helvetica, sans-serif;
   min-height: 100vh;
 }
 

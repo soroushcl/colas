@@ -79,7 +79,7 @@ export const renderTitle = (title: string) => {
     const parts = title.split('*');
 
     return (
-        <p className="text-label_primary leading-10 font-normal text-center text-xl md:text-3xl md:leading-10">
+        <p className="text-label_primary leading-10 font-normal text-center text-xl md:text-3xl md:leading-10 font-roca">
             {parts.map((part, index) => (
                 <span
                     key={index}

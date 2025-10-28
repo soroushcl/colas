@@ -66,7 +66,7 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
 
               {/* Card Content */}
               <div className={`flex flex-col flex-grow gap-1 ${!option.cardImage ? "p-4" : "py-4 pl-1"}`}>
-                <h3 className={`font-semibold text-lg ${option.selected ? "text-system_primary" : "text-system_dark_primary"}`}>{option.title}</h3>
+                <h3 className={`font-roca font-semibold text-lg ${option.selected ? "text-system_primary" : "text-system_dark_primary"}`}>{option.title}</h3>
                 {option.subtitle && (
                   <p className={`text-sm mb-2 ${option.selected ? "text-system_primary" : "text-label_primary"}`}>{option.subtitle}</p>
                 )}

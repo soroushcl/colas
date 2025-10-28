@@ -50,7 +50,7 @@ const Home: React.FC = observer(() => {
                 isBig
             // key={index}
             />
-            <p className='text-label_primary text-xl md:text-2xl font-normal pt-16'>& current weight?</p>
+            <p className='font-roca text-label_primary text-xl md:text-2xl font-normal pt-16'>& current weight?</p>
             <p className='text-label_secondary text-sm md:text-base font-normal pt-4 pb-16'>No worries we listen & we don&apos;t judge</p>
             <LargeInput
                 type='number'

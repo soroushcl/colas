@@ -1,8 +1,6 @@
-// import dotenv from 'dotenv';
-if (process.env.NODE_ENV && process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development") {
+if (process.env.NODE_ENV !== "production") {
   await import("dotenv/config");
 }
-// dotenv.config()
 import express from 'express';
 import cors from 'cors';
 import repositoryFactory from './repositoryFactory.js';
@@ -18,7 +16,7 @@ import { StripePaymentRepository } from './payment/repositories/StripePaymentRep
 // } from "./sampleModule";
 
 const corsOptions = {
-  origin: process.env['ALLOWED_ORIGINS'] || 'https://api-v2.colaskitchen.com',
+  origin: process.env['ALLOWED_ORIGINS'] || ['https://api-v2.colaskitchen.com', 'http://localhost:3000'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   exposedHeaders: 'Set-Cookie',
   credentials: true

@@ -21,7 +21,7 @@ export default function Layout({
 
                 <ServiceProvider api={api}>
                     <StoreProvider >
-                        <div className='my-0 mx-auto min-h-screen max-h-screen flex flex-col justify-between relative'>
+                        <div className='my-0 mx-auto min-h-screen flex flex-col justify-between relative bg-gray_background'>
                             <Image
                                 src={`/images/bg-protein.png`}
                                 width={200}
@@ -40,7 +40,7 @@ export default function Layout({
                                 src={`/images/bg-ld.png`}
                                 width={240}
                                 height={240}
-                                className="object-fit hidden md:flex absolute left-0 top-[660px] h-[240px] w-[240px]"
+                                className="object-fit hidden md:flex absolute left-0 bottom-[40px] h-[240px] w-[240px]"
                                 alt={"Cola"}
                             />
                             <Image
@@ -50,7 +50,7 @@ export default function Layout({
                                 className="object-fit hidden md:flex absolute right-[0px] bottom-[40px] h-[360px] w-[180px]"
                                 alt={"Cola"}
                             />
-                            <div className='hidden md:flex absolute w-full h-[100vh] flex justify-center items-center overflow-hidden'>
+                            <div className='hidden md:flex absolute w-full min-h-[100vh] flex justify-center items-center'>
                                 <Image
                                     src={`/images/bg-circle-full.png`}
                                     width={770}
