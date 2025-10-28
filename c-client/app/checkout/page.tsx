@@ -347,7 +347,7 @@ const CheckoutPage: React.FC = observer(() => {
                         <div className='md:bg-[url(/images/bg.png)]'>
                             {/* Expert */}
                             <div className='md:hidden flex flex-col gap-y-4 w-full text-white p-4 bg-[url(/images/bg.png)] outline-4 outline-offset-0 outline-dashed outline-system_primary'>
-                                <h3 className='font-bold '>{'EXPERT AT HEARTH...'}</h3>
+                                <h3 className='font-bold '>{'EXPERT AT HEART...'}</h3>
                                 <p>{'Cola’s Kitchen’s dog food is expertly crafted by Dr. Farshad Goodarzi, a leading animal nutritionist with two PhDs and research experience at Freie Universität Berlin.'}</p>
                                 <div className='flex justify-evenly'>
                                     <div className='bg-system_secondary bg-no-repeat border-black rounded-3xl w-24 h-24'>
@@ -432,7 +432,7 @@ const CheckoutPage: React.FC = observer(() => {
                                     height={780}
                                     className="absolute w-[780px] h-[780px] object-cover"
                                 />
-                                <h3 className='font-normal px-4 md:text-system_light_accent text-xl md:text-4xl'>{'EXPERT AT HEARTH...'}</h3>
+                                <h3 className='font-normal px-4 md:text-system_light_accent text-xl md:text-4xl'>{'EXPERT AT HEART...'}</h3>
                                 <p className='w-[575px] text-xl md:text-white'>{'Cola’s Kitchen’s dog food is expertly crafted by Dr. Farshad Goodarzi, a leading animal nutritionist with two PhDs and experience at Freie Universität Berlin.'}</p>
                                 <div className='flex gap-x-4 justify-center'>
                                     <div className='w-32 h-32'>
