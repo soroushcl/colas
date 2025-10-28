@@ -73,8 +73,8 @@ const Home: React.FC = observer(() => {
                     subtitle={`${!dogStore.subscription.discounts[0] ? "20% DISCOUNT APPLIED" : dogStore.subscription.discounts[0].discount + "% DISCOUNT APPLIED"}`}
                     recipes={dogStore.subscription.selectedRecipes.toString()}
                     plan={dogStore.subscription.type}
-                    meals={dogStore.subscription.recurring}
-                    totalPrice={dogStore.subscription.dailyPrice * dogStore.subscription.recurring}
+                    meals={14}
+                    totalPrice={dogStore.subscription.dailyPrice * 14}
                     discountRate={!dogStore.subscription.discounts[0] ? 20 : dogStore.subscription.discounts[0].discount}
                     isActive={true}
                 />

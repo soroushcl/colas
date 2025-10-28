@@ -12,8 +12,8 @@ interface CardProps {
     onToggle?: () => void;
 }
 
-const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan, meals, totalPrice, isActive, discountRate, onToggle }) => {
 
+const SubscriptionCard: React.FC<CardProps> = ({ title, subtitle, recipes, plan, meals, totalPrice, isActive, discountRate, onToggle }) => {
     const toggleSwitch = () => {
         if (onToggle) {
             onToggle();

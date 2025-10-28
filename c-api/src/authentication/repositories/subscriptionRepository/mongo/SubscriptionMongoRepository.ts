@@ -44,7 +44,7 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     } else {
       // Convert subscription.id to ObjectId if it's a string
       const subscriptionObjectId = typeof subscription.id === 'string' ? new ObjectId(subscription.id) : subscription.id;
-      await this.subscriptionCollection.updateOne({ _id: subscriptionObjectId }, toMongo(subscription))
+      await this.subscriptionCollection.updateOne({ _id: subscriptionObjectId }, { $set: toMongo(subscription) })
       const updatedSubscription = await this.subscriptionCollection.findOne({ _id: subscriptionObjectId })
       return updatedSubscription as unknown as Subscription
     }
