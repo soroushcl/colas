@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useStores } from '@/stores/StoreContext';
 import React from 'react';
 import Image from 'next/image';
+import { gender } from 'c-lib';
 
 interface NutritionFact {
     name: string;
@@ -156,7 +157,105 @@ const Home: React.FC = observer(() => {
                     // }`}
                     alt={"Cola"}
                 />
-                <NutritionFactsTable nutritionFacts={nutritionFacts} />
+                {/* <NutritionFactsTable nutritionFacts={nutritionFacts} /> */}
+                <div className="w-full md:w-[364px] pt-12 pb-8 px-12 bg-gray_foreground rounded-xl border border-gray_divider">
+                    <div className="space-y-4">
+                        {/* {nutritionFacts.map((fact, index) => (
+                    <ProgressBar key={index} name={fact.name} value={fact.value} max={fact.max} unit={fact.unit} />
+                ))} */}
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Highly digestible lean & fresh proteins</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Vegetables that support digestion and gut health</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Fruits packed with antioxidants for immune support</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Healthy fats rich in Omega-3 for coat and joint health</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Balanced calcium and phosphorus for bone support</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>No fillers, preservatives, or anything artificial</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>{`${dogStore.dog.gender == gender.female?'Her':'His'} personal batch made fresh just for ${dogStore.dog.gender == gender.female?'her':'him'}`}</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>{`Calorie and protein levels adjusted to keep ${dogStore.dog.gender == gender.female?'her':'him'} healthy`}</p>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                            <Image
+                                src={`/images/selected.svg`}
+                                width={20}
+                                height={20}
+                                className="object-fit w-[20px] h-[20px] "
+                                alt={"Cola"}
+                            />
+                            <p className='text-xs font-normal text-label_secondary'>Vet-formulated precision in every meal</p>
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </ProcessLayout>
     );
