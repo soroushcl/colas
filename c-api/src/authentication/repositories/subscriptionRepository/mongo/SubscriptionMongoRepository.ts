@@ -38,10 +38,16 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     // Ensure the subscription has a valid id before calling toMongo
     if (!subscription.id) {
       subscription.id = new ObjectId().toString();
+      let inserted = await this.subscriptionCollection.insertOne(toMongo(subscription));
+      const newSubscription = await this.subscriptionCollection.findOne({ _id: inserted.insertedId })
+      return newSubscription as unknown as Subscription
+    } else {
+      // Convert subscription.id to ObjectId if it's a string
+      const subscriptionObjectId = typeof subscription.id === 'string' ? new ObjectId(subscription.id) : subscription.id;
+      await this.subscriptionCollection.updateOne({ _id: subscriptionObjectId }, toMongo(subscription))
+      const updatedSubscription = await this.subscriptionCollection.findOne({ _id: subscriptionObjectId })
+      return updatedSubscription as unknown as Subscription
     }
-    let inserted = await this.subscriptionCollection.insertOne(toMongo(subscription));
-    const newSubscription = await this.subscriptionCollection.findOne({ _id: inserted.insertedId })
-    return newSubscription as unknown as Subscription
   }
 
   async generateSubscription(subscription: Subscription): Promise<Subscription> {

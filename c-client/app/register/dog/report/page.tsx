@@ -8,54 +8,54 @@ import React from 'react';
 import Image from 'next/image';
 import { gender } from 'c-lib';
 
-interface NutritionFact {
-    name: string;
-    value: number; // The actual amount of the nutrient
-    max: number;   // The recommended or maximum amount
-    unit: string;   // The recommended or maximum amount
-}
+// interface NutritionFact {
+//     name: string;
+//     value: number; // The actual amount of the nutrient
+//     max: number;   // The recommended or maximum amount
+//     unit: string;   // The recommended or maximum amount
+// }
 
-interface ProgressBarProps {
-    name: string;
-    value: number;
-    max: number;
-    unit: string;
-}
+// interface ProgressBarProps {
+//     name: string;
+//     value: number;
+//     max: number;
+//     unit: string;
+// }
 
-interface NutritionFactsTableProps {
-    nutritionFacts: NutritionFact[];
-}
+// interface NutritionFactsTableProps {
+//     nutritionFacts: NutritionFact[];
+// }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ name, value, max, unit }) => {
-    const percentage = (value / max) * 100;
+// const ProgressBar: React.FC<ProgressBarProps> = ({ name, value, max, unit }) => {
+//     const percentage = (value / max) * 100;
 
-    return (
-        <div className="flex flex-col gap-1">
-            <div className="flex justify-between">
-                <span className="font-medium">{name}</span>
-                <span className="text-sm">{value} {unit}</span>
-            </div>
-            <div className="w-full bg-gray_placeholder rounded h-2">
-                <div
-                    className="bg-system_secondary h-2 rounded-xl"
-                    style={{ width: `${Math.min(percentage, 100)}%` }}
-                ></div>
-            </div>
-        </div>
-    );
-};
+//     return (
+//         <div className="flex flex-col gap-1">
+//             <div className="flex justify-between">
+//                 <span className="font-medium">{name}</span>
+//                 <span className="text-sm">{value} {unit}</span>
+//             </div>
+//             <div className="w-full bg-gray_placeholder rounded h-2">
+//                 <div
+//                     className="bg-system_secondary h-2 rounded-xl"
+//                     style={{ width: `${Math.min(percentage, 100)}%` }}
+//                 ></div>
+//             </div>
+//         </div>
+//     );
+// };
 
-const NutritionFactsTable: React.FC<NutritionFactsTableProps> = ({ nutritionFacts }) => {
-    return (
-        <div className="w-full py-6 px-4 bg-gray_foreground rounded-xl border border-gray_divider">
-            <div className="space-y-4">
-                {nutritionFacts.map((fact, index) => (
-                    <ProgressBar key={index} name={fact.name} value={fact.value} max={fact.max} unit={fact.unit} />
-                ))}
-            </div>
-        </div>
-    );
-};
+// const NutritionFactsTable: React.FC<NutritionFactsTableProps> = ({ nutritionFacts }) => {
+//     return (
+//         <div className="w-full py-6 px-4 bg-gray_foreground rounded-xl border border-gray_divider">
+//             <div className="space-y-4">
+//                 {nutritionFacts.map((fact, index) => (
+//                     <ProgressBar key={index} name={fact.name} value={fact.value} max={fact.max} unit={fact.unit} />
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// };
 
 const Home: React.FC = observer(() => {
     const { dogStore, userStore } = useStores();
@@ -64,17 +64,17 @@ const Home: React.FC = observer(() => {
     // const [isImageVisible, setIsImageVisible] = useState(false);
     const router = useRouter();
     const recipe = dogStore.recipes[0];
-    const nutritionFacts: NutritionFact[] = recipe ? [
-        { name: 'Protein', value: parseFloat(recipe.crudeProtein.toFixed(2)), max: 50, unit: "g" },
-        { name: 'Fat', value: parseInt(recipe.fat.replace("Min", "").replace("%", "")), max: 70, unit: "%" },
-        { name: 'Carbohydrates', value: 30, max: 300, unit: "%" },
-        { name: 'Calories', value: parseFloat(recipe.calorie.toFixed(0)), max: 2500, unit: "cal" },
-    ] : [
-        { name: 'Protein', value: 0, max: 50, unit: "g" },
-        { name: 'Fat', value: 0, max: 70, unit: "%" },
-        { name: 'Carbohydrates', value: 0, max: 300, unit: "%" },
-        { name: 'Calories', value: 0, max: 2500, unit: "cal" },
-    ];
+    // const nutritionFacts: NutritionFact[] = recipe ? [
+    //     { name: 'Protein', value: parseFloat(recipe.crudeProtein.toFixed(2)), max: 50, unit: "g" },
+    //     { name: 'Fat', value: parseInt(recipe.fat.replace("Min", "").replace("%", "")), max: 70, unit: "%" },
+    //     { name: 'Carbohydrates', value: 30, max: 300, unit: "%" },
+    //     { name: 'Calories', value: parseFloat(recipe.calorie.toFixed(0)), max: 2500, unit: "cal" },
+    // ] : [
+    //     { name: 'Protein', value: 0, max: 50, unit: "g" },
+    //     { name: 'Fat', value: 0, max: 70, unit: "%" },
+    //     { name: 'Carbohydrates', value: 0, max: 300, unit: "%" },
+    //     { name: 'Calories', value: 0, max: 2500, unit: "cal" },
+    // ];
     // console.log("recipes", dogStore.recipes)
     // if (!dogStore.recipes[0]){
     //     return <p>Redirecting to home...</p>;
