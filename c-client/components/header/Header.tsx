@@ -10,6 +10,7 @@ import LargeInput from '../inputs/largeInput/LargeInput';
 import RadioGroup, { Option } from '../radio-button/RadioGroup';
 import RadioChips, { ChipOption } from '../radio-button/RadioChips';
 import { getEnumKeyByValue } from '@/utils/enumHelper';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
     registeredDogs?: { dog: Dog, recipes: Recipe[], subscription: Subscription }[]
@@ -22,10 +23,11 @@ export default function Header({
     const [isPopupOpen, setPopupOpen] = useState(false)
     const [isEditPopupOpen, setEditPopupOpen] = useState(false)
     const [isDogParamPopupOpen, setIsDogParamPopupOpen] = useState(false)
-    const [editDogPopupIndex, ] = useState(0)
+    const [editDogPopupIndex,] = useState(0)
     const [editDogParamPopupIndex, setEditDogParamPopupIndex] = useState(0)
     const handleOpenPopup = () => setPopupOpen(true);
-    
+    const router = useRouter();
+
     const options: Option[] = [
         {
             title: "Yes",
@@ -321,31 +323,62 @@ export default function Header({
         setEditPopupOpen(false)
     }
 
+    const handleBack = () => {
+        router.back();
+    }
+
     return (
         <div className='relative'>
-            <div className='relative py-0 px-40 bg-gray_background flex justify-center h-[48px] md:h-[88px] items-center gap-2.5 md:shadow-header md:backdrop-blur-xl'>
-                <Image
-                    src="/images/logo.png"
-                    width={60}
-                    height={20}
-                    sizes="100vw"
-                    alt="Picture of the author"
-                    className='w-[60px] h-[20px]'
-                />
+            <div className='relative py-0 md:px-4 bg-gray_background flex justify-center h-[48px] md:h-[88px] items-center gap-2.5 md:shadow-header md:backdrop-blur-xl'>
+                <div className='relative mx-auto h-full w-full md:max-w-2xl flex items-center justify-center'>
+
+                    {true && <button onClick={handleBack} className='absolute top-[16px] md:top-[32px] left-[24px] md:left-[24px]'>
+                        <div
+                            className='hidden md:flex px-4 gap-1 h-[24px] rounded-full border border-gray_divider justify-evenly items-center cursor-pointer'
+                            onClick={() => setPopupOpen(true)}
+                        >
+                            <Image
+                                src="/images/back-chevron-desktop.png"
+                                width={6}
+                                height={10}
+                                alt="Chevron Left"
+                                className='w-[6px] h-[10px]'
+                            />
+                            <p className='text-sm text-system_light_primary'>back</p>
+                        </div>
+                        <Image
+                            src="/images/back-chevron.png"
+                            width={32}
+                            height={32}
+                            alt="Chevron Left"
+                            className='flex md:hidden w-[32px] h-[32px]'
+                        />
+                    </button>
+                    }
+                    <Image
+                        src="/images/logo.png"
+                        width={60}
+                        height={20}
+                        sizes="100vw"
+                        alt="Logo"
+                        className='w-[60px] h-[20px]'
+                    />
+                    {registeredDogs && <div
+                        className='absolute top-[12px] md:top-[32px] right-[24px] md:right-[32px] px-4 gap-1 h-[24px] rounded-full bg-system_secondary flex justify-evenly items-center cursor-pointer'
+                        onClick={() => setPopupOpen(true)}
+                    >
+                        <p className='text-sm text-system_accent'>{registeredDogs[0].dog.name.charAt(0).toUpperCase() + registeredDogs[0].dog.name.slice(1)}</p>
+                        <Image
+                            src="/images/chevrons4.png"
+                            width={10}
+                            height={10}
+                            alt="Chevron"
+                            className='object-cover h-[6px] w-[10px]'
+                        />
+                    </div>}
+                </div>
             </div>
-            {registeredDogs && <div
-                className='absolute top-[12px] md:top-[32px] right-[24px] md:right-[32px] px-4 gap-1 h-[24px] rounded-full bg-system_secondary flex justify-evenly items-center cursor-pointer'
-                onClick={() => setPopupOpen(true)}
-            >
-                <p className='text-sm text-system_accent'>{registeredDogs[0].dog.name.charAt(0).toUpperCase() + registeredDogs[0].dog.name.slice(1)}</p>
-                <Image
-                    src="/images/chevrons4.png"
-                    width={10}
-                    height={10}
-                    alt="Picture of the author"
-                    className='object-cover h-[6px] w-[10px]'
-                />
-            </div>}
+
             {registeredDogs && <DogPopup
                 title="Choose Pooch"
                 content={<div className='w-full flex flex-col gap-4'>

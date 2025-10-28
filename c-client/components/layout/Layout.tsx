@@ -50,7 +50,7 @@ export default function Layout({
                                 className="object-fit hidden md:flex absolute right-[0px] bottom-[40px] h-[360px] w-[180px]"
                                 alt={"Cola"}
                             />
-                            <div className='hidden md:flex absolute w-full min-h-[100vh] flex justify-center items-center'>
+                            <div className='hidden md:flex absolute w-full min-h-screen flex justify-center items-center overflow-hidden'>
                                 <Image
                                     src={`/images/bg-circle-full.png`}
                                     width={770}
