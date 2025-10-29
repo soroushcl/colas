@@ -10,7 +10,11 @@ const config: Config = {
     extend: {
       fontFamily: {
         'roca': ['var(--font-roca)', 'Arial', 'Helvetica', 'sans-serif'],
+        'roca_light': ['var(--font-roca-light)', 'Arial', 'Helvetica', 'sans-serif'],
+        'roca_bold': ['var(--font-roca-bold)', 'Arial', 'Helvetica', 'sans-serif'],
         'felix': ['var(--font-felix)', 'Monaco', 'Consolas', 'monospace'],
+        'felix_light': ['var(--font-felix-light)', 'Monaco', 'Consolas', 'monospace'],
+        'felix_bold': ['var(--font-felix-bold)', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
         background: "var(--background)",

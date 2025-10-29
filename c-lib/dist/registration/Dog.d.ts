@@ -68,8 +68,7 @@ export declare enum shape {
 export declare enum protein {
     beef = "Beef",
     chicken = "Chicken",
-    salmon = "Salmon",
-    turkey = "Turkey"
+    salmon = "Salmon"
 }
 export declare enum dogStatus {
     active = "active",

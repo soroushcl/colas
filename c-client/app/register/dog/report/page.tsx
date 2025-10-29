@@ -142,8 +142,8 @@ const Home: React.FC = observer(() => {
                         </div>
                     </div>
                     <div>
-                        <span className='text-system_primary text-lg font-bold'>{`${recipe ? recipe.calorie.toFixed(0) : 0} `}</span>
-                        <span className='text-system_light_primary text-xs'>{`cal / day`}</span>
+                        <span className='font-felix_bold text-system_primary text-lg font-bold'>{`${recipe ? recipe.calorie.toFixed(0) : 0} `}</span>
+                        <span className='font-felix_light text-system_light_primary text-xs'>{`cal / day`}</span>
                     </div>
 
                 </div>

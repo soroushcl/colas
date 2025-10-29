@@ -70,7 +70,7 @@ export enum protein {
     beef = "Beef",
     chicken = "Chicken",
     salmon = "Salmon",
-    turkey = "Turkey",
+    // turkey = "Turkey",
 }
 export enum dogStatus {
     active = "active",

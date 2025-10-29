@@ -50,16 +50,16 @@ const Home: React.FC = observer(() => {
 
             handleSecondarySelect: () => handleSecondary(dogStore.recipes[2])
         },
-        {
-            title: 'Lean Turkey',
-            subtitle: 'For Picky Eaters',
-            secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe_Turkey.png',
-            selectedCardImage: '/images/recipe_Turkey.png',
-            value: 'Turkey',
-            selected: false,
-            handleSecondarySelect: () => handleSecondary(dogStore.recipes[3])
-        },
+        // {
+        //     title: 'Lean Turkey',
+        //     subtitle: 'For Picky Eaters',
+        //     secondarySubtitle: 'Human-Grade Beef &...',
+        //     cardImage: '/images/recipe_Turkey.png',
+        //     selectedCardImage: '/images/recipe_Turkey.png',
+        //     value: 'Turkey',
+        //     selected: false,
+        //     handleSecondarySelect: () => handleSecondary(dogStore.recipes[3])
+        // },
     ];
 
     const [recipes, setRecipes] = useState<Option[]>(baseRecipes);

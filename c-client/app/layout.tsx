@@ -15,14 +15,38 @@ import Layout from "@/components/layout/Layout";
 // });
 
 const Roca = localFont({
-  src: "./fonts/RocaBlack.ttf",
+  src: "./fonts/RocaRegular.ttf",
   variable: "--font-roca",
   weight: "100 900",
 });
 
+const RocaLight = localFont({
+  src: "./fonts/RocaLight.ttf",
+  variable: "--font-roca-light",
+  weight: "100 900",
+});
+
+const RocaBold = localFont({
+  src: "./fonts/RocaBold.ttf",
+  variable: "--font-roca-bold",
+  weight: "100 900",
+});
+
 const Felix = localFont({
-  src: "./fonts/FellixTRIAL-Black.woff",
+  src: "./fonts/FellixTRIAL-Regular.woff",
   variable: "--font-felix",
+  weight: "100 900",
+});
+
+const FelixLight = localFont({
+  src: "./fonts/FellixTRIAL-Medium.woff",
+  variable: "--font-felix-light",
+  weight: "100 900",
+});
+
+const FelixBold = localFont({
+  src: "./fonts/FellixTRIAL-Bold.woff",
+  variable: "--font-felix-bold",
   weight: "100 900",
 });
 
@@ -39,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${Roca.variable} ${Felix.variable} antialiased`}
+        className={`${Roca.variable} ${Felix.variable} ${RocaLight.variable} ${RocaBold.variable} ${FelixLight.variable} ${FelixBold.variable} antialiased`}
       >
           <Layout>
             {children}

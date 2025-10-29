@@ -49,7 +49,7 @@ export var protein;
     protein["beef"] = "Beef";
     protein["chicken"] = "Chicken";
     protein["salmon"] = "Salmon";
-    protein["turkey"] = "Turkey";
+    // turkey = "Turkey",
 })(protein || (protein = {}));
 export var dogStatus;
 (function (dogStatus) {

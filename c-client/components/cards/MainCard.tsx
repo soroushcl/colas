@@ -42,7 +42,7 @@ const MainCard: React.FC<CardProps> = ({ title, subtitle, description, cardImage
             <div className="flex-1 ml-1 md:ml-4">
                 <h3 className="font-roca text-lg font-semibold">{title}</h3>
                 <p className="text-sm">{subtitle}</p>
-                <p className={`text-xs ${selected ? 'text-system_light_accent' : 'text-label_secondary'}`}>{description}</p>
+                <p className={`font-felix_light text-xs ${selected ? 'text-system_light_accent' : 'text-label_secondary'}`}>{description}</p>
             </div>
             <div className="flex flex-col gap-2 w-20 text-xs">
                 <button

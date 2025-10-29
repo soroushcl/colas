@@ -18,7 +18,7 @@ const Home: React.FC = observer(() => {
     const options: Option[] = Object.values(subscriptionType).map(option => {
         const isSelected = dogStore.subscription.type === option
         return {
-            cardImage: `${option}.png`,
+            cardImage: `${option}.svg`,
             title: option,
             subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
             secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
