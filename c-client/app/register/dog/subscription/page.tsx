@@ -24,13 +24,11 @@ const Home: React.FC = observer(() => {
         //     console.error('Failed to create subscription:', error);
         //     // You might want to add error handling here
         // }
-        userStore.registerNextDog(dogStore.dog, dogStore.recipes, dogStore.subscription)
         dogStore.registerNextDog()
         router.push('/checkout');
     };
 
     const handleSecondaryButtonClick = () => {
-        userStore.registerNextDog(dogStore.dog, dogStore.recipes, dogStore.subscription)
         dogStore.registerNextDog()
         router.push('/register/dog/name');
     };
@@ -48,6 +46,8 @@ const Home: React.FC = observer(() => {
         return <p>Redirecting to home...</p>;
     }
 
+    const dog = userStore.registeredDogs[userStore.registeredDogs.length - 1]
+
     return (
         <ProcessLayout
             title={`Awesome Work!`}
@@ -55,9 +55,9 @@ const Home: React.FC = observer(() => {
             handleSubmit={handleSubmit}
             secondaryButtonCLick={handleSecondaryButtonClick}
             secondaryButtonText={"Register Next Dog"}
-            secondary={dogStore.currentDogIndex + 1 < userStore.user.dogCount!}
+            secondary={userStore.registeredDogs.length < userStore.user.dogCount!}
             disabled={false}
-            mainButtonText={dogStore.currentDogIndex + 1 < userStore.user.dogCount! ? `Skip to Checkout` : 'Checkout'}
+            mainButtonText={userStore.registeredDogs.length + 1 < userStore.user.dogCount! ? `Skip to Checkout` : 'Checkout'}
             registeredDogs={userStore.registeredDogs}
         >
             <div className='flex flex-col items-center'>
@@ -69,13 +69,13 @@ const Home: React.FC = observer(() => {
                     alt={"Cola"}
                 />
                 <SubscriptionCard
-                    title={`${dogStore.dog.name.toUpperCase()}'s BOX`}
-                    subtitle={`${!dogStore.subscription.discounts[0] ? "20% DISCOUNT APPLIED" : dogStore.subscription.discounts[0].discount + "% DISCOUNT APPLIED"}`}
-                    recipes={dogStore.subscription.selectedRecipes.toString()}
-                    plan={dogStore.subscription.type}
+                    title={`${dog.dog.name.toUpperCase()}'s BOX`}
+                    subtitle={`${!dog.subscription.discounts[0] ? "20% DISCOUNT APPLIED" : dog.subscription.discounts[0].discount + "% DISCOUNT APPLIED"}`}
+                    recipes={dog.subscription.selectedRecipes.toString()}
+                    plan={dog.subscription.type}
                     meals={14}
-                    totalPrice={dogStore.subscription.dailyPrice * 14}
-                    discountRate={!dogStore.subscription.discounts[0] ? 20 : dogStore.subscription.discounts[0].discount}
+                    totalPrice={dog.subscription.dailyPrice * 14}
+                    discountRate={!dog.subscription.discounts[0] ? 20 : dog.subscription.discounts[0].discount}
                     isActive={true}
                 />
                 <div className='flex flex-col items-center justify-center pt-10'>
@@ -87,7 +87,7 @@ const Home: React.FC = observer(() => {
                             className="object-fit mr-1"
                             alt={"i"}
                         />
-                        <p className='text-lg text-label_primary font-bold'>{dogStore.currentDogIndex + 1}</p>
+                        <p className='text-lg text-label_primary font-bold'>{userStore.registeredDogs.length}</p>
                         <p className='text-lg text-label_secondary font-normal'>/{userStore.user.dogCount}</p>
                     </div>
                     <p className='text-sm text-label_tertiary'>{"Pooch Registered"}</p>

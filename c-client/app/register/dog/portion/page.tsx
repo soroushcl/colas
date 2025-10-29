@@ -41,6 +41,7 @@ const Home: React.FC = observer(() => {
         if (subscriptionData) {
             dogStore.currentStep += 1;
             router.push('/register/dog/subscription');
+            userStore.registerNextDog(dogStore.dog, dogStore.recipes, dogStore.subscription)
         }
         setLoading(false)
     };
@@ -66,7 +67,7 @@ const Home: React.FC = observer(() => {
                         <div className='w-full my-0 mx-auto p-0 grow w-full h-full relative flex flex-col items-center gap'>
                             <div className={`w-full md:max-w-[700px] my-0 mx-auto bg-system_accent md:bg-gray_background md:my-8 py-0 px-0 grow w-full max-h-full relative flex flex-col items-center gap md:rounded-3xl  overflow-hidden`}>
                                 <div className='flex flex-col w-full h-full grow'>
-                                <div className='grow flex flex-col'>
+                                    <div className='grow flex flex-col'>
                                         <div className='w-full h-[42vh] md:h-[38vh] bg-system_dark_primary text-system_accent font-normal text-center flex flex-col items-center justify-center'>
                                             <p className='text-3xl mb-4'>All done!</p>
                                             <p className='text-sm md:text-2xl '>Preparing the perfect fresh meal plan for your pup...</p>

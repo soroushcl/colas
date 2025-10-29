@@ -10,7 +10,7 @@ import LargeInput from '../inputs/largeInput/LargeInput';
 import RadioGroup, { Option } from '../radio-button/RadioGroup';
 import RadioChips, { ChipOption } from '../radio-button/RadioChips';
 import { getEnumKeyByValue } from '@/utils/enumHelper';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface HeaderProps {
     registeredDogs?: { dog: Dog, recipes: Recipe[], subscription: Subscription }[]
@@ -327,12 +327,14 @@ export default function Header({
         router.back();
     }
 
+    const pathname = usePathname();
+
     return (
         <div className='relative'>
             <div className='relative py-0 md:px-4 bg-gray_background flex justify-center h-[48px] md:h-[88px] items-center gap-2.5 md:shadow-header md:backdrop-blur-xl'>
                 <div className='relative mx-auto h-full w-full md:max-w-2xl flex items-center justify-center'>
 
-                    {true && <button onClick={handleBack} className='absolute top-[16px] md:top-[32px] left-[24px] md:left-[24px]'>
+                    {(pathname !== '/register/dog/subscription' && pathname !== '/register/dog/portion') && <button onClick={handleBack} className='absolute top-[16px] md:top-[32px] left-[24px] md:left-[24px]'>
                         <div
                             className='hidden md:flex px-4 gap-1 h-[24px] rounded-full border border-gray_divider justify-evenly items-center cursor-pointer'
                             onClick={() => setPopupOpen(true)}
