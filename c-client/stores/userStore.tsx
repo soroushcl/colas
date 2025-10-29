@@ -190,7 +190,7 @@ export class UserStore {
           return r
         }) || [];
         let recipes: Recipe[] = payload?.recipes.map((r: any) => {
-          r.recipeId == 1 ? r.protein = protein.beef : r.recipeId == 2 ? r.protein = protein.chicken : r.recipeId == 3 ? r.protein = protein.salmon : r.protein = protein.turkey
+          r.recipeId == 1 ? r.protein = protein.beef : r.recipeId == 2 ? r.protein = protein.chicken : r.recipeId == 3 ? r.protein = protein.salmon : r.protein = protein.salmon
           r.id = r._id
           return r
         })
@@ -228,7 +228,7 @@ export class UserStore {
             { protein: protein.beef, count: 0 },
             { protein: protein.chicken, count: 0 },
             { protein: protein.salmon, count: 0 },
-            { protein: protein.turkey, count: 0 }
+            // { protein: protein.turkey, count: 0 }
           ],
           status: OrderStatus.aggregation,
           date: ''

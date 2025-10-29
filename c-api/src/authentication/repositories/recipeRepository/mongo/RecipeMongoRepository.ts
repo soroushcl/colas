@@ -91,7 +91,8 @@ export class RecipeMongoRepository extends RecipeRepository {
     } else if (recipeId == 3) {
       return protein.salmon
     } else {
-      return protein.turkey
+      return protein.salmon
+      // return protein.turkey
     }
   }
 

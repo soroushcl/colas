@@ -46,7 +46,7 @@ const Home: React.FC = observer(() => {
         return <p>Redirecting to home...</p>;
     }
 
-    const dog = userStore.registeredDogs[userStore.registeredDogs.length - 1]
+    const dog = userStore.registeredDogs.length > 0 ? userStore.registeredDogs[userStore.registeredDogs.length - 1] : undefined
 
     return (
         <ProcessLayout
@@ -68,16 +68,18 @@ const Home: React.FC = observer(() => {
                     className="object-fit grow mb-[-28px] mr-[-150px] z-10"
                     alt={"Cola"}
                 />
-                <SubscriptionCard
-                    title={`${dog.dog.name.toUpperCase()}'s BOX`}
-                    subtitle={`${!dog.subscription.discounts[0] ? "20% DISCOUNT APPLIED" : dog.subscription.discounts[0].discount + "% DISCOUNT APPLIED"}`}
-                    recipes={dog.subscription.selectedRecipes.toString()}
-                    plan={dog.subscription.type}
-                    meals={14}
-                    totalPrice={dog.subscription.dailyPrice * 14}
-                    discountRate={!dog.subscription.discounts[0] ? 20 : dog.subscription.discounts[0].discount}
-                    isActive={true}
-                />
+                {dog ? (
+                    <SubscriptionCard
+                        title={`${dog.dog?.name ? dog.dog.name.toUpperCase() : 'DOG'}'s BOX`}
+                        subtitle={`${!dog.subscription?.discounts?.[0] ? "20% DISCOUNT APPLIED" : dog.subscription.discounts[0].discount + "% DISCOUNT APPLIED"}`}
+                        recipes={(dog.subscription?.selectedRecipes || []).toString()}
+                        plan={dog.subscription?.type || ''}
+                        meals={14}
+                        totalPrice={(dog.subscription?.dailyPrice || 0) * 14}
+                        discountRate={!dog.subscription?.discounts?.[0] ? 20 : dog.subscription.discounts[0].discount}
+                        isActive={true}
+                    />
+                ) : null}
                 <div className='flex flex-col items-center justify-center pt-10'>
                     <div className='flex flex-row items-center justify-center'>
                         <Image

@@ -526,8 +526,8 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
       return 2
     } else if (p == protein.salmon) {
       return 1
-    } else if (p == protein.turkey) {
-      return 4
+    // } else if (p == protein.turkey) {
+    //   return 4
     } else {
       return 3
     }
