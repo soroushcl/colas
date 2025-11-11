@@ -19,21 +19,36 @@ export class UserStore {
   }
   upcomingOrders: Order[] = []
   card: number = 0
-  billingAddress:{
+  billingAddress: {
     line1: string,
     line2: string,
     city: string,
     state: string,
     country: string,
     postalCode: string
-  } ={
-    line1: '',
-    line2: '',
-    city: '',
-    state: '',
-    country: 'CA',
-    postalCode: ''
-  }
+  } = {
+      line1: '',
+      line2: '',
+      city: '',
+      state: '',
+      country: 'CA',
+      postalCode: ''
+    }
+  shippingAddress: {
+    line1: string,
+    line2: string,
+    city: string,
+    state: string,
+    country: string,
+    postalCode: string
+  } = {
+      line1: '',
+      line2: '',
+      city: '',
+      state: '',
+      country: 'CA',
+      postalCode: ''
+    }
   user: User = {
     email: "",
     password: '',
@@ -83,11 +98,32 @@ export class UserStore {
         const persistedRegisteredDogs = window.localStorage.getItem('userStore:registeredDogs');
         const persistedUpcomingOrder = window.localStorage.getItem('userStore:upcomingOrder');
         const persistedUpcomingOrders = window.localStorage.getItem('userStore:upcomingOrders');
+        const persistedBillingAddress = window.localStorage.getItem('userStore:billingAddress');
+        const persistedShippingAddress = window.localStorage.getItem('userStore:shippingAddress');
+        const persistedCard = window.localStorage.getItem('userStore:card');
         const persistedCurrentRegisteringDog = window.localStorage.getItem('userStore:currentRegisteringDog');
         if (persistedUser) {
           const parsedUser = JSON.parse(persistedUser);
           if (parsedUser && typeof parsedUser === 'object') {
             this.user = { ...this.user, ...parsedUser };
+          }
+        }
+        if (persistedCard) {
+          const parsedCard = JSON.parse(persistedCard);
+          if (parsedCard && typeof parsedCard === 'number') {
+            this.card = parsedCard;
+          }
+        }
+        if (persistedBillingAddress) {
+          const parsedBillingAddress = JSON.parse(persistedBillingAddress);
+          if (parsedBillingAddress && typeof parsedBillingAddress === 'object') {
+            this.billingAddress = { ...this.billingAddress, ...parsedBillingAddress };
+          }
+        }
+        if (persistedShippingAddress) {
+          const parsedShippingAddress = JSON.parse(persistedShippingAddress);
+          if (parsedShippingAddress && typeof parsedShippingAddress === 'object') {
+            this.shippingAddress = { ...this.shippingAddress, ...parsedShippingAddress };
           }
         }
         if (persistedRemember != null) {
@@ -145,6 +181,7 @@ export class UserStore {
           currentRegisteringDog: this.currentRegisteringDog,
           card: this.card,
           billingAddress: this.billingAddress,
+          shippingAddress: this.shippingAddress,
           upcomingOrders: this.upcomingOrders,
           upcomingOrder: this.upcomingOrder,
         }),
@@ -157,6 +194,7 @@ export class UserStore {
             window.localStorage.setItem('userStore:currentRegisteringDog', String(snapshot.currentRegisteringDog));
             window.localStorage.setItem('userStore:card', JSON.stringify(snapshot.card));
             window.localStorage.setItem('userStore:billingAddress', JSON.stringify(snapshot.billingAddress));
+            window.localStorage.setItem('userStore:shippingAddress', JSON.stringify(snapshot.shippingAddress));
             window.localStorage.setItem('userStore:upcomingOrders', JSON.stringify(snapshot.upcomingOrders));
             window.localStorage.setItem('userStore:upcomingOrder', JSON.stringify(snapshot.upcomingOrder));
           } catch (_) {
@@ -293,13 +331,15 @@ export class UserStore {
         recipeNames = recipeNames.substring(0, recipeNames.length - 1)
         this.upcomingOrder = { dogs: upcomingOrder.dogs, recipes: recipeNames, status: upcomingOrder.status, date: upcomingOrder.date }
         this.upcomingOrders = upcomingOrders
-        this.card = payload.cards[0]? payload.cards[0].card.last4 : 0
+        this.card = payload.cards[0] ? payload.cards[0].card.last4 : 0
         this.billingAddress = payload.billingAddress
+        this.shippingAddress = payload.billingAddress
         console.log("login completed registeredDogs", this.registeredDogs)
         console.log("login completed upcomingOrder", this.upcomingOrder)
         console.log("login completed upcomingOrder", this.upcomingOrder.date)
         console.log("login completed cards", this.card)
         console.log("login completed billingAddress", this.billingAddress)
+        console.log("login completed shippingAddress", this.shippingAddress)
 
         if (typeof window !== "undefined") {
           try {
@@ -310,6 +350,7 @@ export class UserStore {
             window.localStorage.setItem('userStore:upcomingOrders', JSON.stringify(this.upcomingOrders));
             window.localStorage.setItem('userStore:card', JSON.stringify(this.card));
             window.localStorage.setItem('userStore:billingAddress', JSON.stringify(this.billingAddress));
+            window.localStorage.setItem('userStore:shippingAddress', JSON.stringify(this.shippingAddress));
           } catch (_) {
             // ignore
           }
@@ -419,15 +460,15 @@ export class UserStore {
   async setPassword(): Promise<Boolean> {
     console.log('User Store setPassword:', this.user.password, this.forgotData.repassword);
     try {
-      if(!this.user.password){
+      if (!this.user.password) {
         return false
       }
       const res = await this.api.setPasswordRequest(this.user.id, this.user.password, this.forgotData.repassword)
       console.log("User Store res", res)
       if (res) {
-         // Auto-login the user after successful update
-         const loginPassword = this.user.password ? this.user.password : '123';
-         const loginRes = await this.loginUser()
+        // Auto-login the user after successful update
+        const loginPassword = this.user.password ? this.user.password : '123';
+        const loginRes = await this.loginUser()
         this.currentStep += 1
         return true
       } else {

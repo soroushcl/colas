@@ -66,7 +66,7 @@ export default function ProcessLayout({
                     </div>
                     <div className="flex flex-col gap-8 md:gap-6 items-center">
                         {secondary && <SecondaryButton text={secondaryButtonText || "Login With Google"} onClick={secondaryButtonCLick} icon={secondaryIcon} />}
-                        {!isPayment || hasSubmit && <MainButton enabled={!disabled} text={mainButtonText} nextArrow={nextArrow} />}
+                        {(!isPayment || hasSubmit) && <MainButton enabled={!disabled} text={mainButtonText} nextArrow={nextArrow} />}
                     </div>
                 </form>
             </div>
