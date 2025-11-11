@@ -31,7 +31,7 @@ const RecipePopup: React.FC<PopupProps> = ({
         >
             <div
                 // onClick={onOpen}
-                className="bg-gray_foreground rounded-t-lg md:rounded-2xl shadow-lg py-6 pb-0 w-full md:w-[890px] relative overflow-hidden"
+                className="bg-gray_foreground rounded-t-2xl md:rounded-2xl shadow-lg p-6 pb-2 md:pb-6 w-full md:w-[890px] relative overflow-hidden"
             >
                 <div className='flex flex-col justify-between'>
                     <div className='flex flex-row justify-between px-4'>

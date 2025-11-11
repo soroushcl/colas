@@ -1,25 +1,26 @@
+import { Order, protein } from 'c-lib';
 import Image from 'next/image';
 import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface PopupProps {
     title: string;
-    content: ReactNode;
     onSubmit?: () => void;
     onOpen?: () => void;
     onClose?: () => void;
     onBack?: () => void;
+    orders: { dogName: string, status: string, portions: string, selectedRecipes: string[], shippingDate: Date, id: string }[];
     isOpen: boolean;
 }
 
-const DogPopup: React.FC<PopupProps> = ({
+const UpcomingOrderPopup: React.FC<PopupProps> = ({
     title,
-    content,
     onSubmit,
     // onOpen,
     onClose,
     onBack,
     isOpen,
+    orders,
 }) => {
     // useEffect(() => {
     //     if (isOpen) onOpen?.();
@@ -66,7 +67,30 @@ const DogPopup: React.FC<PopupProps> = ({
                         </button>
                     </div>
                     <div className='h-[0.5px] w-full stroke-[0.5px] bg-gray_divider' />
-                    <div className="text-lg mb-0 mt-2">{content}</div>
+                    <div className="text-lg mb-0 mt-2 flex flex-col gap-4">
+                        {orders.map((order) => (
+                            <div key={order.id} className='border-[0.5px] border-gray_divider rounded-2xl p-4 flex flex-col gap-2'>
+                                <div className='flex flex-row justify-between border-b-[0.5px] border-gray_divider pb-2'>
+                                    <div className='text-system_primary font-roca'>{order.dogName}</div>
+                                    <div className='bg-system_light_secondary text-system_secondary px-2 py-1 rounded-2xl text-xs '>{order.status}</div>
+                                </div>
+                                <div className='flex flex-row justify-between border-b-[0.5px] border-gray_divider pb-2'>
+                                    <div className='text-label_secondary text-sm'>{"Portions:"}</div>
+                                    <div className='text-system_light_primary text-base'>{order.portions}</div>
+                                </div>
+                                <div className='flex flex-row justify-between border-b-[0.5px] border-gray_divider pb-2'>
+                                    <div className='text-label_secondary text-sm'>{"Recipes:"}</div>
+                                    <div className='text-system_light_primary text-base'>{order.selectedRecipes.map((r: number | string) => {
+                                        return r == 1 ? ' Beef' : r == 2 ? ' Chicken' : r == 3 ? ' Salmon' : r == 4 ? ' Turkey' : ' ' + r
+                                    }).join(', ')}</div>
+                                </div>
+                                <div className='flex flex-row justify-between'>
+                                    <div className='text-label_secondary text-sm'>{"Delivery date:"}</div>
+                                    <div className='text-system_light_primary text-sm'>{new Date(order.shippingDate!).toDateString()}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                     <div className="w-full flex justify-center items-center">
                         {onSubmit && (
                             <button
@@ -84,4 +108,4 @@ const DogPopup: React.FC<PopupProps> = ({
     );
 };
 
-export default DogPopup;
+export default UpcomingOrderPopup;

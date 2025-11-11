@@ -9,11 +9,14 @@ import UpcomingOrderCard from "../components/cards/UpcomingOrderCard";
 import { useStores } from "@/stores/StoreContext";
 import { observer } from "mobx-react-lite";
 import ProcessLayout from "@/components/layout/ProcessLayout";
+import { subscriptionInfo } from "c-lib";
+import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
 
 function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const { dogStore, userStore } = useStores();
+  const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,6 +31,19 @@ function ProfilePage() {
     return <p>Redirecting to login...</p>;
   }
 
+  const upcomingOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string, id: string }[] = []
+  for (let i = 0; i < userStore.upcomingOrders.length; i++) {
+    let dogName = userStore.registeredDogs.filter(d => userStore.upcomingOrders[i].dog == d.dog.id)[0].dog.name
+    dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
+    const status = userStore.upcomingOrders[i].status
+    const portions = userStore.upcomingOrders[i].detail.type.charAt(0).toUpperCase() + userStore.upcomingOrders[i].detail.type.slice(1) + ' meal'
+    const recipes = userStore.upcomingOrders[i].detail.info.map((r: subscriptionInfo, index: number) => {
+      return index == 0 && r.amount > 0 ? r.amount + ' Beef' : index == 1 && r.amount > 0 ? r.amount + ' Chicken' : index == 2 && r.amount > 0 ? r.amount + ' Salmon' : null
+    })
+    const deliveryDate = new Date(userStore.upcomingOrders[i].shippingDate!).toDateString()
+    upcomingOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes.filter(r => r !== null).join(','), deliveryDate: deliveryDate, id: userStore.upcomingOrders[i].id })
+  }
+
   return (
     <ProcessLayout title={""} handleSubmit={function (): void {
       throw new Error("Function not implemented.");
@@ -35,6 +51,12 @@ function ProfilePage() {
 
 
       <div className="w-full px-6">
+        <UpcomingOrderPopup
+          title="Upcoming orders"
+          orders={upcomingOrders.map(o => ({ dogName: o.dogName, status: o.status, portions: o.portions, selectedRecipes: o.recipes.split(','), shippingDate: new Date(o.deliveryDate), id: o.id }))}
+          isOpen={isUpcomingOrderPopupOpen}
+          onClose={() => setIsUpcomingOrderPopupOpen(false)}
+        />
         {/* Greeting */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-label_primary">
@@ -68,6 +90,7 @@ function ProfilePage() {
             summary={userStore.upcomingOrder.recipes}
             recipients={userStore.upcomingOrder.dogs.toString()}
             status={userStore.upcomingOrder.status}
+            onClick={() => setIsUpcomingOrderPopupOpen(true)}
           />
         </div>
 

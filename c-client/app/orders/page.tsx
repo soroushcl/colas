@@ -6,13 +6,15 @@ import UpcomingOrderCard from "../../components/cards/UpcomingOrderCard";
 import SwitchTabs from "../../components/SwitchTabs";
 import ProcessLayout from "@/components/layout/ProcessLayout";
 import { useStores } from "@/stores/StoreContext";
+import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
+import { protein, subscriptionInfo } from "c-lib";
 
 export default function OrderPage() {
   const { userStore } = useStores();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<"orders" | "history">("orders");
   const router = useRouter();
-
+  const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -82,6 +84,19 @@ export default function OrderPage() {
       oldOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes, deliveryDate: deliveryDate })
     })
   }
+  const upcomingOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string, id: string }[] = []
+  for (let i = 0; i < userStore.upcomingOrders.length; i++) {
+    let dogName = userStore.registeredDogs.filter(d => userStore.upcomingOrders[i].dog == d.dog.id)[0].dog.name
+    dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
+    const status = userStore.upcomingOrders[i].status
+    const portions = userStore.upcomingOrders[i].detail.type.charAt(0).toUpperCase() + userStore.upcomingOrders[i].detail.type.slice(1) + ' meal'
+    const recipes = userStore.upcomingOrders[i].detail.info.map((r: subscriptionInfo, index: number) => {
+      return index == 0 && r.amount > 0 ? r.amount + ' Beef' : index == 1 && r.amount > 0 ? r.amount + ' Chicken' : index == 2 && r.amount > 0 ? r.amount + ' Salmon' : null
+    })
+    const deliveryDate = new Date(userStore.upcomingOrders[i].shippingDate!).toDateString()
+    upcomingOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes.filter(r => r !== null).join(','), deliveryDate: deliveryDate, id: userStore.upcomingOrders[i].id })
+  }
+  console.log("upcomingOrders", upcomingOrders)
 
 
   return (
@@ -89,6 +104,12 @@ export default function OrderPage() {
       throw new Error("Function not implemented.");
     }} disabled={true} isPayment>
       <div className="w-full px-4 py-6 space-y-6">
+        <UpcomingOrderPopup
+          title="Upcoming orders"
+          orders={upcomingOrders.map(o => ({ dogName: o.dogName, status: o.status, portions: o.portions, selectedRecipes: o.recipes.split(','), shippingDate: new Date(o.deliveryDate), id: o.id }))}
+          isOpen={isUpcomingOrderPopupOpen}
+          onClose={() => setIsUpcomingOrderPopupOpen(false)}
+        />
         {/* Segmented Switch */}
         <div className="w-full flex justify-center">
           <SwitchTabs
@@ -111,6 +132,7 @@ export default function OrderPage() {
                 summary={userStore.upcomingOrder.recipes}
                 recipients={userStore.upcomingOrder.dogs.toString()}
                 status={userStore.upcomingOrder.status}
+                onClick={() => setIsUpcomingOrderPopupOpen(true)}
               />
             </div>
 

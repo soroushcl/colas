@@ -17,6 +17,7 @@ export class UserStore {
     status: OrderStatus.active,
     date: ''
   }
+  upcomingOrders: Order[] = []
   card: number = 0
   billingAddress:{
     line1: string,
@@ -80,6 +81,8 @@ export class UserStore {
         const persistedRemember = window.localStorage.getItem('userStore:rememberMe');
         const persistedStep = window.localStorage.getItem('userStore:currentStep');
         const persistedRegisteredDogs = window.localStorage.getItem('userStore:registeredDogs');
+        const persistedUpcomingOrder = window.localStorage.getItem('userStore:upcomingOrder');
+        const persistedUpcomingOrders = window.localStorage.getItem('userStore:upcomingOrders');
         const persistedCurrentRegisteringDog = window.localStorage.getItem('userStore:currentRegisteringDog');
         if (persistedUser) {
           const parsedUser = JSON.parse(persistedUser);
@@ -104,6 +107,26 @@ export class UserStore {
             // ignore hydration errors for registeredDogs
           }
         }
+        if (persistedUpcomingOrder) {
+          try {
+            const parsedUpcomingOrder = JSON.parse(persistedUpcomingOrder);
+            if (parsedUpcomingOrder) {
+              this.upcomingOrder = parsedUpcomingOrder;
+            }
+          } catch (_) {
+            // ignore hydration errors for registeredDogs
+          }
+        }
+        if (persistedUpcomingOrders) {
+          try {
+            const parsedUpcomingOrders = JSON.parse(persistedUpcomingOrders);
+            if (parsedUpcomingOrders) {
+              this.upcomingOrders = parsedUpcomingOrders;
+            }
+          } catch (_) {
+            // ignore hydration errors for upcomingOrders
+          }
+        }
         if (persistedCurrentRegisteringDog != null) {
           const index = parseInt(persistedCurrentRegisteringDog, 10);
           if (!Number.isNaN(index)) this.currentRegisteringDog = index;
@@ -122,6 +145,8 @@ export class UserStore {
           currentRegisteringDog: this.currentRegisteringDog,
           card: this.card,
           billingAddress: this.billingAddress,
+          upcomingOrders: this.upcomingOrders,
+          upcomingOrder: this.upcomingOrder,
         }),
         (snapshot) => {
           try {
@@ -132,6 +157,8 @@ export class UserStore {
             window.localStorage.setItem('userStore:currentRegisteringDog', String(snapshot.currentRegisteringDog));
             window.localStorage.setItem('userStore:card', JSON.stringify(snapshot.card));
             window.localStorage.setItem('userStore:billingAddress', JSON.stringify(snapshot.billingAddress));
+            window.localStorage.setItem('userStore:upcomingOrders', JSON.stringify(snapshot.upcomingOrders));
+            window.localStorage.setItem('userStore:upcomingOrder', JSON.stringify(snapshot.upcomingOrder));
           } catch (_) {
             // ignore persistence errors
           }
@@ -233,9 +260,11 @@ export class UserStore {
           status: OrderStatus.aggregation,
           date: ''
         }
+        let upcomingOrders: Order[] = []
         for (let i = 0; i < orders.length; i++) {
           console.log("upcomingOrder 1", [OrderStatus.aggregation, OrderStatus.packaging, OrderStatus.preparation, OrderStatus.shipped].includes(orders[i].status), orders[i].status)
           if ([OrderStatus.aggregation, OrderStatus.packaging, OrderStatus.preparation, OrderStatus.shipped].includes(orders[i].status)) {
+            upcomingOrders.push(orders[i])
             let dog = dogs.filter((d: any) => d.id == orders[i].dog)[0]
             console.log("upcomingOrder 2", dog.name, orders[i].dog, dogs)
             if (!upcomingOrder.dogs.includes(dog.name)) {
@@ -250,7 +279,7 @@ export class UserStore {
               upcomingOrder.recipes.filter(t => t.protein == prot)[0].count += amount
             }
             upcomingOrder.status = orders[i].status
-            upcomingOrder.date = new Date(orders[i].shippingDate || '').toDateString()
+            upcomingOrder.date = new Date(orders[i].shippingDate || '').toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' })
           }
         }
         let recipeNames = ''
@@ -263,6 +292,7 @@ export class UserStore {
         }
         recipeNames = recipeNames.substring(0, recipeNames.length - 1)
         this.upcomingOrder = { dogs: upcomingOrder.dogs, recipes: recipeNames, status: upcomingOrder.status, date: upcomingOrder.date }
+        this.upcomingOrders = upcomingOrders
         this.card = payload.cards[0]? payload.cards[0].card.last4 : 0
         this.billingAddress = payload.billingAddress
         console.log("login completed registeredDogs", this.registeredDogs)
@@ -277,6 +307,7 @@ export class UserStore {
             window.localStorage.setItem('userStore:user', JSON.stringify(this.user));
             window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(this.registeredDogs));
             window.localStorage.setItem('userStore:upcomingOrder', JSON.stringify(this.upcomingOrder));
+            window.localStorage.setItem('userStore:upcomingOrders', JSON.stringify(this.upcomingOrders));
             window.localStorage.setItem('userStore:card', JSON.stringify(this.card));
             window.localStorage.setItem('userStore:billingAddress', JSON.stringify(this.billingAddress));
           } catch (_) {
