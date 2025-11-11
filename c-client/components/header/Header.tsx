@@ -238,15 +238,15 @@ export default function Header({
             value: 'beef',
             selected: false
         },
-        {
-            title: 'Tasty Turkey',
-            subtitle: 'For Picky Eaters',
-            secondarySubtitle: 'Human-Grade Beef &...',
-            cardImage: '/images/recipe.png',
-            selectedCardImage: '/images/selected_recipe.png',
-            value: 'turkey',
-            selected: false
-        },
+        // {
+        //     title: 'Tasty Turkey',
+        //     subtitle: 'For Picky Eaters',
+        //     secondarySubtitle: 'Human-Grade Beef &...',
+        //     cardImage: '/images/recipe.png',
+        //     selectedCardImage: '/images/selected_recipe.png',
+        //     value: 'turkey',
+        //     selected: false
+        // },
     ];
 
     const [recipes, setRecipes] = useState<Option[]>(baseRecipes);

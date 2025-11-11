@@ -19,6 +19,7 @@ interface ProcessLayoutProps {
     nextArrow?: boolean;
     secondaryIcon?: boolean;
     isPayment?: boolean;
+    hasSubmit?: boolean;
     registeredDogs?: { dog: Dog, recipes: Recipe[], subscription: Subscription }[]
 }
 
@@ -34,6 +35,7 @@ export default function ProcessLayout({
     secondaryButtonCLick,
     secondaryButtonText,
     mainButtonText = "Next",
+    hasSubmit,
     secondaryIcon,
     isPayment,
     registeredDogs,
@@ -64,7 +66,7 @@ export default function ProcessLayout({
                     </div>
                     <div className="flex flex-col gap-8 md:gap-6 items-center">
                         {secondary && <SecondaryButton text={secondaryButtonText || "Login With Google"} onClick={secondaryButtonCLick} icon={secondaryIcon} />}
-                        {!isPayment && <MainButton enabled={!disabled} text={mainButtonText} nextArrow={nextArrow} />}
+                        {!isPayment || hasSubmit && <MainButton enabled={!disabled} text={mainButtonText} nextArrow={nextArrow} />}
                     </div>
                 </form>
             </div>

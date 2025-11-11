@@ -40,6 +40,7 @@ const config: Config = {
         gray_placeholder: "var(--gray-placeholder)",
         gray_icon: "var(--gray-icon)",
         semantic_red: "var(--semantic-red)",
+        semantic_blue: "var(--semantic-blue)",
         cream: {
           50: '#fefcf9',
           100: '#fdf8f0',

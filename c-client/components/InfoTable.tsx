@@ -26,7 +26,7 @@ export default function InfoTable({ title, rows }: InfoTableProps) {
         {rows.map((row, index) => {
           const type: RowType = row.type ?? "value";
           return (
-            <div key={`${row.label}-${index}`} className="flex flex-col cursor-pointer">
+            <div key={`${row.label}-${index}`} className="flex flex-col">
               <div
 
                 className="flex items-center justify-between"
@@ -54,7 +54,7 @@ export default function InfoTable({ title, rows }: InfoTableProps) {
                 )}
 
                 {type === "value" && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 cursor-pointer">
                     {row.value !== undefined && row.value !== null && row.value !== "" && (
                       <span className="text-system_light_primary font-felix_bold text-sm">{row.value}</span>
                     )}
