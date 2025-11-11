@@ -8,6 +8,8 @@ import ProcessLayout from "@/components/layout/ProcessLayout";
 import { useStores } from "@/stores/StoreContext";
 import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
 import { protein, subscriptionInfo } from "c-lib";
+import DogPopup from "@/components/popups/DogPopup";
+import CustomNumberComponent from "@/components/CustomNumberComponent";
 
 export default function OrderPage() {
   const { userStore } = useStores();
@@ -15,6 +17,8 @@ export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<"orders" | "history">("orders");
   const router = useRouter();
   const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
+  const [isDeliveryDatePopupOpen, setIsDeliveryDatePopupOpen] = useState(false);
+  const [deliveryFrequency, setDeliveryFrequency] = useState(8);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -57,7 +61,7 @@ export default function OrderPage() {
         }
       })
       const recipes = recipeNames.toString().substring(0, recipeNames.toString().length)
-      const deliveryDate = new Date(r.shippingDate!).toDateString()
+      const deliveryDate = new Date(r.shippingDate!).toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' })
       futureOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes, deliveryDate: deliveryDate })
     })
   }
@@ -110,6 +114,34 @@ export default function OrderPage() {
           isOpen={isUpcomingOrderPopupOpen}
           onClose={() => setIsUpcomingOrderPopupOpen(false)}
         />
+        <DogPopup
+          title="Delivery date"
+          content={
+            <div className='w-full flex flex-col gap-4'>
+              {
+                <div className='flex flex-col gap-4 text-center pb-8 justify-center items-center'>
+                  <div className="w-[216px] h-[112px] rounded-3xl bg-system_accent shadow-xs border-[0.5px] border-gray_divider p-4 flex flex-col justify-center">
+                    <span className="text-xs text-label_tertiary">$46.32/WEEK</span>
+                    <div>
+                      <span className="text-lg font-felix_bold text-system_primary">$44.32</span>
+                      <span className="text-sm text-system_primary">/WEEK</span>
+                    </div>
+                    <p className="text-system_dark_primary text-sm">{'Longer range, Lower price'}</p>
+                  </div>
+                  <div>
+                    <p className="text-label_tertiary text-xs">{'Delivery every.....weeks'}</p>
+                    <CustomNumberComponent value={deliveryFrequency} setValue={setDeliveryFrequency} minValue={1} maxValue={12} />
+                  </div>
+                  <p className='text-label_secondary text-sm'>{'Adjusting delivery frequency will change how much food you receive!'}</p>
+                </div>
+              }
+
+            </div>
+          }
+          onClose={() => setIsDeliveryDatePopupOpen(false)}
+          onSubmit={() => setIsDeliveryDatePopupOpen(false)}
+          isOpen={isDeliveryDatePopupOpen}
+        />
         {/* Segmented Switch */}
         <div className="w-full flex justify-center">
           <SwitchTabs
@@ -154,7 +186,7 @@ export default function OrderPage() {
                       },
                       { label: "Portions:", value: o.portions, type: "text" },
                       { label: "Recipes", value: o.recipes, type: "text" },
-                      { label: "Delivery date:", value: o.deliveryDate, type: "value" }
+                      { label: "Delivery date:", value: o.deliveryDate, type: "value", onClick: () => setIsDeliveryDatePopupOpen(true) }
                     ]}
                   />
                 </div>

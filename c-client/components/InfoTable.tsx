@@ -56,7 +56,7 @@ export default function InfoTable({ title, rows }: InfoTableProps) {
                 {type === "value" && (
                   <div className="flex items-center gap-2">
                     {row.value !== undefined && row.value !== null && row.value !== "" && (
-                      <span className="text-system_light_primary font-medium">{row.value}</span>
+                      <span className="text-system_light_primary font-felix_bold text-sm">{row.value}</span>
                     )}
                     <Image src="/images/icons4.png" alt="Table Dog" width={24} height={24} className='object-contain w-[24px] h-[24px]' />
                   </div>

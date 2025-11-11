@@ -11,12 +11,14 @@ import { observer } from "mobx-react-lite";
 import ProcessLayout from "@/components/layout/ProcessLayout";
 import { subscriptionInfo } from "c-lib";
 import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
+import DogPopup from "@/components/popups/DogPopup";
 
 function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const { dogStore, userStore } = useStores();
   const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
+  const [isSubscriptionPopupOpen, setIsSubscriptionDatePopupOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -56,6 +58,21 @@ function ProfilePage() {
           orders={upcomingOrders.map(o => ({ dogName: o.dogName, status: o.status, portions: o.portions, selectedRecipes: o.recipes.split(','), shippingDate: new Date(o.deliveryDate), id: o.id }))}
           isOpen={isUpcomingOrderPopupOpen}
           onClose={() => setIsUpcomingOrderPopupOpen(false)}
+        />
+        <DogPopup
+          title="Choose Subscription"
+          content={
+            <div className='w-full flex flex-col gap-4'>
+              <p className="text-sm text-label_primary">Select your pooch to view subscription options</p>
+              {userStore.registeredDogs.map(r => {
+                return(
+                  <DogCard key={r.dog.id} variant="profile" subtitle="next order" name={r.dog.name} href={`/dog/${r.dog.id}`} />
+                )
+              })}
+            </div>
+          }
+          onClose={() => setIsSubscriptionDatePopupOpen(false)}
+          isOpen={isSubscriptionPopupOpen}
         />
         {/* Greeting */}
         <div className="mb-6">
@@ -108,6 +125,7 @@ function ProfilePage() {
               label: "Subscription plan",
               type: "value",
               labelIcon: "/images/icons1.png",
+              onClick: () => setIsSubscriptionDatePopupOpen(true),
             },
             {
               label: "Purchase history",
