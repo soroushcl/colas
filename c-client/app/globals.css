@@ -27,6 +27,7 @@
   --gray-icon: #888C85;
   --semantic-red: #F23030;
   --semantic-blue: #1A8CFF;
+  --system-disable-primary: #55715C;
 }
 
 /* @media (prefers-color-scheme: dark) {

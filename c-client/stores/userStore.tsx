@@ -248,6 +248,8 @@ export class UserStore {
         }) || [];
         let subscriptions: Subscription[] = payload?.subscriptions.map((r: any) => {
           r.id = r._id
+          r.info = dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.info
+          r.recurring = dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.recurring
           return r
         }) || [];
         let orders: Order[] = payload?.orders.map((r: any) => {

@@ -41,6 +41,7 @@ const config: Config = {
         gray_icon: "var(--gray-icon)",
         semantic_red: "var(--semantic-red)",
         semantic_blue: "var(--semantic-blue)",
+        system_disable_primary: "var(--system-disable-primary)",
         cream: {
           50: '#fefcf9',
           100: '#fdf8f0',

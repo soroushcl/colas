@@ -9,12 +9,13 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 import RadioGroup, { Option } from "@/components/radio-button/RadioGroup";
-import { activityLevel, allergy, gender, healthIssue, protein, subscriptionType } from "c-lib";
+import { activityLevel, allergy, gender, healthIssue, subscriptionType } from "c-lib";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 import FetchApi from "@/services/api";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
 import RadioChips, { ChipOption } from "@/components/radio-button/RadioChips";
 import { getEnumKeyByValue } from "@/utils/enumHelper";
+import RecipeCards from "@/components/radio-button/RecipeCards";
 
 interface DogProfilePageClientProps {
   dogId: string;
@@ -108,17 +109,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
     //     selected: false
     // },
   ];
-  const [recipess, setRecipess] = useState<Option[]>(baseRecipes);
-  const handleRecipeSelect = (updatedOptions: Option[]) => {
-    const selectedRecipes = updatedOptions
-      .filter(option => option.selected)
-      .map(option => option.value)
-      .filter((v): v is string => !!v) as unknown as protein[];
 
-    setRecipess(updatedOptions);
-    dogStore.subscription.selectedRecipes = selectedRecipes as unknown as protein[];
-    console.log("selectedRecipes", dogStore.subscription.selectedRecipes)
-  };
 
   const [breeds, setBreeds] = useState<string[]>([]);
 
@@ -331,11 +322,19 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
         <DogPopup
           title="Recipes"
           content={
-            <RadioGroup type='card' options={recipess} multiSelect onSelect={handleRecipeSelect} />
+            <RecipeCards
+              options={baseRecipes.map(({ cardImage, ...rest }, index) => ({
+                ...rest,
+                cardImage: cardImage ?? '',
+                value: registeredDog.subscription.info[index].amount,
+              }))}
+              total={registeredDog.subscription.recurring}
+            />
           }
           onClose={() => setIsRecipePopupOpen(false)}
           onSubmit={() => setIsRecipePopupOpen(false)}
           isOpen={isRecipePopupOpen}
+          disabled={false}
         />
         <DogPopup
           title="Allergy"
@@ -571,7 +570,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
                   'WEEK OF OCTOBER 28, 2024',
                 ]}
                 onSelect={function (value: string): void {
-                  throw new Error("Function not implemented.");
+                  throw new Error("Function not implemented." + value);
                 }}
                 placeholder="CHOOSE YOUR NEXT DELIVERY"
               ></SearchableSelect>

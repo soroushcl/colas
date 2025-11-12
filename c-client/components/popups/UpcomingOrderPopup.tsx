@@ -1,6 +1,5 @@
-import { Order, protein } from 'c-lib';
 import Image from 'next/image';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 
 export interface PopupProps {

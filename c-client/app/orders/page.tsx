@@ -7,7 +7,7 @@ import SwitchTabs from "../../components/SwitchTabs";
 import ProcessLayout from "@/components/layout/ProcessLayout";
 import { useStores } from "@/stores/StoreContext";
 import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
-import { protein, subscriptionInfo } from "c-lib";
+import { subscriptionInfo } from "c-lib";
 import DogPopup from "@/components/popups/DogPopup";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 
