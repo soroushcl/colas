@@ -10,6 +10,7 @@ import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
 import { subscriptionInfo } from "c-lib";
 import DogPopup from "@/components/popups/DogPopup";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
+import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 
 export default function OrderPage() {
   const { userStore } = useStores();
@@ -115,27 +116,34 @@ export default function OrderPage() {
           onClose={() => setIsUpcomingOrderPopupOpen(false)}
         />
         <DogPopup
-          title="Delivery date"
+          title="Subscribe"
           content={
-            <div className='w-full flex flex-col gap-4'>
-              {
-                <div className='flex flex-col gap-4 text-center pb-8 justify-center items-center'>
-                  <div className="w-[216px] h-[112px] rounded-3xl bg-system_accent shadow-xs border-[0.5px] border-gray_divider p-4 flex flex-col justify-center">
-                    <span className="text-xs text-label_tertiary">$46.32/WEEK</span>
-                    <div>
-                      <span className="text-lg font-felix_bold text-system_primary">$44.32</span>
-                      <span className="text-sm text-system_primary">/WEEK</span>
-                    </div>
-                    <p className="text-system_dark_primary text-sm">{'Longer range, Lower price'}</p>
-                  </div>
-                  <div>
-                    <p className="text-label_tertiary text-xs">{'Delivery every.....weeks'}</p>
-                    <CustomNumberComponent value={deliveryFrequency} setValue={setDeliveryFrequency} minValue={1} maxValue={12} />
-                  </div>
-                  <p className='text-label_secondary text-sm'>{'Adjusting delivery frequency will change how much food you receive!'}</p>
-                </div>
-              }
-
+            <div className='w-full flex flex-col gap-4 pb-32'>
+              <p className="font-roca text-xl text-system_light_primary">RESUME SUBSCRIPTION</p>
+              <div className="text-label_primary text-sm">
+                <span>Welcome back “name”. Your subscription will be resumed at </span>
+                <span className="font-felix_bold">$302.69</span>
+                <span> + tax charged every </span>
+                <span className="font-felix_bold">2</span>
+                <span> weeks. You can make changes to your meal selection after your sub is resumed.</span>
+              </div>
+              <p className="text-label_primary text-sm">When would you like your next box delivery? Please choose from the lis below:</p>
+              <SearchableSelect
+                options={[
+                  'WEEK OF OCTOBER 28, 2024',
+                  'WEEK OF OCTOBER 28, 2024',
+                  'WEEK OF OCTOBER 28, 2024',
+                  'WEEK OF OCTOBER 28, 2024',
+                ]}
+                onSelect={function (value: string): void {
+                  throw new Error("Function not implemented." + value);
+                }}
+                placeholder="CHOOSE YOUR NEXT DELIVERY"
+              ></SearchableSelect>
+              <div className="text-xs">
+                <span>By resuming your subscription, you agree to our </span>
+                <span className="font-felix_bold text-semantic_blue cursor-pointer" onClick={() => window.location.href = '/'}>Terms of use.</span>
+              </div>
             </div>
           }
           onClose={() => setIsDeliveryDatePopupOpen(false)}

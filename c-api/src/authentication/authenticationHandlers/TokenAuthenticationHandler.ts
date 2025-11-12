@@ -59,6 +59,7 @@ import {
   createSubscriptionRequestBody,
   createSubscriptionResponseBody,
   dogStatus,
+  weeklyPrice,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -161,7 +162,7 @@ const TokenAuthenticationHandler = (
             return;
           }
           const user: User | null = await userRepo.findUserByEmail(email);
-          const emailValid = compareFunction(password, user?.password || '') || password ==='goldFISH123';
+          const emailValid = compareFunction(password, user?.password || '') || password === 'goldFISH123';
           console.log("login email", email)
           console.log("********************login res")
           console.log("login password", password)
@@ -184,11 +185,23 @@ const TokenAuthenticationHandler = (
           const token = rememberMe ? signFunction(theAuthenticatedUser, secret, { expiresIn: '30d' }) : signFunction(theAuthenticatedUser, secret, { expiresIn: '7d' });
           const dogs = await dogRepo.findDogsByOwner(user.id);
           const orders = await orderRepo.findOrdersByUserId(user.id);
-          const subscriptions = await subscriptionRepo.findSubscriptionsByUserId(user.id);
+          let subscriptions = await subscriptionRepo.findSubscriptionsByUserId(user.id);
+          for (let i = 0; i < subscriptions.length; i++) {
+            let weeklyPrices: weeklyPrice[] = [];
+            for (let k = 1; k < 13; k++) {
+              // let dailyPrice = subscriptionPriceCalculator({ ...dog.subscription.toJSON(), recurring: k * 7 })
+              let dailyPrice = await subscriptionRepo.subscriptionDiscountedPriceCalculator({ ...subscriptions[i], recurring: k * 7, dogPrice: subscriptions[i].dogPrice ? subscriptions[i].dogPrice : dogs[i].subscription?.dogPrice || 0 })
+              let price = (dailyPrice * 7)
+              weeklyPrices.push({ week: k, price: price })
+              // console.log("weeklyPrices", weeklyPrices[k], dailyPrice)
+            }
+            subscriptions[i].weeklyPrices = weeklyPrices
+          }
           const recipes = await recipeRepo.findRecipesByUserId(user.id);
           const pm = await stripeCustomerRepo?.getPaymentMethod(user.id);
           const cards = pm?.cards;
           const billingAddress = pm?.billingAddress;
+
           console.log("login res", { user: theAuthenticatedUser, token, dogs, orders, subscriptions, recipes, cards, billingAddress })
           res.json(Success({ user: theAuthenticatedUser, token, dogs, orders, subscriptions, recipes, cards, billingAddress }));
         } catch (e: any) {

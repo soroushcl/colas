@@ -16,4 +16,9 @@ export class PromoCodeMongoRepository extends PromoCodeRepository {
     if (!mongoPromoCode) return null;
     return fromMongo<PromoCode>(mongoPromoCode as any);
   }
+  async findPromoCodeById(code: string): Promise<PromoCode | null> {
+    const mongoPromoCode = await this.promoCodeCollection.findOne({ id: code });
+    if (!mongoPromoCode) return null;
+    return fromMongo<PromoCode>(mongoPromoCode as any);
+  }
 }

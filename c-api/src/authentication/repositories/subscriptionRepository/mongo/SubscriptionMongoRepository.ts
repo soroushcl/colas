@@ -6,6 +6,12 @@ import { BreedRepository } from 'src/breeds/repositories';
 import axios from 'axios';
 import { RecipeRepository } from '@auth/repositories/recipeRepository';
 import { DogRepository } from '@auth/repositories/dogRepository';
+import { PromoCodeRepository } from 'src/payment/repositories';
+import Stripe from 'stripe';
+
+let stripeSecretKey = process.env['STRIPE_SECRET_KEY']
+const stripe = new Stripe(stripeSecretKey || '', { apiVersion: '2024-06-20' });
+
 
 export class SubscriptionMongoRepository extends SubscriptionRepository {
   private subscriptionCollection: Collection;
@@ -17,8 +23,9 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
   private breedRepo: BreedRepository;
   private recipeRepo: RecipeRepository;
   private dogRepo: DogRepository;
+  private promoCodeRepo: PromoCodeRepository;
 
-  constructor(db: Db, subscriptionCollectionName: string, priceVersionCollectionName: string, calorieRangeCollectionName: string, calorieRangePriceCollectionName: string, growthPatternCollectionName: string, priceModelCollectionName: string, breedRepo: BreedRepository, recipeRepo: RecipeRepository, dogRepo: DogRepository) {
+  constructor(db: Db, subscriptionCollectionName: string, priceVersionCollectionName: string, calorieRangeCollectionName: string, calorieRangePriceCollectionName: string, growthPatternCollectionName: string, priceModelCollectionName: string, breedRepo: BreedRepository, recipeRepo: RecipeRepository, dogRepo: DogRepository, promoCodeRepo: PromoCodeRepository) {
     super();
     this.subscriptionCollection = db.collection(subscriptionCollectionName);
     this.priceVersionCollection = db.collection(priceVersionCollectionName);
@@ -29,6 +36,7 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     this.breedRepo = breedRepo;
     this.recipeRepo = recipeRepo;
     this.dogRepo = dogRepo;
+    this.promoCodeRepo = promoCodeRepo;
   }
 
   shippingPrice = 20;
@@ -90,6 +98,35 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     let dailyPrice = (subscription.dogPrice * coef + this.shippingPrice / subscription.recurring)
     console.log("subscriptionPriceCalculator dailyPrice: ", dailyPrice, coef, subscription)
     return dailyPrice
+  }
+  async subscriptionDiscountedPriceCalculator(subscription: Subscription): Promise<number> {
+    let dailyPrice = this.subscriptionPriceCalculator(subscription);
+    let discounted = dailyPrice
+    for (const discount of subscription.discounts) {
+      let promo = await this.promoCodeRepo.findPromoCodeById(discount.id)
+      if (promo) {
+        let stripePromotion = await stripe.promotionCodes.retrieve(promo.stripePromoCodeId);
+        if (stripePromotion.active) {
+          let tempDiscount = promo.percentOff
+          let tempPercentOff = promo.percentOff
+          let tempAmountOff = promo.amountOff
+          // console.log("subscriptionDiscountedPriceCalculator promo: ", promo.toJSON())
+          // console.log(" percentOff: ", tempDiscount, tempPercentOff, tempAmountOff)
+          if (tempPercentOff) {
+            discounted = discounted * (100 - tempPercentOff) / 100
+          } else if (tempDiscount) {
+            discounted = discounted * (100 - tempDiscount) / 100
+          } else if (tempAmountOff) {
+            discounted = discounted - (tempAmountOff / subscription.recurring)
+          } else {
+            console.log("Error!")
+          }
+        }
+      }
+      // console.log("subscriptionDiscountedPriceCalculator discount: ", discount, discounted)
+    }
+    // console.log("subscriptionDiscountedPriceCalculator discounted dailyPrice: ", discounted)
+    return discounted
   }
 
   amountCalculator(recipes: Recipe[], selectedRecipes: protein[], recurring: number): { recipeId: Recipe["id"], amount: number }[] {
@@ -526,8 +563,8 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
       return 2
     } else if (p == protein.salmon) {
       return 1
-    // } else if (p == protein.turkey) {
-    //   return 4
+      // } else if (p == protein.turkey) {
+      //   return 4
     } else {
       return 3
     }

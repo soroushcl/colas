@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV === "local") {
+// Load environment variables from .env file in non-production environments
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development") {
   await import("dotenv/config");
 }
 import { Db, MongoClient } from "mongodb";
@@ -54,6 +55,7 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       breedRepo,
       recipeRepo,
       dogRepo,
+      promoCodeRepo,
     );
 
     return {
@@ -93,6 +95,7 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       breedRepo,
       recipeRepo,
       dogRepo,
+      promoCodeRepo,
     );
 
     return {

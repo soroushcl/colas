@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV === "local") {
+// Load environment variables from .env file in non-production environments
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development") {
   await import("dotenv/config");
 }
 import express from 'express';
@@ -45,7 +46,8 @@ repositoryFactory().then(repositories => {
   // Payments API
   const stripeSecret = process.env['STRIPE_SECRET_KEY'] || '';
   if (!stripeSecret) {
-    console.warn('STRIPE_SECRET not set; /stripe endpoints disabled');
+    console.warn('STRIPE_SECRET_KEY not set; /stripe endpoints disabled');
+    console.warn(`NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
   } else {
     const paymentRepo = new StripePaymentRepository(stripeSecret);
     app.use('/stripe', paymentRouterFactory(paymentRepo, repositories.promoCodeRepo, stripeSecret));

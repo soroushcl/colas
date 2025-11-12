@@ -19,6 +19,7 @@ export interface Subscription {
     dailyPrice: number;
     priceVersion: PriceVersion['id'];
     isActive: boolean;
+    weeklyPrices?: weeklyPrice[];
 }
 export interface Address {
     line1: string;
@@ -71,6 +72,10 @@ export declare enum subscriptionType {
 export interface subscriptionInfo {
     recipeId: Recipe['id'];
     amount: number;
+}
+export interface weeklyPrice {
+    week: number;
+    price: number;
 }
 export interface Coupon {
     id: string;

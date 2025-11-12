@@ -1,4 +1,5 @@
 import { Recipe } from "./Recipe";
+import { Subscription } from "./Subscription";
 export interface Dog {
     id: string;
     owner: string;
@@ -24,6 +25,7 @@ export interface Dog {
     note?: string;
     status?: dogStatus;
     recipes: Recipe['id'][];
+    subscription?: Subscription;
 }
 export declare enum gender {
     male = "Male",

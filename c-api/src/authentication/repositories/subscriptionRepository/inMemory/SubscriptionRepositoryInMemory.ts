@@ -28,4 +28,9 @@ export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
     });
   }
 
+  async subscriptionDiscountedPriceCalculator(subscription: Subscription): Promise<number> {
+    // In-memory implementation: return the dailyPrice if available, otherwise return 0
+    return subscription.dailyPrice || 0;
+  }
+
 }

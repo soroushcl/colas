@@ -1,4 +1,5 @@
 import { Recipe } from "./Recipe";
+import { Subscription } from "./Subscription";
 
 export interface Dog {
     id: string;
@@ -24,7 +25,8 @@ export interface Dog {
     calorie?: number;
     note?: string;
     status?: dogStatus;
-    recipes: Recipe['id'][]
+    recipes: Recipe['id'][];
+    subscription?: Subscription;
 }
 export enum gender {
     male = "Male",
