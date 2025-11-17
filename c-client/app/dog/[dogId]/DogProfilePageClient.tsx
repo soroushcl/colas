@@ -296,7 +296,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     console.log("portionOptions", registeredDog.subscription.type, option)
     const isSelected = registeredDog.subscription.type.toLocaleLowerCase() === option.toLowerCase()
     return {
-      cardImage: `${option}.png`,
+      cardImage: `${option}.svg`,
       title: option + ` (${registeredDog.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
