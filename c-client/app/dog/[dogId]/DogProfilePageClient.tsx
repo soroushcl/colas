@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 // import Link from "next/link";
 import InfoTable from "../../../components/InfoTable";
 import ProcessLayout from "@/components/layout/ProcessLayout";
@@ -9,19 +9,20 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 import RadioGroup, { Option } from "@/components/radio-button/RadioGroup";
-import { activityLevel, allergy, gender, healthIssue, subscriptionType } from "c-lib";
+import { activityLevel, allergy, gender, healthIssue, subscriptionInfo, subscriptionType } from "c-lib";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 import FetchApi from "@/services/api";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
 import RadioChips, { ChipOption } from "@/components/radio-button/RadioChips";
 import { getEnumKeyByValue } from "@/utils/enumHelper";
 import RecipeCards from "@/components/radio-button/RecipeCards";
+import { observer } from "mobx-react-lite";
 
 interface DogProfilePageClientProps {
   dogId: string;
 }
 
-export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
+export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientProps) => {
   const { userStore, dogStore } = useStores();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isResumeSubscriptionPopupOpen, setIsResumeSubscriptionPopupOpen] = useState(false);
@@ -37,7 +38,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
   const [isHealthPopupOpen, setIsHealthPopupOpen] = useState(false);
   const router = useRouter();
   const registeredDog = userStore.registeredDogs.filter((r: { dog: { id: string; }; }) => r.dog.id == dogId)[0]
-  const recipes = registeredDog.activeOrders[0].detail.selectedRecipes.map((r: number | string) => {
+  const recipes = registeredDog.dog?.subscription?.selectedRecipes.map((r: number | string) => {
     // Handle both old format (numbers) and new format (protein enum strings)
     if (typeof r === 'number') {
       // Old format: numbers
@@ -47,7 +48,12 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
       return ' ' + r
     }
   })
-  const recipe = recipes.toString().substring(0, recipes.toString().length)
+  const [chickenAmount,] = useState(registeredDog.subscription.info[0]?.amount || 0)
+  const [salmonAmount,] = useState(registeredDog.subscription.info[1]?.amount || 0)
+  const [BeefAmount,] = useState(registeredDog.subscription.info[2]?.amount || 0)
+
+  const recipe = recipes?.toString().substring(0, recipes.toString().length)
+  const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog.subscription.recurring / 7);
   const [dogData] = useState({
     name: registeredDog.dog.name.charAt(0).toUpperCase() + registeredDog.dog.name.slice(1),
     breed: registeredDog.dog.breed,
@@ -60,24 +66,26 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
     hasHealthIssue: registeredDog.dog.hasHealthIssue,
     healthIssue: registeredDog.dog.healthIssue,
     status: registeredDog.subscription.status,
-    portions: registeredDog.activeOrders[0].detail.type,
-    frequency: `${registeredDog.activeOrders[0].detail.recurring / 7} Week${registeredDog.activeOrders[0].detail.recurring > 7 ? "s" : ""}`,
+    portions: registeredDog.subscription.type,
+    frequency: `${deliveryFrequency} Week${deliveryFrequency > 1 ? "s" : ""}`,
     recipe: recipe,
     favoriteProtein: registeredDog.dog.proteins,
-    price: `$${(registeredDog.activeOrders[0].detail.dailyPrice * registeredDog.activeOrders[0].detail.recurring).toFixed(2)} + Tax`
+    price: `$${(registeredDog.subscription.dailyPrice * registeredDog.subscription.recurring).toFixed(2)} + Tax`
   });
-  console.log("dogData", registeredDog.activeOrders[0].detail.selectedRecipes, dogData)
+  console.log("dogData", dogData)
   console.log("registeredDog", registeredDog)
 
-  const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog.activeOrders[0].detail.recurring / 7);
+  const weeklyPrice = registeredDog.subscription.weeklyPrices!.filter(p => p.week == registeredDog.subscription.recurring / 7)[0].price.toFixed(2)
+  const api = new FetchApi();
 
-  const baseRecipes: Option[] = [
+  const baseRecipes: Option[] = useMemo(() => [
     {
       title: 'Juicy Chicken',
       subtitle: 'For Picky Eaters',
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
+      amount: registeredDog.subscription.info[0]?.amount || 0,
       value: 'chicken',
       selected: false
     },
@@ -87,6 +95,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
+      amount: registeredDog.subscription.info[1]?.amount || 0,
       value: 'salmon',
       selected: false
     },
@@ -96,6 +105,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
+      amount: registeredDog.subscription.info[2]?.amount || 0,
       value: 'beef',
       selected: false
     },
@@ -108,7 +118,8 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
     //     value: 'turkey',
     //     selected: false
     // },
-  ];
+  ], [registeredDog.subscription.info]);
+
 
 
   const [breeds, setBreeds] = useState<string[]>([]);
@@ -281,21 +292,25 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
   };
 
 
-  const portionOptions: Option[] = Object.values(subscriptionType).map(option => {
-    const isSelected = dogStore.subscription.type === option
+  const portionOptions: Option[] = useMemo(() => Object.values(subscriptionType).map(option => {
+    console.log("portionOptions", registeredDog.subscription.type, option)
+    const isSelected = registeredDog.subscription.type.toLocaleLowerCase() === option.toLowerCase()
     return {
       cardImage: `${option}.png`,
-      title: option,
+      title: option + ` (${registeredDog.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
       selected: isSelected,
+      amount: registeredDog.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price,
     }
-  })
+  }), [registeredDog.subscription.type, registeredDog.subscription.subscriptionTypePrices]);
+
   const handlePortionSelect = (updatedOptions: Option[]) => {
     const selected = updatedOptions.filter(op => {
       return op.selected
     })
-    dogStore.subscription.type = selected[0].title as unknown as subscriptionType;
+    console.log("subscription.type", registeredDog.subscription.type, selected[0].title.includes('Full') ? subscriptionType['full'] : selected[0].title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'])
+    registeredDog.subscription.type = selected[0].title.includes('Full') ? subscriptionType['full'] : selected[0].title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'];
   };
 
   useEffect(() => {
@@ -328,11 +343,94 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
                 cardImage: cardImage ?? '',
                 value: registeredDog.subscription.info[index].amount,
               }))}
-              total={registeredDog.subscription.recurring}
+              total={deliveryFrequency * 7}
+              onValueChange={(optionTitle, newValue) => {
+                // Update the subscription info based on the recipe title
+                if (optionTitle === 'Juicy Chicken') {
+                  registeredDog.subscription.info[0].amount = newValue;
+                } else if (optionTitle === 'Tasty Salmon') {
+                  registeredDog.subscription.info[1].amount = newValue;
+                } else if (optionTitle === 'Hearty Beef') {
+                  registeredDog.subscription.info[2].amount = newValue;
+                }
+              }}
             />
           }
           onClose={() => setIsRecipePopupOpen(false)}
-          onSubmit={() => setIsRecipePopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog.subscription.info[0].amount += 1
+              if (deliveryFrequency !== registeredDog.subscription.recurring / 7) {
+                const sub = {
+                  selectedRecipes: registeredDog.subscription.selectedRecipes,
+                  recurring: deliveryFrequency * 7, // Convert weeks to days
+                  sub: registeredDog.subscription.info.map((info: subscriptionInfo ) => {
+                    const recipeIdValue =
+                      info.recipeId;
+                    return {
+                      recipeId: recipeIdValue,
+                      amount: info.amount
+                    };
+                  })
+                };
+
+                const result = await api.updateDogRecurring(dogId, sub);
+                if (result.status === "success") {
+                  // setDeliveryFrequency(registeredDog.subscription.recurring / 7)
+                  registeredDog.subscription.recurring = deliveryFrequency * 7
+                  setIsFrequencyPopupOpen(false);
+                  setIsRecipePopupOpen(false);
+                  // Optionally refresh the page or update the store
+                  window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                  window.location.reload();
+                } else {
+                  console.error("Failed to update dog recurring:", result.err);
+                  alert("Failed to update delivery frequency. Please try again.");
+                }
+              } else if ((chickenAmount !== registeredDog.subscription.info[0]?.amount) || (salmonAmount !== registeredDog.subscription.info[1]?.amount) || (BeefAmount !== registeredDog.subscription.info[2]?.amount)) {
+                const sub = {
+                  selectedRecipes: registeredDog.subscription.selectedRecipes,
+                  recurring: deliveryFrequency * 7, // Convert weeks to days
+                  sub: registeredDog.subscription.info.map((info: subscriptionInfo) => {
+                    // Handle both old format (recipeId as number) and new format (recipeId as object)
+                    // const recipeIdValue = typeof info.recipeId === 'object' && info.recipeId?.recipeId
+                    //   ? info.recipeId.recipeId
+                    //   : info.recipeId;
+                    const recipeIdValue = info.recipeId;
+
+                    return {
+                      recipeId: recipeIdValue,
+                      amount: info.amount
+                    };
+                  })
+                };
+
+                const result = await api.updateDogRecurring(dogId, sub);
+                if (result.status === "success") {
+                  // setDeliveryFrequency(registeredDog.subscription.recurring / 7)
+                  registeredDog.subscription.recurring = deliveryFrequency * 7
+                  setIsFrequencyPopupOpen(false);
+                  setIsRecipePopupOpen(false);
+                  // Optionally refresh the page or update the store
+                  window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                  window.location.reload();
+                } else {
+                  console.error("Failed to update dog recurring:", result.err);
+                  alert("Failed to update delivery frequency. Please try again.");
+                }
+              } else {
+                setIsFrequencyPopupOpen(false);
+                setIsRecipePopupOpen(false);
+              }
+              console.log(chickenAmount, registeredDog.subscription.info[0]?.amount)
+              console.log(salmonAmount, registeredDog.subscription.info[1]?.amount)
+              console.log(BeefAmount, registeredDog.subscription.info[2]?.amount)
+            } catch (error) {
+              console.error("Error updating dog recurring:", error);
+              alert("An error occurred while updating delivery frequency. Please try again.");
+            }
+          }}
           isOpen={isRecipePopupOpen}
           disabled={false}
         />
@@ -528,9 +626,9 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
               {
                 <div className='flex flex-col gap-4 text-center pb-8 justify-center items-center'>
                   <div className="w-[216px] h-[112px] rounded-3xl bg-system_accent shadow-xs border-[0.5px] border-gray_divider p-4 flex flex-col justify-center">
-                    <span className="text-xs text-label_tertiary">$46.32/WEEK</span>
+                    {(deliveryFrequency !== registeredDog.subscription.recurring / 7) && <span className="text-xs text-label_tertiary">{"$" + weeklyPrice + "/WEEK"}</span>}
                     <div>
-                      <span className="text-lg font-felix_bold text-system_primary">$44.32</span>
+                      <span className={`text-lg font-felix_bold ${deliveryFrequency < registeredDog.subscription.recurring / 7 ? "text-semantic_red" : "text-system_primary"}`}>{"$" + registeredDog.subscription.weeklyPrices!.filter(p => p.week == deliveryFrequency)[0].price.toFixed(2)}</span>
                       <span className="text-sm text-system_primary">/WEEK</span>
                     </div>
                     <p className="text-system_dark_primary text-sm">{'Longer range, Lower price'}</p>
@@ -546,7 +644,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
             </div>
           }
           onClose={() => setIsFrequencyPopupOpen(false)}
-          onSubmit={() => setIsFrequencyPopupOpen(false)}
+          onSubmit={() => setIsRecipePopupOpen(true)}
           isOpen={isFrequencyPopupOpen}
         />
         <DogPopup
@@ -627,7 +725,7 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
           rows={[
             { label: "Status", value: dogData.status, type: "badge" },
             { label: "Portions", value: dogData.portions, type: "value", onClick: () => setIsPortionPopupOpen(true) },
-            { label: "Frequency", value: dogData.frequency, type: "value", onClick: () => setIsFrequencyPopupOpen(true) },
+            { label: "Frequency", value: deliveryFrequency, type: "value", onClick: () => setIsFrequencyPopupOpen(true) },
             { label: "Recipe", value: dogData.recipe, type: "value", onClick: () => setIsRecipePopupOpen(true) },
             { label: "Favorite protein", value: dogData.favoriteProtein, type: "value" },
             { label: "Price:", value: dogData.price, type: "text" }
@@ -676,4 +774,4 @@ export function DogProfilePageClient({ dogId }: DogProfilePageClientProps) {
       </div>
     </ProcessLayout>
   );
-}
+});

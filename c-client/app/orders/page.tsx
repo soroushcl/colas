@@ -9,7 +9,7 @@ import { useStores } from "@/stores/StoreContext";
 import UpcomingOrderPopup from "@/components/popups/UpcomingOrderPopup";
 import { subscriptionInfo } from "c-lib";
 import DogPopup from "@/components/popups/DogPopup";
-import CustomNumberComponent from "@/components/CustomNumberComponent";
+// import CustomNumberComponent from "@/components/CustomNumberComponent";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 
 export default function OrderPage() {
@@ -19,7 +19,7 @@ export default function OrderPage() {
   const router = useRouter();
   const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
   const [isDeliveryDatePopupOpen, setIsDeliveryDatePopupOpen] = useState(false);
-  const [deliveryFrequency, setDeliveryFrequency] = useState(8);
+  // const [deliveryFrequency, setDeliveryFrequency] = useState(8);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {

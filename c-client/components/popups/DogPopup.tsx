@@ -73,7 +73,7 @@ const DogPopup: React.FC<PopupProps> = ({
                     <div className="w-full flex justify-center items-center">
                         {onSubmit && (
                             <MainButton
-                                // onClick={onSubmit}
+                                onSubmit={onSubmit}
                                 enabled={!disabled}
                                 text="Submit"
                             // className="border border-system_primary bg-system_primary text-visual_light_amber shadow-md font-bold text-xl text-system_primary w-full h-14 px-4 py-2 rounded-2xl mb-4"

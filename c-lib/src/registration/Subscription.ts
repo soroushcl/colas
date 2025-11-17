@@ -18,6 +18,7 @@ export interface Subscription {
     priceVersion: PriceVersion['id'];
     isActive: boolean;
     weeklyPrices?: weeklyPrice[]
+    subscriptionTypePrices?: subscriptionTypePrice[]
 }
 
 export interface Address {
@@ -83,6 +84,11 @@ export interface subscriptionInfo {
 
 export interface weeklyPrice {
     week: number
+    price: number
+}
+
+export interface subscriptionTypePrice {
+    type: Subscription['type']
     price: number
 }
 

@@ -20,6 +20,7 @@ export interface Subscription {
     priceVersion: PriceVersion['id'];
     isActive: boolean;
     weeklyPrices?: weeklyPrice[];
+    subscriptionTypePrices?: subscriptionTypePrice[];
 }
 export interface Address {
     line1: string;
@@ -75,6 +76,10 @@ export interface subscriptionInfo {
 }
 export interface weeklyPrice {
     week: number;
+    price: number;
+}
+export interface subscriptionTypePrice {
+    type: Subscription['type'];
     price: number;
 }
 export interface Coupon {

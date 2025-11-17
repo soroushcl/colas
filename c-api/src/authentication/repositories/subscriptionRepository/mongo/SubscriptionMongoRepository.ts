@@ -9,6 +9,8 @@ import { DogRepository } from '@auth/repositories/dogRepository';
 import { PromoCodeRepository } from 'src/payment/repositories';
 import Stripe from 'stripe';
 
+type SubscriptionWithMongoId = Subscription & { _id?: string | ObjectId };
+
 let stripeSecretKey = process.env['STRIPE_SECRET_KEY']
 const stripe = new Stripe(stripeSecretKey || '', { apiVersion: '2024-06-20' });
 
@@ -43,16 +45,27 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
 
   async addSubscription(subscription: Subscription): Promise<Subscription> {
     console.log("addSubscription")
+    const subscriptionDocument = subscription as SubscriptionWithMongoId;
     // Ensure the subscription has a valid id before calling toMongo
-    if (!subscription.id) {
+    if (!subscriptionDocument.id && !subscriptionDocument._id) {
+      console.log("create")
       subscription.id = new ObjectId().toString();
       let inserted = await this.subscriptionCollection.insertOne(toMongo(subscription));
       const newSubscription = await this.subscriptionCollection.findOne({ _id: inserted.insertedId })
       return newSubscription as unknown as Subscription
     } else {
       // Convert subscription.id to ObjectId if it's a string
-      const subscriptionObjectId = typeof subscription.id === 'string' ? new ObjectId(subscription.id) : subscription.id;
-      await this.subscriptionCollection.updateOne({ _id: subscriptionObjectId }, { $set: toMongo(subscription) })
+      let subscriptionObjectId = typeof subscriptionDocument.id === 'string' ? new ObjectId(subscriptionDocument.id) : subscriptionDocument.id;
+      if (!subscriptionDocument.id && subscriptionDocument._id) {
+        subscriptionObjectId = typeof subscriptionDocument._id === 'string' ? new ObjectId(subscriptionDocument._id) : subscriptionDocument._id;
+      }
+      const mongoSubscription = toMongo(subscription);
+      console.log("update" , mongoSubscription)
+      const { _id: _ignoredMongoId, ...subscriptionWithoutMongoId } = mongoSubscription;
+      await this.subscriptionCollection.updateOne(
+        { _id: subscriptionObjectId },
+        { $set: subscriptionWithoutMongoId }
+      )
       const updatedSubscription = await this.subscriptionCollection.findOne({ _id: subscriptionObjectId })
       return updatedSubscription as unknown as Subscription
     }

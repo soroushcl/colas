@@ -1,6 +1,6 @@
 'use client'
 import { makeAutoObservable, reaction } from 'mobx';
-import { googleLoginRequestBody, Order, OrderStatus, protein, Recipe, resetPasswordRequestBody, Subscription, User, userStatus } from 'c-lib';
+import { googleLoginRequestBody, Order, OrderStatus, protein, Recipe, resetPasswordRequestBody, Subscription, subscriptionType, User, userStatus } from 'c-lib';
 import FetchApi from '../services/api';
 import { Dog } from 'c-lib';
 import { DogStore } from './dogStore';
@@ -248,8 +248,9 @@ export class UserStore {
         }) || [];
         let subscriptions: Subscription[] = payload?.subscriptions.map((r: any) => {
           r.id = r._id
-          r.info = dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.info
-          r.recurring = dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.recurring
+          r.info = r.info ? r.info : dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.info
+          r.recurring = r.recurring ? r.recurring : dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.recurring
+          r.type = r.type ? r.type : dogs.filter((d: Dog) => d.id == r.dog)[0].subscription.type as subscriptionType
           return r
         }) || [];
         let orders: Order[] = payload?.orders.map((r: any) => {

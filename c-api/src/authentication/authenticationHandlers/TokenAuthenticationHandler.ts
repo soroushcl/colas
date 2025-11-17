@@ -60,6 +60,12 @@ import {
   createSubscriptionResponseBody,
   dogStatus,
   weeklyPrice,
+  Subscription,
+  recurringType,
+  OrderStatus,
+  OrderDetail,
+  subscriptionType,
+  subscriptionTypePrice,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -67,6 +73,12 @@ import { mailHandlerFactory } from "@services/mailer/mailHandlerFactory";
 // import {OrgUserInvitedParams} from "@services/mailer/templates/stringTemplates/orgUserInvited";
 import { ForgotPasswordParams } from "@services/mailer/templates/stringTemplates/forgotPassword";
 import { OrderRepository } from '@auth/repositories/orderRepository';
+import { ObjectId } from 'mongodb';
+import Stripe from 'stripe';
+import { SubscriptionMongoRepository } from '../repositories/subscriptionRepository/mongo/SubscriptionMongoRepository';
+import { DogMongoRepository } from '../repositories/dogRepository/mongo/DogMongoRepository';
+import { StripeCustomerMongoRepository } from '../repositories/stripeCustomerRepository/mongo/StripeCustomerMongoRepository';
+import { OrderMongoRepository } from '../repositories/orderRepository/mongo/OrderMongoRepository';
 
 const googleLoginWithCode = async (code: string) => {
   const CLIENT_ID = process.env['OAUTH2_GOOGLE_CLIENT_ID'] || '';
@@ -116,6 +128,243 @@ const TokenAuthenticationHandler = (
   compareFunction: compareFunction = (raw: string, hashed: string) => raw === hashed,
   hashFunction: hashFunction = (raw: string) => raw,
 ): AuthenticationHandler => {
+  // Helper function to update subscription recurring in Stripe and update orders/subscriptions
+  const updateSubscriptionRecurringInternal = async (userId: string, dogId: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      if (!stripeCustomerRepo) {
+        return { success: false, error: 'StripeCustomer repository not configured' };
+      }
+
+      // Convert userId to ObjectId for query
+      const userIdObjectId = new ObjectId(userId);
+
+      // Cast to access mongo-specific methods
+      const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+      const stripeCustomerCollection = (stripeCustomerMongoRepo as any).collection;
+      const stripe = (stripeCustomerMongoRepo as any).stripe;
+
+      // Find StripeCustomer by userId
+      const sc = await stripeCustomerCollection.findOne({ userId: userIdObjectId });
+
+      if (!sc || !sc.subscriptions || sc.subscriptions.length === 0) {
+        return { success: false, error: 'No stripe user found!' };
+      }
+
+      // Filter subscriptions by dogId (handle both ObjectId and string)
+      const _subscriptions = sc.subscriptions.filter((s: any) => {
+        const sDogId = (s.dogId instanceof ObjectId) ? s.dogId.toString() : String(s.dogId || '');
+        const targetDogId = String(dogId);
+        return sDogId === targetDogId;
+      });
+
+      if (_subscriptions.length === 0) {
+        return { success: false, error: 'No dog subscription found!' };
+      }
+
+      const { subscriptionId } = _subscriptions[0];
+
+      // Retrieve subscription from Stripe
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+      // Verify dog_id matches
+      if (subscription.metadata.dog_id !== String(dogId)) {
+        return { success: false, error: 'No dog found!' };
+      }
+
+      // Find dog
+      const dog = await dogRepo.findDogById(String(dogId));
+
+      if (!dog || !dog.subscription) {
+        return { success: false, error: 'No dog found!' };
+      }
+
+      // Get environment variables
+      const stripeSubscriptionProduct = process.env['STRIPE_SUBSCRIPTION_PRODUCTION'] || process.env['STRIPE_SUBSCRIPTION_PRODUCT'];
+
+      if (!stripeSubscriptionProduct) {
+        return { success: false, error: 'STRIPE_SUBSCRIPTION_PRODUCTION environment variable is not set' };
+      }
+
+      const stripeTaxRatesEnv = process.env['STRIPE_TAX_RATES'] || '[]';
+      let stripeTaxRates: string[] = [];
+
+      try {
+        stripeTaxRates = JSON.parse(stripeTaxRatesEnv);
+      } catch (e) {
+        // If not JSON, try comma-separated
+        stripeTaxRates = stripeTaxRatesEnv.split(',').map(r => r.trim()).filter(r => r);
+      }
+
+      // Calculate recurring interval
+      const recurringDays = dog.subscription.recurring || 28;
+      const intervalCount = Math.max(1, Math.floor(recurringDays / 7));
+
+      // Build items array
+      const items = [{
+        price_data: {
+          currency: "cad",
+          product: stripeSubscriptionProduct,
+          recurring: {
+            interval: 'week' as const,
+            interval_count: intervalCount,
+          },
+          unit_amount: Math.floor((dog.subscription.dailyPrice || 0) * recurringDays * 100) // in cents
+        },
+        ...(stripeTaxRates.length > 0 ? { tax_rates: stripeTaxRates } : {})
+      }];
+
+      // Build new subscription object
+      const stripeSubscription: Stripe.SubscriptionCreateParams = {
+        customer: sc.stripeCustomerId,
+        metadata: {
+          "dog_id": String(dog.id || dogId),
+          "dog_name": dog.name || ''
+        },
+        items,
+        expand: ['latest_invoice.payment_intent'],
+        trial_end: subscription.current_period_end,
+        proration_behavior: 'none'
+      };
+
+      // Handle discounts
+      if (subscription.discount) {
+        if (subscription.discount.promotion_code) {
+          const pc = subscription.discount.promotion_code;
+          try {
+            const stripePromotion = await stripe.promotionCodes.retrieve(pc);
+            if (stripePromotion.active) {
+              stripeSubscription.promotion_code = pc;
+            }
+          } catch (e) {
+            console.log('Error retrieving promotion code:', e);
+          }
+        } else if (subscription.discount.coupon) {
+          const couponId = subscription.discount.coupon.id;
+          try {
+            const coupon = await stripe.coupons.retrieve(couponId);
+            if (coupon.valid) {
+              stripeSubscription.coupon = couponId;
+            }
+          } catch (e) {
+            console.log('Error retrieving coupon:', e);
+          }
+        }
+      }
+
+      // Create new subscription
+      const newSubscription = await stripe.subscriptions.create(stripeSubscription);
+
+      // Update subscriptions array
+      const subscriptions = sc.subscriptions.map((s: any) => {
+        const sDogId = (s.dogId instanceof ObjectId) ? s.dogId.toString() : String(s.dogId || '');
+        const targetDogId = String(dogId);
+        if (sDogId === targetDogId) {
+          return {
+            ...s,
+            subscriptionId: newSubscription.id
+          };
+        }
+        return s;
+      });
+
+      // Update document
+      await stripeCustomerCollection.updateOne(
+        { _id: sc._id },
+        {
+          $set: {
+            subscriptions,
+            updatedAt: new Date()
+          }
+        }
+      );
+
+      // Cancel old subscription
+      await stripe.subscriptions.cancel(subscriptionId);
+
+      // Update Orders and Subscriptions
+      const orderMongoRepo = orderRepo as unknown as OrderMongoRepository;
+      const orderCollection = (orderMongoRepo as any).orderCollection;
+      const subscriptionMongoRepo = subscriptionRepo as unknown as SubscriptionMongoRepository;
+      const subscriptionCollection = (subscriptionMongoRepo as any).subscriptionCollection;
+
+      // Convert IDs for query (reuse userIdObjectId from above)
+      const dogIdObjectId = ObjectId.isValid(String(dogId)) ? new ObjectId(String(dogId)) : null;
+
+      // Find active order
+      const orderFilter: any = {
+        userId: userIdObjectId,
+        status: OrderStatus.active
+      };
+
+      // Handle dog field (could be ObjectId or string)
+      if (dogIdObjectId) {
+        orderFilter.dog = { $in: [dogIdObjectId, String(dogId)] };
+      } else {
+        orderFilter.dog = String(dogId);
+      }
+
+      const order = await orderCollection.findOne(orderFilter);
+
+      if (order && dog.subscription) {
+        // Create detail object
+        const detail: OrderDetail = {
+          type: dog.subscription.type,
+          selectedRecipes: dog.subscription.selectedRecipes,
+          info: dog.subscription.info,
+          dailyPrice: dog.subscription.dailyPrice,
+          recurring: dog.subscription.recurring
+        };
+
+        // Update subscriptions
+        const subscriptionFilter: any = {
+          userId: userIdObjectId
+        };
+
+        if (dogIdObjectId) {
+          subscriptionFilter.dog = { $in: [dogIdObjectId, String(dogId)] };
+        } else {
+          subscriptionFilter.dog = String(dogId);
+        }
+
+        await subscriptionCollection.updateMany(
+          subscriptionFilter,
+          { $set: { dailyPrice: dog.subscription.dailyPrice } }
+        );
+
+        // Update active orders
+        const orderUpdateFilter: any = {
+          userId: userIdObjectId,
+          status: OrderStatus.active
+        };
+
+        if (dogIdObjectId) {
+          orderUpdateFilter.dog = { $in: [dogIdObjectId, String(dogId)] };
+        } else {
+          orderUpdateFilter.dog = String(dogId);
+        }
+
+        // Calculate currentPeriodEnd
+        const currentPeriodStart = order.currentPeriodStart ? new Date(order.currentPeriodStart) : new Date();
+        const currentPeriodEnd = new Date(currentPeriodStart.getTime() + (dog.subscription.recurring || 28) * 24 * 3600 * 1000);
+
+        await orderCollection.updateMany(
+          orderUpdateFilter,
+          {
+            $set: {
+              detail,
+              price: (dog.subscription.dailyPrice || 0) * (dog.subscription.recurring || 28),
+              currentPeriodEnd
+            }
+          }
+        );
+      }
+
+      return { success: true };
+    } catch (e: any) {
+      console.log('Error in updateSubscriptionRecurringInternal:', e);
+      return { success: false, error: e.toString() };
+    }
+  };
   return {
     authMiddleware: async (req: Request, res: Response, next: NextFunction) => {
       let token = req.headers['authentication'] as string;
@@ -193,9 +442,16 @@ const TokenAuthenticationHandler = (
               let dailyPrice = await subscriptionRepo.subscriptionDiscountedPriceCalculator({ ...subscriptions[i], recurring: k * 7, dogPrice: subscriptions[i].dogPrice ? subscriptions[i].dogPrice : dogs[i].subscription?.dogPrice || 0 })
               let price = (dailyPrice * 7)
               weeklyPrices.push({ week: k, price: price })
-              // console.log("weeklyPrices", weeklyPrices[k], dailyPrice)
             }
             subscriptions[i].weeklyPrices = weeklyPrices
+            let subscriptionTypePrices: subscriptionTypePrice[] = [];
+            for (let k = 1; k < 4; k++) {
+              // let dailyPrice = subscriptionPriceCalculator({ ...dog.subscription.toJSON(), recurring: k * 7 })
+              let dailyPrice = await subscriptionRepo.subscriptionDiscountedPriceCalculator({ ...subscriptions[i], type: k == 1 ? subscriptionType['full'] : k == 2 ? subscriptionType['half'] : subscriptionType['topper'], dogPrice: subscriptions[i].dogPrice ? subscriptions[i].dogPrice : dogs[i].subscription?.dogPrice || 0 })
+              let price = (dailyPrice * 7)
+              subscriptionTypePrices.push({ type: k == 1 ? subscriptionType['full'] : k == 2 ? subscriptionType['half'] : subscriptionType['topper'], price: price })
+            }
+            subscriptions[i].subscriptionTypePrices = subscriptionTypePrices
           }
           const recipes = await recipeRepo.findRecipesByUserId(user.id);
           const pm = await stripeCustomerRepo?.getPaymentMethod(user.id);
@@ -766,6 +1022,189 @@ const TokenAuthenticationHandler = (
           res
             .status(400)
             .json(Fail(new Error("Password and repassword should be the same.").toString()));
+        }
+      },
+      updateDogRecurring: async (req: Request, res: Response) => {
+        try {
+          if (req.user) {
+            let { dogId, sub } = req.body;
+
+            dogId = new ObjectId(dogId).toString();
+
+            // let selectedRecipes = sub.selectedRecipes.map((r: any) => parseInt(r));
+
+            let recurring = sub.recurring;
+
+            // Cast repositories to access mongo-specific methods and collections
+            const subscriptionMongoRepo = subscriptionRepo as unknown as SubscriptionMongoRepository;
+            const dogMongoRepo = dogRepo as unknown as DogMongoRepository;
+
+            // Access the dog collection directly to update
+            const dogCollection = (dogMongoRepo as any).dogCollection;
+
+            // Find dog with owner verification
+            const dog = await dogRepo.findDogById(dogId);
+            console.log("dog", dog)
+            console.log("sub info", dog?.subscription?.info)
+            console.log("user id", req.user.id)
+
+            if (!dog) {
+              res.status(500).send({ err: "no dogs found" });
+              return;
+            }
+
+            const ownerId = (dog.owner as any) instanceof ObjectId
+              ? (dog.owner as any).toString()
+              : String(dog.owner || '');
+            const userId = String(req.user.id);
+
+            if (ownerId !== userId) {
+              res.status(500).send({ err: "no dogs found" });
+              return;
+            }
+
+            // Get the dog's subscription info
+            const subscriptions = await subscriptionRepo.findSubscriptionsByUserId(req.user.id);
+            // Convert dog field to string (handles both ObjectId and string cases)
+            const dogSubscription = subscriptions.find(s => {
+              const subDogId = (s.dog as any) instanceof ObjectId
+                ? (s.dog as any).toString()
+                : String(s.dog || '');
+              return subDogId === String(dogId);
+            });
+
+            if (!dogSubscription) {
+              res.status(500).send({ err: "no subscription found" });
+              return;
+            }
+
+            // Build info array from sub.sub
+            let info = sub.sub.map((s: any) => {
+              console.log(s)
+              let tempInfo = dog.subscription!.info.find((i: any) => {
+                // Handle both old format (recipeId as number) and new format (recipeId as object)
+                let recipeIdValue: any = i.recipeId;
+                if (typeof i.recipeId === 'object' && i.recipeId) {
+                  if ('recipeId' in i.recipeId) {
+                    recipeIdValue = (i.recipeId as any).recipeId;
+                  } else if (i.recipeId instanceof ObjectId) {
+                    recipeIdValue = i.recipeId.toString();
+                  } else if ('_id' in i.recipeId) {
+                    recipeIdValue = (i.recipeId as any)._id;
+                  }
+                }
+                // Convert both to strings for comparison
+                const recipeIdStr = (recipeIdValue instanceof ObjectId)
+                  ? recipeIdValue.toString()
+                  : String(recipeIdValue || '');
+                const sRecipeIdStr = String(s.recipeId || '');
+                return recipeIdStr === sRecipeIdStr;
+              });
+
+              if (!tempInfo) {
+                throw new Error(`Recipe info not found for recipeId: ${s.recipeId}`);
+              }
+
+              // Handle recipeId - it might be an object with _id or just an id
+              let recipeIdObj: ObjectId;
+              if (typeof tempInfo.recipeId === 'object' && tempInfo.recipeId && '_id' in tempInfo.recipeId) {
+                recipeIdObj = new ObjectId((tempInfo.recipeId as any)._id);
+              } else {
+                recipeIdObj = new ObjectId(tempInfo.recipeId as string);
+              }
+
+              return {
+                recipeId: recipeIdObj,
+                amount: parseInt(s.amount)
+              };
+            });
+
+            // Set dogPrice if not set (backward compatibility)
+            if (!dogSubscription.dogPrice) {
+              dogSubscription.dogPrice = dogSubscription.dailyPrice;
+            }
+
+            // Calculate new daily price using subscriptionPriceCalculator
+            const updatedSubscription: Subscription = {
+              ...dogSubscription,
+              recurring: recurring,
+              // selectedRecipes: selectedRecipes,
+              info: info as any,
+              recurringType: recurringType.manual
+            };
+
+            const dailyPrice = subscriptionMongoRepo.subscriptionPriceCalculator(updatedSubscription);
+
+            updatedSubscription.dailyPrice = dailyPrice;
+
+            // Update subscription document
+            console.log("updatedSubscription", updatedSubscription)
+            await subscriptionRepo.addSubscription(updatedSubscription);
+
+            // Update dog document's subscription reference
+            await dogCollection.updateOne(
+              { _id: new ObjectId(dogId), owner: req.user.id },
+              {
+                $set: {
+                  'subscription.dailyPrice': dailyPrice,
+                  // 'subscription.selectedRecipes': selectedRecipes,
+                  'subscription.info': info,
+                  'subscription.recurring': recurring,
+                  'subscription.recurringType': recurringType.manual
+                }
+              }
+            );
+
+            // Call updateSubscriptionRecurringInternal helper function
+            const updateResult = await updateSubscriptionRecurringInternal(req.user.id, dogId);
+
+            if (updateResult.success) {
+              res.send({
+                status: "success",
+                price: (dailyPrice * recurring).toLocaleString("en-US", { style: "currency", currency: "USD" }).substring(1)
+              });
+            } else {
+              res.status(500).send({ err: updateResult.error || 'Something went wrong with stripe' });
+            }
+          } else {
+            res.status(500).send({ err: "no Users found" });
+          }
+        } catch (e: any) {
+          console.log(e);
+          res.status(500).send({ err: e.toString() });
+        }
+      },
+      updateSubscriptionRecurring: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          let { userId, dogId } = req.body;
+
+          if (!userId || !dogId) {
+            res.status(400).send({ err: 'Missing userId or dogId' });
+            return;
+          }
+
+          const result = await updateSubscriptionRecurringInternal(userId, dogId);
+
+          if (!result.success) {
+            res.status(500).send({ err: result.error || 'Failed to update subscription' });
+            return;
+          }
+
+          // Find dog to attach to request for potential next middleware
+          const dog = await dogRepo.findDogById(String(dogId));
+          if (dog) {
+            (req as any).dog = dog;
+          }
+
+          // Call next if provided, otherwise send success
+          if (next) {
+            next();
+          } else {
+            res.send({ status: 'success' });
+          }
+        } catch (e: any) {
+          console.log('Error in updateSubscriptionRecurring:', e);
+          res.status(500).send({ err: e.toString() });
         }
       },
       authGuard: async (req: Request, res: Response, next: NextFunction) => {

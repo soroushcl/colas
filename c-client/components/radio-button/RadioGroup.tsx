@@ -9,6 +9,7 @@ export interface Option {
   cardImage?: string;
   selectedCardImage?: string;
   value?: string;
+  amount?: number;
   selected: boolean;
   handlePrimarySelect?: () => void;
   handleSecondarySelect?: () => void;

@@ -6,9 +6,10 @@ interface ButtonProps {
     enabled: boolean;
     text: string;
     nextArrow?: boolean;
+    onSubmit?: () => void;
 }
 
-const MainButton: React.FC<ButtonProps> = observer(({ enabled, text, nextArrow = false }) => {
+const MainButton: React.FC<ButtonProps> = observer(({ enabled, text, nextArrow = false, onSubmit }) => {
     return (
         <>
             <div
@@ -18,9 +19,7 @@ const MainButton: React.FC<ButtonProps> = observer(({ enabled, text, nextArrow =
                     className='flex items-center justify-center gap-1 w-screen md:w-96 h-14 md:rounded-2xl shadow-sm md:shadow-3xl bg-system_primary active:shadow-none disabled:shadow-none disabled:bg-gray_disable'
                     disabled={!enabled}
                     type="submit"
-                    onClick={() => {
-                        console.log("Main Button Clicked!", enabled)
-                    }}
+                    onClick={onSubmit}
                 >
                     <p className='text-visual_light_amber text-xl font-bold'>
                         {text}

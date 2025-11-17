@@ -354,4 +354,33 @@ export default class FetchApi {
         return await res.json() as getBreedsResponseBody;
     };
 
+    // Update Dog Recurring
+    updateDogRecurring = async (dogId: string, sub: { selectedRecipes: (number | string)[], recurring: number, sub: { recipeId: string | number, amount: number }[] }): Promise<{ status: string; price?: string; err?: string }> => {
+        console.log("updateDogRecurring called", dogId, sub);
+        const res = await this.request<{ status: string; price?: string; err?: string }, { dogId: string; sub: any }>(`${this.baseUrl}/authentication/update-dog-recurring`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                dogId,
+                sub
+            },
+        });
+        console.log("updateDogRecurring res", res);
+        return res;
+    };
+
+    updateDogSubscription = async (dogId: string, sub: { selectedRecipes: (number | string)[], sub: { recipeId: string | number, amount: number }[] }): Promise<{ status: string; price?: string; err?: string }> => {
+        console.log("updateDogSubscription called", dogId, sub);
+        const res = await this.request<{ status: string; price?: string; err?: string }, { dogId: string; sub: any }>(`${this.baseUrl}/authentication/update-dog-subscription`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                dogId,
+                sub
+            },
+        });
+        console.log("updateDogSubscription res", res);
+        return res;
+    };
+
 }

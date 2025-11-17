@@ -1,7 +1,7 @@
 "use client";
 import { observer } from 'mobx-react-lite';
 import ProcessLayout from '@/components/layout/ProcessLayout';
-import HorizontalWeightSelector from '@/components/inputs/HorizontalWeightSelector';
+// import HorizontalWeightSelector from '@/components/inputs/HorizontalWeightSelector';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStores } from '@/stores/StoreContext';
@@ -44,13 +44,13 @@ const Home: React.FC = observer(() => {
     return (
         <ProcessLayout title={`Weight`} subTitle={"This will stay between us, don't worry!"} handleSubmit={handleSubmit} disabled={false} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
             <div className="flex justify-center items-center min-h-[400px]">
-                <HorizontalWeightSelector
+                {/* <HorizontalWeightSelector
                     value={dogStore.dog.weight}
                     onChange={(weight) => dogStore.dog.weight = weight}
                     min={5}
                     max={200}
                     step={0.5}
-                />
+                /> */}
             </div>
         </ProcessLayout>
     );
