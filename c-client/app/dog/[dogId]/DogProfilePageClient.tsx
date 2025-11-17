@@ -38,7 +38,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   const [isHealthPopupOpen, setIsHealthPopupOpen] = useState(false);
   const router = useRouter();
   const registeredDog = userStore.registeredDogs.filter((r: { dog: { id: string; }; }) => r.dog.id == dogId)[0]
-  const recipes = registeredDog.dog?.subscription?.selectedRecipes.map((r: number | string) => {
+  const recipes = registeredDog?.dog?.subscription?.selectedRecipes.map((r: number | string) => {
     // Handle both old format (numbers) and new format (protein enum strings)
     if (typeof r === 'number') {
       // Old format: numbers
@@ -48,34 +48,34 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       return ' ' + r
     }
   })
-  const [chickenAmount,] = useState(registeredDog.subscription.info[0]?.amount || 0)
-  const [salmonAmount,] = useState(registeredDog.subscription.info[1]?.amount || 0)
-  const [BeefAmount,] = useState(registeredDog.subscription.info[2]?.amount || 0)
+  const [chickenAmount,] = useState(registeredDog?.subscription.info[0]?.amount || 0)
+  const [salmonAmount,] = useState(registeredDog?.subscription.info[1]?.amount || 0)
+  const [BeefAmount,] = useState(registeredDog?.subscription.info[2]?.amount || 0)
 
   const recipe = recipes?.toString().substring(0, recipes.toString().length)
-  const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog.subscription.recurring / 7);
+  const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog?.subscription.recurring / 7);
   const [dogData] = useState({
-    name: registeredDog.dog.name.charAt(0).toUpperCase() + registeredDog.dog.name.slice(1),
-    breed: registeredDog.dog.breed,
-    age: new Date(registeredDog.dog.age).toDateString(),
-    gender: registeredDog.dog.gender,
-    neutered: registeredDog.dog.isNeutered,
-    activity: registeredDog.dog.activityLevel,
-    isAllergic: registeredDog.dog.isAllergic,
-    allergies: registeredDog.dog.allergies,
-    hasHealthIssue: registeredDog.dog.hasHealthIssue,
-    healthIssue: registeredDog.dog.healthIssue,
-    status: registeredDog.subscription.status,
-    portions: registeredDog.subscription.type,
+    name: registeredDog?.dog.name.charAt(0).toUpperCase() + registeredDog?.dog.name.slice(1),
+    breed: registeredDog?.dog.breed,
+    age: new Date(registeredDog?.dog.age).toDateString(),
+    gender: registeredDog?.dog.gender,
+    neutered: registeredDog?.dog.isNeutered,
+    activity: registeredDog?.dog.activityLevel,
+    isAllergic: registeredDog?.dog.isAllergic,
+    allergies: registeredDog?.dog.allergies,
+    hasHealthIssue: registeredDog?.dog.hasHealthIssue,
+    healthIssue: registeredDog?.dog.healthIssue,
+    status: registeredDog?.subscription.status,
+    portions: registeredDog?.subscription.type,
     frequency: `${deliveryFrequency} Week${deliveryFrequency > 1 ? "s" : ""}`,
     recipe: recipe,
-    favoriteProtein: registeredDog.dog.proteins,
-    price: `$${(registeredDog.subscription.dailyPrice * registeredDog.subscription.recurring).toFixed(2)} + Tax`
+    favoriteProtein: registeredDog?.dog.proteins,
+    price: `$${(registeredDog?.subscription.dailyPrice * registeredDog?.subscription.recurring).toFixed(2)} + Tax`
   });
   console.log("dogData", dogData)
   console.log("registeredDog", registeredDog)
 
-  const weeklyPrice = registeredDog.subscription.weeklyPrices!.filter(p => p.week == registeredDog.subscription.recurring / 7)[0].price.toFixed(2)
+  const weeklyPrice = registeredDog?.subscription.weeklyPrices!.filter(p => p.week == registeredDog?.subscription.recurring / 7)[0].price.toFixed(2)
   const api = new FetchApi();
 
   const baseRecipes: Option[] = useMemo(() => [
@@ -85,7 +85,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
-      amount: registeredDog.subscription.info[0]?.amount || 0,
+      amount: registeredDog?.subscription.info[0]?.amount || 0,
       value: 'chicken',
       selected: false
     },
@@ -95,7 +95,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
-      amount: registeredDog.subscription.info[1]?.amount || 0,
+      amount: registeredDog?.subscription.info[1]?.amount || 0,
       value: 'salmon',
       selected: false
     },
@@ -105,7 +105,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       secondarySubtitle: 'Human-Grade Beef &...',
       cardImage: '/images/recipe.png',
       selectedCardImage: '/images/selected_recipe.png',
-      amount: registeredDog.subscription.info[2]?.amount || 0,
+      amount: registeredDog?.subscription.info[2]?.amount || 0,
       value: 'beef',
       selected: false
     },
@@ -118,7 +118,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     //     value: 'turkey',
     //     selected: false
     // },
-  ], [registeredDog.subscription.info]);
+  ], [registeredDog?.subscription.info]);
 
 
 
@@ -162,12 +162,12 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     },
   ];
 
-  const handleSelect = (updatedOptions: typeof options) => {
+  const handleSelect = (updatedOptions: number) => {
     // Sync selected values back to MobX store
-    const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    if (isNursingOption) {
-      dogStore.dog.isNeutered = isNursingOption.selected;
-    }
+    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
+    // if (isNursingOption) {
+    //   dogStore.dog.isNeutered = isNursingOption.selected;
+    // }
   };
 
   const activityOptions: Option[] = [
@@ -191,26 +191,26 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     },
   ];
 
-  const handleActivitySelect = (updatedOptions: typeof options) => {
+  const handleActivitySelect = (updatedOptions: number) => {
     // Sync selected values back to MobX store
-    const lowOption = updatedOptions.find((opt) => opt.title === "Low");
-    if (lowOption) {
-      if (lowOption.selected) {
-        dogData.activity = activityLevel.low;
-      }
-    }
-    const normalOption = updatedOptions.find((opt) => opt.title === "Normal");
-    if (normalOption) {
-      if (normalOption.selected) {
-        dogData.activity = activityLevel.normal;
-      }
-    }
-    const highOption = updatedOptions.find((opt) => opt.title === "High");
-    if (highOption) {
-      if (highOption.selected) {
-        dogData.activity = activityLevel.high;
-      }
-    }
+    // const lowOption = updatedOptions.find((opt) => opt.title === "Low");
+    // if (lowOption) {
+    //   if (lowOption.selected) {
+    //     dogData.activity = activityLevel.low;
+    //   }
+    // }
+    // const normalOption = updatedOptions.find((opt) => opt.title === "Normal");
+    // if (normalOption) {
+    //   if (normalOption.selected) {
+    //     dogData.activity = activityLevel.normal;
+    //   }
+    // }
+    // const highOption = updatedOptions.find((opt) => opt.title === "High");
+    // if (highOption) {
+    //   if (highOption.selected) {
+    //     dogData.activity = activityLevel.high;
+    //   }
+    // }
   };
 
   const allergyOptions: Option[] = [
@@ -236,11 +236,11 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     };
   }) : [];
 
-  const handleAllergySelect = (updatedOptions: typeof options) => {
-    const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    if (isNursingOption) {
-      dogData.isAllergic = isNursingOption.selected;
-    }
+  const handleAllergySelect = (updatedOptions: number) => {
+    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
+    // if (isNursingOption) {
+    //   dogData.isAllergic = isNursingOption.selected;
+    // }
   };
 
   const handleHealthSelect = (updatedOptions: ChipOption[]) => {
@@ -275,11 +275,11 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     };
   }) : [];
 
-  const handleHealthIssueSelect = (updatedOptions: typeof options) => {
-    const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    if (isNursingOption) {
-      dogData.hasHealthIssue = isNursingOption.selected;
-    }
+  const handleHealthIssueSelect = (updatedOptions: number) => {
+    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
+    // if (isNursingOption) {
+    //   dogData.hasHealthIssue = isNursingOption.selected;
+    // }
   };
 
   const handleHealthIssuesSelect = (updatedOptions: ChipOption[]) => {
@@ -293,24 +293,24 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
 
   const portionOptions: Option[] = useMemo(() => Object.values(subscriptionType).map(option => {
-    console.log("portionOptions", registeredDog.subscription.type, option)
-    const isSelected = registeredDog.subscription.type.toLocaleLowerCase() === option.toLowerCase()
+    console.log("portionOptions", registeredDog?.subscription.type, option)
     return {
       cardImage: `${option}.svg`,
-      title: option + ` (${registeredDog.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
+      title: option + ` (${registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
-      selected: isSelected,
-      amount: registeredDog.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price,
+      selected: registeredDog?.subscription.type.toLowerCase() === option.toLowerCase(),
+      amount: registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price,
     }
-  }), [registeredDog.subscription.type, registeredDog.subscription.subscriptionTypePrices]);
+  }), [registeredDog?.subscription.type, registeredDog?.subscription.subscriptionTypePrices]);
 
-  const handlePortionSelect = (updatedOptions: Option[]) => {
-    const selected = updatedOptions.filter(op => {
-      return op.selected
-    })
-    console.log("subscription.type", registeredDog.subscription.type, selected[0].title.includes('Full') ? subscriptionType['full'] : selected[0].title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'])
-    registeredDog.subscription.type = selected[0].title.includes('Full') ? subscriptionType['full'] : selected[0].title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'];
+  const handlePortionSelect = (selected: number) => {
+    // const selected = updatedOptions.filter(op => {
+    //   return op.selected
+    // })
+    console.log("subscription.type", registeredDog?.subscription.type, selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
+    userStore.setDogSubscriptionType(dogId, selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
+    // registeredDog.subscription.type = selected.title.includes('Full') ? subscriptionType['full'] : selected.title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'];
   };
 
   useEffect(() => {
@@ -341,7 +341,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               options={baseRecipes.map(({ cardImage, ...rest }, index) => ({
                 ...rest,
                 cardImage: cardImage ?? '',
-                value: registeredDog.subscription.info[index].amount,
+                value: registeredDog?.subscription.info[index].amount,
               }))}
               total={deliveryFrequency * 7}
               onValueChange={(optionTitle, newValue) => {
@@ -360,12 +360,12 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
           onSubmit={async () => {
             try {
               // Only call API if frequency has changed
-              // registeredDog.subscription.info[0].amount += 1
-              if (deliveryFrequency !== registeredDog.subscription.recurring / 7) {
+              // registeredDog?.subscription.info[0].amount += 1
+              if (deliveryFrequency !== registeredDog?.subscription.recurring / 7) {
                 const sub = {
-                  selectedRecipes: registeredDog.subscription.selectedRecipes,
+                  selectedRecipes: registeredDog?.subscription.selectedRecipes,
                   recurring: deliveryFrequency * 7, // Convert weeks to days
-                  sub: registeredDog.subscription.info.map((info: subscriptionInfo ) => {
+                  sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
                     const recipeIdValue =
                       info.recipeId;
                     return {
@@ -377,7 +377,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
                 const result = await api.updateDogRecurring(dogId, sub);
                 if (result.status === "success") {
-                  // setDeliveryFrequency(registeredDog.subscription.recurring / 7)
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
                   registeredDog.subscription.recurring = deliveryFrequency * 7
                   setIsFrequencyPopupOpen(false);
                   setIsRecipePopupOpen(false);
@@ -388,11 +388,11 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                   console.error("Failed to update dog recurring:", result.err);
                   alert("Failed to update delivery frequency. Please try again.");
                 }
-              } else if ((chickenAmount !== registeredDog.subscription.info[0]?.amount) || (salmonAmount !== registeredDog.subscription.info[1]?.amount) || (BeefAmount !== registeredDog.subscription.info[2]?.amount)) {
+              } else if ((chickenAmount !== registeredDog?.subscription.info[0]?.amount) || (salmonAmount !== registeredDog?.subscription.info[1]?.amount) || (BeefAmount !== registeredDog?.subscription.info[2]?.amount)) {
                 const sub = {
-                  selectedRecipes: registeredDog.subscription.selectedRecipes,
+                  selectedRecipes: registeredDog?.subscription.selectedRecipes,
                   recurring: deliveryFrequency * 7, // Convert weeks to days
-                  sub: registeredDog.subscription.info.map((info: subscriptionInfo) => {
+                  sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
                     // Handle both old format (recipeId as number) and new format (recipeId as object)
                     // const recipeIdValue = typeof info.recipeId === 'object' && info.recipeId?.recipeId
                     //   ? info.recipeId.recipeId
@@ -408,7 +408,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
                 const result = await api.updateDogRecurring(dogId, sub);
                 if (result.status === "success") {
-                  // setDeliveryFrequency(registeredDog.subscription.recurring / 7)
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
                   registeredDog.subscription.recurring = deliveryFrequency * 7
                   setIsFrequencyPopupOpen(false);
                   setIsRecipePopupOpen(false);
@@ -423,9 +423,9 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 setIsFrequencyPopupOpen(false);
                 setIsRecipePopupOpen(false);
               }
-              console.log(chickenAmount, registeredDog.subscription.info[0]?.amount)
-              console.log(salmonAmount, registeredDog.subscription.info[1]?.amount)
-              console.log(BeefAmount, registeredDog.subscription.info[2]?.amount)
+              console.log(chickenAmount, registeredDog?.subscription.info[0]?.amount)
+              console.log(salmonAmount, registeredDog?.subscription.info[1]?.amount)
+              console.log(BeefAmount, registeredDog?.subscription.info[2]?.amount)
             } catch (error) {
               console.error("Error updating dog recurring:", error);
               alert("An error occurred while updating delivery frequency. Please try again.");
@@ -442,7 +442,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <div className='flex flex-col align-center items-center grow gap-10'>
                   <RadioGroup
                     options={allergyOptions}
-                    onSelect={handleAllergySelect}
+                    onSelect={(selected) => { handleAllergySelect(selected) }}
                     multiSelect={false}
                   />
                   {
@@ -466,7 +466,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <div className='flex flex-col align-center items-center grow gap-10'>
                   <RadioGroup
                     options={healthIssueOptions}
-                    onSelect={handleHealthIssueSelect}
+                    onSelect={(selected) => { handleHealthIssueSelect(selected) }}
                     multiSelect={false}
                   />
                   {
@@ -490,7 +490,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <div className='flex flex-row gap-6 md:gap-10'>
                   <RadioGroup
                     options={activityOptions}
-                    onSelect={handleActivitySelect}
+                    onSelect={(selected) => { handleActivitySelect(selected) }}
                     multiSelect={false}
                   />
                 </div>
@@ -510,7 +510,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <div className='flex flex-row gap-6 md:gap-10'>
                   <RadioGroup
                     options={options}
-                    onSelect={handleSelect}
+                    onSelect={(selected) => { handleSelect(selected) }}
                     multiSelect={false}
                   />
                 </div>
@@ -626,9 +626,9 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               {
                 <div className='flex flex-col gap-4 text-center pb-8 justify-center items-center'>
                   <div className="w-[216px] h-[112px] rounded-3xl bg-system_accent shadow-xs border-[0.5px] border-gray_divider p-4 flex flex-col justify-center">
-                    {(deliveryFrequency !== registeredDog.subscription.recurring / 7) && <span className="text-xs text-label_tertiary">{"$" + weeklyPrice + "/WEEK"}</span>}
+                    {(deliveryFrequency !== registeredDog?.subscription.recurring / 7) && <span className="text-xs text-label_tertiary">{"$" + weeklyPrice + "/WEEK"}</span>}
                     <div>
-                      <span className={`text-lg font-felix_bold ${deliveryFrequency < registeredDog.subscription.recurring / 7 ? "text-semantic_red" : "text-system_primary"}`}>{"$" + registeredDog.subscription.weeklyPrices!.filter(p => p.week == deliveryFrequency)[0].price.toFixed(2)}</span>
+                      <span className={`text-lg font-felix_bold ${deliveryFrequency < registeredDog?.subscription.recurring / 7 ? "text-semantic_red" : "text-system_primary"}`}>{"$" + registeredDog?.subscription.weeklyPrices!.filter(p => p.week == deliveryFrequency)[0].price.toFixed(2)}</span>
                       <span className="text-sm text-system_primary">/WEEK</span>
                     </div>
                     <p className="text-system_dark_primary text-sm">{'Longer range, Lower price'}</p>
@@ -690,7 +690,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <div className='flex flex-row gap-6 md:gap-10'>
                   <RadioGroup
                     options={portionOptions}
-                    onSelect={handlePortionSelect}
+                    onSelect={(selected) => { handlePortionSelect(selected) }}
                     multiSelect={true}
                   />
                 </div>

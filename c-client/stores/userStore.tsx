@@ -225,6 +225,11 @@ export class UserStore {
     return (this.user.dogCount !== 0);
   }
 
+  setDogSubscriptionType(dogId: string, type: subscriptionType) {
+    const dog = this.registeredDogs.find(d => d.dog.id === dogId);
+    if (dog) dog.subscription.type = type;
+  }
+
   async loginUser(): Promise<Boolean> {
     console.log('User Store loginUser:', this.user.email, this.user.firstName, this.user.state, this.user.dogCount);
     try {

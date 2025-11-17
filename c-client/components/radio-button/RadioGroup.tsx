@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import React from "react";
 import MainCard from "../cards/MainCard";
@@ -17,7 +18,7 @@ export interface Option {
 
 interface MultiSelectRadioGroupProps {
   options: Option[];
-  onSelect?: (updatedOptions: Option[]) => void; // Callback with updated options
+  onSelect?: (updatedOptions: number) => void; // Callback with updated options
   multiSelect?: boolean; // Flag for multi-select mode
   type?: string;
 }
@@ -29,6 +30,7 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
   type = 'default',
 }) => {
   const handleSelect = (index: number) => {
+    console.log("index", index)
     const updatedOptions = options.map((option, i) => ({
       ...option,
       selected: multiSelect
@@ -37,8 +39,9 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
           : option.selected
         : i === index, // Single select
     }));
+    console.log("updatedOptions", updatedOptions)
     if (onSelect) {
-      onSelect(updatedOptions); // Trigger callback with updated options
+      onSelect(index); // Trigger callback with updated options
     }
   };
 
@@ -103,11 +106,11 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
         {
           options.map((option, index) => (
             <div key={index} >
-              <MainCard 
-                title={option.title} 
-                subtitle={option.subtitle!} 
-                description={option.secondarySubtitle!} 
-                cardImage={option.cardImage!} 
+              <MainCard
+                title={option.title}
+                subtitle={option.subtitle!}
+                description={option.secondarySubtitle!}
+                cardImage={option.cardImage!}
                 selected={option.selected}
                 selectedCardImage={option.selectedCardImage}
                 onPrimarySelect={() => handleSelect(index)}
