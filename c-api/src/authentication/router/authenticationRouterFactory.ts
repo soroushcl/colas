@@ -25,6 +25,7 @@ export const authenticationRouterFactory = (authViews: AuthenticationRouterFacto
   router.post('/forgot-password/', authViews.forgotPassword);
   router.post('/reset-password/', authViews.resetPassword);
   router.post('/update-dog-recurring', authViews.updateDogRecurring);
+  router.post('/update-dog-subscription-foodType', authViews.updateDogSubscriptionFoodType);
   router.post('/update-subscription-recurring', authViews.updateSubscriptionRecurring);
   
   return router;

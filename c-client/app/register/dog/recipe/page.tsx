@@ -74,13 +74,20 @@ const Home: React.FC = observer(() => {
         // }
     };
 
-    const handleSelect = (updatedOptions: Option[]) => {
-        const selectedRecipes = updatedOptions
+    const handleSelect = (selected: number) => {
+        const selectedRecipes = Object.values(protein).map((option, index) => {
+            const isSelected = dogStore.dog.proteins.some(
+                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+            )
+            return {
+                selected: isSelected,
+                title: option
+            }
+        })
             .filter(option => option.selected)
-            .map(option => option.value)
-            .filter((v): v is string => !!v) as unknown as protein[];
+            .map(option => option.title)
+            .filter((v): v is protein => !!v) as unknown as protein[];
 
-        setRecipes(updatedOptions);
         dogStore.subscription.selectedRecipes = selectedRecipes as unknown as protein[];
         console.log("selectedRecipes", dogStore.subscription.selectedRecipes)
     };

@@ -1207,6 +1207,108 @@ const TokenAuthenticationHandler = (
           res.status(500).send({ err: e.toString() });
         }
       },
+      updateDogSubscriptionFoodType: async (req: Request, res: Response) => {
+        try {
+          if (req.user) {
+            let { dogId, type } = req.body;
+
+            dogId = new ObjectId(dogId).toString();
+
+
+            // Cast repositories to access mongo-specific methods and collections
+            const subscriptionMongoRepo = subscriptionRepo as unknown as SubscriptionMongoRepository;
+            const dogMongoRepo = dogRepo as unknown as DogMongoRepository;
+
+            // Access the dog collection directly to update
+            const dogCollection = (dogMongoRepo as any).dogCollection;
+
+            // Find dog with owner verification
+            const dog = await dogRepo.findDogById(dogId);
+            console.log("dog", dog)
+            console.log("sub info", dog?.subscription?.info)
+            console.log("user id", req.user.id)
+
+            if (!dog) {
+              res.status(500).send({ err: "no dogs found" });
+              return;
+            }
+
+            const ownerId = (dog.owner as any) instanceof ObjectId
+              ? (dog.owner as any).toString()
+              : String(dog.owner || '');
+            const userId = String(req.user.id);
+
+            if (ownerId !== userId) {
+              res.status(500).send({ err: "no dogs found" });
+              return;
+            }
+
+            // Get the dog's subscription info
+            const subscriptions = await subscriptionRepo.findSubscriptionsByUserId(req.user.id);
+            // Convert dog field to string (handles both ObjectId and string cases)
+            const dogSubscription = subscriptions.find(s => {
+              const subDogId = (s.dog as any) instanceof ObjectId
+                ? (s.dog as any).toString()
+                : String(s.dog || '');
+              return subDogId === String(dogId);
+            });
+
+            if (!dogSubscription) {
+              res.status(500).send({ err: "no subscription found" });
+              return;
+            }
+
+            // Build info array from sub.sub
+            
+            // Set dogPrice if not set (backward compatibility)
+            if (!dogSubscription.dogPrice) {
+              dogSubscription.dogPrice = dogSubscription.dailyPrice;
+            }
+
+            // Calculate new daily price using subscriptionPriceCalculator
+            const updatedSubscription: Subscription = {
+              ...dogSubscription,
+              type: type,
+            };
+
+            const dailyPrice = subscriptionMongoRepo.subscriptionPriceCalculator(updatedSubscription);
+
+            updatedSubscription.dailyPrice = dailyPrice;
+
+            // Update subscription document
+            console.log("updatedSubscription", updatedSubscription)
+            await subscriptionRepo.addSubscription(updatedSubscription);
+
+            // Update dog document's subscription reference
+            await dogCollection.updateOne(
+              { _id: new ObjectId(dogId), owner: req.user.id },
+              {
+                $set: {
+                  'subscription.dailyPrice': dailyPrice,
+                  'subscription.type': type,
+                }
+              }
+            );
+
+            // Call updateSubscriptionRecurringInternal helper function
+            const updateResult = await updateSubscriptionRecurringInternal(req.user.id, dogId);
+
+            if (updateResult.success) {
+              res.send({
+                status: "success",
+                price: (dailyPrice * dog.subscription?.recurring!).toLocaleString("en-US", { style: "currency", currency: "USD" }).substring(1)
+              });
+            } else {
+              res.status(500).send({ err: updateResult.error || 'Something went wrong with stripe' });
+            }
+          } else {
+            res.status(500).send({ err: "no Users found" });
+          }
+        } catch (e: any) {
+          console.log(e);
+          res.status(500).send({ err: e.toString() });
+        }
+      },
       authGuard: async (req: Request, res: Response, next: NextFunction) => {
         if (req.isAuthenticated && req.isAuthenticated()) {
           next();

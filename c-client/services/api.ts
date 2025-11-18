@@ -33,6 +33,7 @@ import {
     getBreedsResponseBody,
     paymentIntentResponseBody,
     paymentIntentRequestBody,
+    subscriptionType,
 } from 'c-lib';
 
 if (typeof window === "undefined") {
@@ -44,7 +45,7 @@ type fetch = typeof fetch;
 
 export default class FetchApi {
     private token: string | null = null;
-    
+
     constructor(
         private fetch: fetch = global.fetch.bind(global),
         public baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
@@ -126,7 +127,7 @@ export default class FetchApi {
     };
 
     // Google Login
-    googleLogin = async (code: string): Promise<googleLoginResponseBody>  => {
+    googleLogin = async (code: string): Promise<googleLoginResponseBody> => {
 
         const res = await this.request<googleLoginResponseBody, googleLoginRequestBody>(`${this.baseUrl}/authentication/google-login`, {
             method: "POST",
@@ -345,7 +346,7 @@ export default class FetchApi {
         });
 
         console.log("getBreeds res", res);
-        
+
         if (!res.ok) {
             const json = await res.json();
             throw ((json)?.error);
@@ -366,6 +367,21 @@ export default class FetchApi {
             },
         });
         console.log("updateDogRecurring res", res);
+        return res;
+    };
+
+    // Update-dog-subscription-foodType
+    updateDogSubscriptionFoodType = async (dogId: string, type: subscriptionType): Promise<{ status: string; err?: string }> => {
+        console.log("updateDogSubscriptionFoodType called", dogId, type);
+        const res = await this.request<{ status: string; price?: string; err?: string }, { dogId: string; type: subscriptionType }>(`${this.baseUrl}/authentication/update-dog-subscription-foodType`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                dogId,
+                type
+            },
+        });
+        console.log("updateDogSubscriptionFoodType res", res);
         return res;
     };
 

@@ -41,12 +41,9 @@ export default function Header({
         },
     ];
 
-    const handleSelect = (updatedOptions: typeof options) => {
+    const handleSelect = (selected: number) => {
         // Sync selected values back to MobX store
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.isNeutered = isNursingOption.selected;
-        }
+        dogStore.dog.isNeutered = selected == 0 ? true : false
     };
 
     const activityOptions: Option[] = [
@@ -70,26 +67,10 @@ export default function Header({
         },
     ];
 
-    const handleActivitySelect = (updatedOptions: typeof options) => {
+    const handleActivitySelect = (selected: number) => {
         // Sync selected values back to MobX store
-        const lowOption = updatedOptions.find((opt) => opt.title === "Low");
-        if (lowOption) {
-            if (lowOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.low;
-            }
-        }
-        const normalOption = updatedOptions.find((opt) => opt.title === "Normal");
-        if (normalOption) {
-            if (normalOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.normal;
-            }
-        }
-        const highOption = updatedOptions.find((opt) => opt.title === "High");
-        if (highOption) {
-            if (highOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.high;
-            }
-        }
+
+        dogStore.dog.activityLevel = selected == 0 ? activityLevel.low : selected == 1 ? activityLevel.normal : activityLevel.high;
     };
 
     const allergyOptions: Option[] = [
@@ -115,11 +96,8 @@ export default function Header({
         };
     });
 
-    const handleAllergySelect = (updatedOptions: typeof options) => {
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.isAllergic = isNursingOption.selected;
-        }
+    const handleAllergySelect = (selected: number) => {
+        dogStore.dog.isAllergic = selected == 0 ? true : false
     };
 
     const handleHealthSelect = (updatedOptions: ChipOption[]) => {
@@ -154,11 +132,8 @@ export default function Header({
         };
     });
 
-    const handleHealthIssueSelect = (updatedOptions: typeof options) => {
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.hasHealthIssue = isNursingOption.selected;
-        }
+    const handleHealthIssueSelect = (selected: number) => {
+        dogStore.dog.hasHealthIssue = selected == 0 ? true : false
     };
 
     const handleHealthIssuesSelect = (updatedOptions: ChipOption[]) => {
@@ -182,8 +157,16 @@ export default function Header({
         }
     })
 
-    const handleProteinSelect = (updatedOptions: Option[]) => {
-        const selectedIssues = updatedOptions
+    const handleProteinSelect = (selected: number) => {
+        const selectedIssues = Object.values(protein).map((option, index) => {
+            const isSelected = dogStore.dog.proteins.some(
+                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+            )
+            return {
+                selected: isSelected,
+                title: option
+            }
+        })
             .filter(option => option.selected)
             .map(option => getEnumKeyByValue(protein, option.title))
             .filter((key): key is keyof typeof protein => !!key);
@@ -203,11 +186,8 @@ export default function Header({
         }
     })
 
-    const handlePortionSelect = (updatedOptions: Option[]) => {
-        const selected = updatedOptions.filter(op => {
-            return op.selected
-        })
-        dogStore.subscription.type = selected[0].title as unknown as subscriptionType;
+    const handlePortionSelect = (selected: number) => {
+        dogStore.subscription.type = selected == 0 ? subscriptionType.full : selected == 1 ? subscriptionType.half : subscriptionType.topper
     };
 
     const baseRecipes: Option[] = [
@@ -249,15 +229,22 @@ export default function Header({
         // },
     ];
 
-    const [recipes, setRecipes] = useState<Option[]>(baseRecipes);
+    const [recipes, ] = useState<Option[]>(baseRecipes);
 
-    const handleRecipeSelect = (updatedOptions: Option[]) => {
-        const selectedRecipes = updatedOptions
+    const handleRecipeSelect = (selected: number) => {
+        const selectedRecipes = Object.values(protein).map((option, index) => {
+            const isSelected = dogStore.dog.proteins.some(
+                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+            )
+            return {
+                selected: isSelected,
+                title: option
+            }
+        })
             .filter(option => option.selected)
-            .map(option => option.value)
-            .filter((v): v is string => !!v) as unknown as protein[];
+            .map(option => option.title)
+            .filter((v): v is protein => !!v) as unknown as protein[];
 
-        setRecipes(updatedOptions);
         dogStore.subscription.selectedRecipes = selectedRecipes as unknown as protein[];
         console.log("selectedRecipes", dogStore.subscription.selectedRecipes)
     };

@@ -54,6 +54,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
   const recipe = recipes?.toString().substring(0, recipes.toString().length)
   const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog?.subscription.recurring / 7);
+  const [mealType, setMealType] = useState(registeredDog?.subscription.type);
   const [dogData] = useState({
     name: registeredDog?.dog.name.charAt(0).toUpperCase() + registeredDog?.dog.name.slice(1),
     breed: registeredDog?.dog.breed,
@@ -163,6 +164,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   ];
 
   const handleSelect = (updatedOptions: number) => {
+    console.log(updatedOptions)
     // Sync selected values back to MobX store
     // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
     // if (isNursingOption) {
@@ -192,6 +194,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   ];
 
   const handleActivitySelect = (updatedOptions: number) => {
+    console.log(updatedOptions)
     // Sync selected values back to MobX store
     // const lowOption = updatedOptions.find((opt) => opt.title === "Low");
     // if (lowOption) {
@@ -237,6 +240,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   }) : [];
 
   const handleAllergySelect = (updatedOptions: number) => {
+    console.log(updatedOptions)
     // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
     // if (isNursingOption) {
     //   dogData.isAllergic = isNursingOption.selected;
@@ -276,6 +280,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   }) : [];
 
   const handleHealthIssueSelect = (updatedOptions: number) => {
+    console.log(updatedOptions)
     // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
     // if (isNursingOption) {
     //   dogData.hasHealthIssue = isNursingOption.selected;
@@ -299,17 +304,17 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       title: option + ` (${registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
-      selected: registeredDog?.subscription.type.toLowerCase() === option.toLowerCase(),
+      selected: mealType.toLowerCase() === option.toLowerCase(),
       amount: registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price,
     }
-  }), [registeredDog?.subscription.type, registeredDog?.subscription.subscriptionTypePrices]);
+  }), [registeredDog?.subscription.type, registeredDog?.subscription.subscriptionTypePrices, mealType]);
 
   const handlePortionSelect = (selected: number) => {
     // const selected = updatedOptions.filter(op => {
     //   return op.selected
     // })
-    console.log("subscription.type", registeredDog?.subscription.type, selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
-    userStore.setDogSubscriptionType(dogId, selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
+    console.log("subscription.type", mealType, registeredDog?.subscription.type, selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
+    setMealType(selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper'])
     // registeredDog.subscription.type = selected.title.includes('Full') ? subscriptionType['full'] : selected.title.includes('Half') ? subscriptionType['half'] : subscriptionType['topper'];
   };
 
@@ -699,7 +704,34 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsPortionPopupOpen(false)}
-          onSubmit={() => setIsPortionPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (mealType !== registeredDog?.subscription.type) {
+                userStore.setDogSubscriptionType(dogId, mealType)
+                
+                const result = await api.updateDogSubscriptionFoodType(dogId, mealType);
+                if (result.status === "success") {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  registeredDog.subscription.recurring = deliveryFrequency * 7
+                  setIsFrequencyPopupOpen(false);
+                  setIsRecipePopupOpen(false);
+                  // Optionally refresh the page or update the store
+                  window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                  window.location.reload();
+                } else {
+                  console.error("Failed to update dog subscription type:", result.err);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsPortionPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog subscription type:", error);
+              alert("An error occurred while updating subscription type. Please try again.");
+            }
+          }}
           isOpen={isPortionPopupOpen}
         />
         {/* Dog Profile Picture */}

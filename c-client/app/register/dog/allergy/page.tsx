@@ -37,10 +37,11 @@ const Home: React.FC = observer(() => {
         };
     });
 
-    const handleSelect = (updatedOptions: typeof options) => {
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.isAllergic = isNursingOption.selected;
+    const handleSelect = (selected: number) => {
+        if (selected == 0) {
+            dogStore.dog.isAllergic = true;
+        } else {
+            dogStore.dog.isAllergic = false;
         }
     };
 

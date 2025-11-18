@@ -36,25 +36,16 @@ const Home: React.FC = observer(() => {
         },
     ];
 
-    const handleSelect = (updatedOptions: typeof options) => {
+    const handleSelect = (selected: number) => {
         // Sync selected values back to MobX store
-        const lowOption = updatedOptions.find((opt) => opt.title === "Under Weight");
-        if (lowOption) {
-            if (lowOption.selected) {
-                dogStore.dog.shape = shape.underweight;
-            }
+        if (selected == 0) {
+            dogStore.dog.shape = shape.underweight;
         }
-        const normalOption = updatedOptions.find((opt) => opt.title === "Ideal Weight");
-        if (normalOption) {
-            if (normalOption.selected) {
-                dogStore.dog.shape = shape.fit;
-            }
+        if (selected == 1) {
+            dogStore.dog.shape = shape.fit;
         }
-        const highOption = updatedOptions.find((opt) => opt.title === "Over Weight");
-        if (highOption) {
-            if (highOption.selected) {
-                dogStore.dog.shape = shape.overweight;
-            }
+        if (selected == 2) {
+            dogStore.dog.shape = shape.overweight;
         }
     };
 

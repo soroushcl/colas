@@ -10,7 +10,7 @@ import { healthIssue } from 'c-lib';
 import { getEnumKeyByValue } from '@/utils/enumHelper';
 
 const Home: React.FC = observer(() => {
-    const { dogStore ,userStore } = useStores();
+    const { dogStore, userStore } = useStores();
     // const { mainButtondisabled } = regStore;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
@@ -37,17 +37,14 @@ const Home: React.FC = observer(() => {
         };
     });
 
-    const handleSelect = (updatedOptions: typeof options) => {
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.hasHealthIssue = isNursingOption.selected;
-        }
+    const handleSelect = (selected: number) => {
+        dogStore.dog.hasHealthIssue = selected == 0 ? true : false;
     };
 
     const handleHealthSelect = (updatedOptions: ChipOption[]) => {
         const selectedIssues = updatedOptions
             .filter(option => option.selected)
-            .map(option => getEnumKeyByValue(healthIssue, option.title)) 
+            .map(option => getEnumKeyByValue(healthIssue, option.title))
             .filter((key): key is keyof typeof healthIssue => !!key);
 
         dogStore.dog.healthIssue = selectedIssues as unknown as healthIssue[];

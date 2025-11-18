@@ -22,6 +22,7 @@ export interface AuthenticationHandler {
     updateUserById: RequestHandler;
     updateDogRecurring: RequestHandler;
     updateSubscriptionRecurring: RequestHandler;
+    updateDogSubscriptionFoodType: RequestHandler;
     // updateCustomer: RequestHandler;
     // deactivateUser: RequestHandler;
     // reactivateUser: RequestHandler;
@@ -44,6 +45,7 @@ export interface AuthenticationRouterFactoryViews {
   updateUser: RequestHandler;
   updateUserById: RequestHandler;
   updateDogRecurring: RequestHandler;
+  updateDogSubscriptionFoodType: RequestHandler;
   updateSubscriptionRecurring: RequestHandler;
   // updateCustomer: RequestHandler;
   // deactivateUser: RequestHandler;

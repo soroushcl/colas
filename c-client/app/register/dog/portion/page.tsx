@@ -26,11 +26,8 @@ const Home: React.FC = observer(() => {
         }
     })
 
-    const handleSelect = (updatedOptions: Option[]) => {
-        const selected = updatedOptions.filter(op => {
-            return op.selected
-        })
-        dogStore.subscription.type = selected[0].title as unknown as subscriptionType;
+    const handleSelect = (selected: number) => {
+        dogStore.subscription.type = selected == 0 ? subscriptionType['full'] : selected == 1 ? subscriptionType['half'] : subscriptionType['topper']
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

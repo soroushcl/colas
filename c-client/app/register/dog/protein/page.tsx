@@ -29,8 +29,16 @@ const Home: React.FC = observer(() => {
         }
     })
 
-    const handleSelect = (updatedOptions: Option[]) => {
-        const selectedIssues = updatedOptions
+    const handleSelect = (selected: number) => {
+        const selectedIssues = Object.values(protein).map((option, index) => {
+            const isSelected = dogStore.dog.proteins.some(
+                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+            )
+            return {
+                selected: isSelected,
+                title: option
+            }
+        })
             .filter(option => option.selected)
             .map(option => getEnumKeyByValue(protein, option.title))
             .filter((key): key is keyof typeof protein => !!key);
@@ -42,13 +50,13 @@ const Home: React.FC = observer(() => {
         e.preventDefault();
         // router.push('/register/dog/nutrition');
         setLoading(true)
-        
+
         // Start both the API call and the 5-second timer simultaneously
         const [res] = await Promise.all([
             dogStore.registerDog(userStore.user.id),
             new Promise(resolve => setTimeout(resolve, 5000))
         ]);
-        
+
         if (res) {
             router.push('/register/dog/report');
             console.log(res)

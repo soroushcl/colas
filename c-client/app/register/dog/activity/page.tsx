@@ -33,25 +33,18 @@ const Home: React.FC = observer(() => {
         },
     ];
 
-    const handleSelect = (updatedOptions: typeof options) => {
+    const handleSelect = (selected: number) => {
+        console.log(selected)
+
         // Sync selected values back to MobX store
-        const lowOption = updatedOptions.find((opt) => opt.title === "Low");
-        if (lowOption) {
-            if (lowOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.low;
-            }
+        if (selected == 0) {
+            dogStore.dog.activityLevel = activityLevel.low;
         }
-        const normalOption = updatedOptions.find((opt) => opt.title === "Normal");
-        if (normalOption) {
-            if (normalOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.normal;
-            }
+        if (selected == 1) {
+            dogStore.dog.activityLevel = activityLevel.normal;
         }
-        const highOption = updatedOptions.find((opt) => opt.title === "High");
-        if (highOption) {
-            if (highOption.selected) {
-                dogStore.dog.activityLevel = activityLevel.high;
-            }
+        if (selected == 2) {
+            dogStore.dog.activityLevel = activityLevel.high;
         }
     };
 

@@ -24,12 +24,8 @@ const Home: React.FC = observer(() => {
         },
     ];
 
-    const handleSelect = (updatedOptions: typeof options) => {
-        // Sync selected values back to MobX store
-        const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-        if (isNursingOption) {
-            dogStore.dog.isPregnant = isNursingOption.selected;
-        }
+    const handleSelect = (selected: number) => {
+        dogStore.dog.isPregnant = selected == 0 ? true : false;
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

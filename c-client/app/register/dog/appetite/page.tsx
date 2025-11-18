@@ -8,7 +8,7 @@ import { eatingHabit } from 'c-lib';
 import RadioGroup, { Option } from '@/components/radio-button/RadioGroup';
 
 const Home: React.FC = observer(() => {
-    const { dogStore,  userStore } = useStores();
+    const { dogStore, userStore } = useStores();
     // const { mainButtondisabled } = regStore;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
@@ -33,25 +33,16 @@ const Home: React.FC = observer(() => {
         },
     ];
 
-    const handleSelect = (updatedOptions: typeof options) => {
+    const handleSelect = (selected: number) => {
         // Sync selected values back to MobX store
-        const lowOption = updatedOptions.find((opt) => opt.title === eatingHabit.picky);
-        if (lowOption) {
-            if (lowOption.selected) {
-                dogStore.dog.eating = eatingHabit.picky;
-            }
+        if (selected == 0) {
+            dogStore.dog.eating = eatingHabit.picky;
         }
-        const normalOption = updatedOptions.find((opt) =>  opt.title === eatingHabit.good);
-        if (normalOption) {
-            if (normalOption.selected) {
-                dogStore.dog.eating = eatingHabit.good;
-            }
+        if (selected == 1) {
+            dogStore.dog.eating = eatingHabit.good;
         }
-        const highOption = updatedOptions.find((opt) =>  opt.title === eatingHabit.great);
-        if (highOption) {
-            if (highOption.selected) {
-                dogStore.dog.eating = eatingHabit.great;
-            }
+        if (selected == 2) {
+            dogStore.dog.eating = eatingHabit.great;
         }
     };
 
