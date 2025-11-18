@@ -22,6 +22,30 @@ interface DogProfilePageClientProps {
   dogId: string;
 }
 
+const nextWeeksCalculator = (weeks?: number) => {
+  if (!weeks) {
+    weeks = 28
+  }
+  const now = new Date();
+  // if (date) now = date;
+  const t = now.getDay();
+  let diff = 0;
+  diff = (7 + (1 - t)) % 7 || 7;
+  let nextMonday;
+  if (diff <= 4) {
+    nextMonday = new Date(new Date(now.setDate(now.getDate() + diff + 7)).setHours(0, 0, 0));
+  } else {
+    nextMonday = new Date(new Date(now.setDate(now.getDate() + diff)).setHours(0, 0, 0));
+  }
+  let tempNextMonday = new Date(nextMonday);
+  const result = [tempNextMonday.toLocaleString('default', { year: "numeric", month: "long", day: "numeric" }).toUpperCase()];
+  for (let i = 1; i < weeks; i++) {
+    tempNextMonday = new Date(tempNextMonday.getTime() + 7 * 24 * 60 * 60 * 1000)
+    result.push(tempNextMonday.toLocaleString('default', { year: "numeric", month: "long", day: "numeric" }).toUpperCase())
+  }
+  return result;
+}
+
 export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientProps) => {
   const { userStore, dogStore } = useStores();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,6 +75,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   const [chickenAmount,] = useState(registeredDog?.subscription.info[0]?.amount || 0)
   const [salmonAmount,] = useState(registeredDog?.subscription.info[1]?.amount || 0)
   const [BeefAmount,] = useState(registeredDog?.subscription.info[2]?.amount || 0)
+
+  const shortNextWeeks = nextWeeksCalculator(4);
 
   const recipe = recipes?.toString().substring(0, recipes.toString().length)
   const [deliveryFrequency, setDeliveryFrequency] = useState(registeredDog?.subscription.recurring / 7);
@@ -124,6 +150,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
 
   const [breeds, setBreeds] = useState<string[]>([]);
+  const [breed, setBreed] = useState(dogData.breed);
 
   useEffect(() => {
     const fetchBreeds = async () => {
@@ -304,7 +331,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       title: option + ` (${registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
-      selected: mealType.toLowerCase() === option.toLowerCase(),
+      selected: mealType?.toLowerCase() === option.toLowerCase(),
       amount: registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price,
     }
   }), [registeredDog?.subscription.type, registeredDog?.subscription.subscriptionTypePrices, mealType]);
@@ -612,9 +639,10 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                   placeholder="Breed"
                   onSelect={(value) => {
                     // setSelectedOption(value);
-                    dogStore.dog.breed = value
+                    setBreed(value)
                     console.log("Selected:", value);
                   }}
+                  selected={breed}
                 />
               }
 
@@ -666,12 +694,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               </div>
               <p className="text-label_primary text-sm">When would you like your next box delivery? Please choose from the lis below:</p>
               <SearchableSelect
-                options={[
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                ]}
+                options={shortNextWeeks}
                 onSelect={function (value: string): void {
                   throw new Error("Function not implemented." + value);
                 }}
@@ -710,7 +733,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               // registeredDog?.subscription.info[0].amount += 1
               if (mealType !== registeredDog?.subscription.type) {
                 userStore.setDogSubscriptionType(dogId, mealType)
-                
+
                 const result = await api.updateDogSubscriptionFoodType(dogId, mealType);
                 if (result.status === "success") {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)

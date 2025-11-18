@@ -12,6 +12,30 @@ import DogPopup from "@/components/popups/DogPopup";
 // import CustomNumberComponent from "@/components/CustomNumberComponent";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 
+const nextWeeksCalculator = (weeks?: number) => {
+  if (!weeks) {
+    weeks = 28
+  }
+  const now = new Date();
+  // if (date) now = date;
+  const t = now.getDay();
+  let diff = 0;
+  diff = (7 + (1 - t)) % 7 || 7;
+  let nextMonday;
+  if (diff <= 4) {
+    nextMonday = new Date(new Date(now.setDate(now.getDate() + diff + 7)).setHours(0, 0, 0));
+  } else {
+    nextMonday = new Date(new Date(now.setDate(now.getDate() + diff)).setHours(0, 0, 0));
+  }
+  let tempNextMonday = new Date(nextMonday);
+  const result = [tempNextMonday.toLocaleString('default', { year: "numeric", month: "long", day: "numeric" }).toUpperCase()];
+  for (let i = 1; i < weeks; i++) {
+    tempNextMonday = new Date(tempNextMonday.getTime() + 7 * 24 * 60 * 60 * 1000)
+    result.push(tempNextMonday.toLocaleString('default', { year: "numeric", month: "long", day: "numeric" }).toUpperCase())
+  }
+  return result;
+}
+
 export default function OrderPage() {
   const { userStore } = useStores();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,6 +43,8 @@ export default function OrderPage() {
   const router = useRouter();
   const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
   const [isDeliveryDatePopupOpen, setIsDeliveryDatePopupOpen] = useState(false);
+
+  const nextWeeks = nextWeeksCalculator();
   // const [deliveryFrequency, setDeliveryFrequency] = useState(8);
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -129,12 +155,7 @@ export default function OrderPage() {
               </div>
               <p className="text-label_primary text-sm">When would you like your next box delivery? Please choose from the lis below:</p>
               <SearchableSelect
-                options={[
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                  'WEEK OF OCTOBER 28, 2024',
-                ]}
+                options={nextWeeks}
                 onSelect={function (value: string): void {
                   throw new Error("Function not implemented." + value);
                 }}
