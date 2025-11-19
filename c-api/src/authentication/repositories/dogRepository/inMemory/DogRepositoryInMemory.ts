@@ -24,6 +24,10 @@ export class DogRepositoryInMemory extends DogRepository {
     });
   }
 
+  checkAndUpdateDogLifeStage(_dogId: string): Promise<void> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+
   // export function createDb(): Dog[] {
   //   return [
   //     {

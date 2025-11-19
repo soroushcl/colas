@@ -1,3 +1,4 @@
+import { createMongoId, toMongo } from '@utils/mongoUtils';
 import { OrderRepository } from '../OrderRepository';
 import { Order, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
@@ -52,6 +53,21 @@ export class OrderMongoRepository extends OrderRepository {
     return list as unknown as Order[];
   }
 
+  async addOrder(order: Order): Promise<Order> {
+    const normalizedOrder = this.ensureValidOrderId(order);
+    const inserted = await this.orderCollection.insertOne(toMongo(normalizedOrder));
+    const newOrder = await this.orderCollection.findOne({ _id: inserted.insertedId });
+    return newOrder as unknown as Order;
+  }
 
+  private ensureValidOrderId(order: Order): Order {
+    if (order.id && ObjectId.isValid(order.id)) {
+      return order;
+    }
+    return {
+      ...order,
+      id: createMongoId(),
+    };
+  }
 }
 

@@ -28,4 +28,11 @@ export class OrderRepositoryInMemory extends OrderRepository {
     });
   }
 
+  addOrder(order: Order): Promise<Order> | Promise<never> {
+    return new Promise((resolve, reject) => {
+      this.db.push(order as Order);
+      resolve(order as Order);
+    });
+  }
+
 }

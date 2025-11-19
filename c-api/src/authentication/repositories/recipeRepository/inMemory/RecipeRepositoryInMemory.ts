@@ -33,4 +33,10 @@ export class RecipeRepositoryInMemory extends RecipeRepository {
     });
   }
 
+  updateDogRecipes(dog: Dog, versionNumber: number): Promise<{ success: boolean, error?: string }> | Promise<never> {
+    return new Promise((resolve) => {
+      resolve({ success: true });
+    });
+  }
+
 }

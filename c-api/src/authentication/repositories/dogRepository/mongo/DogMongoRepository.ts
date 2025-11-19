@@ -1,7 +1,9 @@
 import { DogRepository } from '../DogRepository';
-import { Dog, User } from 'c-lib';
+import { Dog, dogLifeStage, Subscription, User } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
 import { fromMongo, toMongo } from "@utils/mongoUtils";
+import { SubscriptionMongoRepository, SubscriptionRepository } from '@auth/repositories/subscriptionRepository';
+import { BreedRepository } from 'src/breeds/repositories';
 
 
 export class DogMongoRepository extends DogRepository {
@@ -20,10 +22,19 @@ export class DogMongoRepository extends DogRepository {
     return fromMongo(dog as any) as unknown as Dog;
   }
   private dogCollection: Collection;
-
-  constructor(db: Db, dogCollectionName: string) {
+  private priceModelCollection: Collection;
+  private subscriptionRepo?: SubscriptionRepository;
+  private breedRepo: BreedRepository;
+  constructor(db: Db, dogCollectionName: string, priceModelCollectionName: string, breedRepo: BreedRepository, subscriptionRepo?: SubscriptionRepository) {
     super();
     this.dogCollection = db.collection(dogCollectionName);
+    this.priceModelCollection = db.collection(priceModelCollectionName);
+    this.subscriptionRepo = subscriptionRepo;
+    this.breedRepo = breedRepo;
+  }
+
+  setSubscriptionRepository(subscriptionRepo: SubscriptionRepository) {
+    this.subscriptionRepo = subscriptionRepo;
   }
 
 
@@ -42,5 +53,47 @@ export class DogMongoRepository extends DogRepository {
     const list = await cursor.toArray();
     return list as unknown as Dog[];
   }
+
+  async calculateDogLifeStage(age: Date, breedName: string): Promise<dogLifeStage> {
+    // console.log("calculateDogLifeStage", age, breedName)
+    let breed = await this.breedRepo.getBreedByName(breedName.replace(/\(/g, '\\(').replace(/\)/g, '\\)'))
+    if (breed) {
+        let ageInMonth = (new Date().getTime() - new Date(age).getTime()) / (1000 * 60 * 60 * 24 * 30);
+        // console.log("breed", breed, ageInMonth, breed.adultAgeInMounth, breed.seniorAgeInMounth)
+        return ageInMonth < breed.adultAgeInMonth ? dogLifeStage.puppy : ageInMonth < breed.seniorAgeInMonth ? dogLifeStage.adult : dogLifeStage.senior;
+    } else {
+        console.log("no Breed found!", breedName.replace(/\(/g, '\\(').replace(/\)/g, '\\)'))
+        return dogLifeStage.adult;
+    }
+}
+
+  async checkAndUpdateDogLifeStage(dogId: string): Promise<void> {
+    const dog = await this.findDogById(String(dogId));
+    if (!this.subscriptionRepo) {
+      throw new Error("Subscription repository not configured for DogMongoRepository");
+    }
+    const subscriptionMongoRepo = this.subscriptionRepo as unknown as SubscriptionMongoRepository;
+    const subscriptionCollection = (subscriptionMongoRepo as any).subscriptionCollection;
+    if (dog) {
+        const priceModel = await this.priceModelCollection.findOne({ dog: new ObjectId(dogId) });
+        if (priceModel) {
+            const lastLifeStage = priceModel.dogLifeStage;
+            const currentLifeStage = await this.calculateDogLifeStage(dog.age, dog.breed);
+            if (lastLifeStage == currentLifeStage) {
+                return;
+            } else {
+                const dogPrice = await subscriptionMongoRepo.createDogDailyPrice(dog, priceModel.priceVersion)
+                const dailyPrice = subscriptionMongoRepo.subscriptionPriceCalculator({ ...dog.subscription as Subscription, dogPrice: dogPrice ?? 0 });
+                await this.dogCollection.updateOne({ _id: new ObjectId(dog.id) }, { $set: { subscription: { ...dog.subscription as Subscription, dogPrice: dogPrice, dailyPrice: dailyPrice } } });
+                await subscriptionCollection.updateOne({ dog: new ObjectId(dog.id) }, { $set: { dailyPrice: dailyPrice } });
+            }
+        } else {
+            console.log("no priceModel found!", dogId)
+        }
+
+    } else {
+        console.log("no Dog found!", dogId)
+    }
+}
 
 }

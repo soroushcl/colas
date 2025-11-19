@@ -1,5 +1,5 @@
 import { OAuth2Client } from 'google-auth-library';
-import { UserRepository, DogRepository, RecipeRepository, SubscriptionRepository, StripeCustomerRepository } from '../repositories/index';
+import { UserRepository, DogRepository, RecipeRepository, SubscriptionRepository, StripeCustomerRepository, StripeCustomerSubscriptionEntry, RecipeMongoRepository } from '../repositories/index';
 import {
   AuthenticationHandler,
   compareFunction,
@@ -447,7 +447,7 @@ const TokenAuthenticationHandler = (
             let subscriptionTypePrices: subscriptionTypePrice[] = [];
             for (let k = 1; k < 4; k++) {
               // let dailyPrice = subscriptionPriceCalculator({ ...dog.subscription.toJSON(), recurring: k * 7 })
-              let dailyPrice = await subscriptionRepo.subscriptionDiscountedPriceCalculator({ ...subscriptions[i], type: k == 1 ? subscriptionType['full'] : k == 2 ? subscriptionType['half'] : subscriptionType['topper'], dogPrice: subscriptions[i].dogPrice ? subscriptions[i].dogPrice : dogs[i].subscription?.dogPrice || 0 })
+              let dailyPrice = await subscriptionRepo.subscriptionDiscountedPriceCalculator({ ...subscriptions[i], type: k == 1 ? subscriptionType['full'] : k == 2 ? subscriptionType['half'] : subscriptionType['topper'], dogPrice: subscriptions[i].dogPrice ? subscriptions[i].dogPrice : dogs[i].subscription?.dogPrice || 0, recurring: subscriptions[i].recurring ?? dogs[i].subscription?.recurring ?? 28 })
               let price = (dailyPrice * 7)
               subscriptionTypePrices.push({ type: k == 1 ? subscriptionType['full'] : k == 2 ? subscriptionType['half'] : subscriptionType['topper'], price: price })
             }
@@ -1219,9 +1219,9 @@ const TokenAuthenticationHandler = (
             const subscriptionMongoRepo = subscriptionRepo as unknown as SubscriptionMongoRepository;
             const dogMongoRepo = dogRepo as unknown as DogMongoRepository;
 
+
             // Access the dog collection directly to update
             const dogCollection = (dogMongoRepo as any).dogCollection;
-
             // Find dog with owner verification
             const dog = await dogRepo.findDogById(dogId);
             console.log("dog", dog)
@@ -1259,7 +1259,7 @@ const TokenAuthenticationHandler = (
             }
 
             // Build info array from sub.sub
-            
+
             // Set dogPrice if not set (backward compatibility)
             if (!dogSubscription.dogPrice) {
               dogSubscription.dogPrice = dogSubscription.dailyPrice;
@@ -1303,6 +1303,183 @@ const TokenAuthenticationHandler = (
             }
           } else {
             res.status(500).send({ err: "no Users found" });
+          }
+        } catch (e: any) {
+          console.log(e);
+          res.status(500).send({ err: e.toString() });
+        }
+      },
+
+      reactivateSubscription: async (req: Request, res: Response) => {
+        try {
+          console.log("AAA", req.body)
+          if (req.body.subscriptionId) {
+            let tempSub = await subscriptionRepo.findSubscriptionsById(req.body.subscriptionId)
+            if (tempSub) {
+              const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+              const stripeCustomerCollection = (stripeCustomerMongoRepo as any).collection;
+              const subscriptionMongoRepo = subscriptionRepo as unknown as SubscriptionMongoRepository;
+              const dogMongoRepo = dogRepo as unknown as DogMongoRepository;
+              const recipeMongoRepo = recipeRepo as unknown as RecipeMongoRepository;
+              const stripe = (stripeCustomerMongoRepo as any).stripe;
+              const sc = await stripeCustomerCollection.findOne({ userId: tempSub.userId });
+              if (sc && sc.subscriptions.length > 0) {
+                let tempDog = await dogRepo.findDogById(String(tempSub.dog));
+                if (tempDog) {
+                  // let tempDog = JSON.parse(req.body.dog)
+                  let dogId = tempDog.id
+                  // console.log("DD", dogId, sc)
+                  let _subscriptions = sc.subscriptions.filter((s: StripeCustomerSubscriptionEntry) => s.dogId.toString() == dogId.toString())
+                  if (_subscriptions.length > 0) {
+                    let { subscriptionId } = _subscriptions[0];
+                    const trial_end = new Date(parseInt(req.body.until) - 4 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000);
+                    if (tempSub.status.toString() === "canceled") {
+                      //update Price
+                      let priceVersion = await subscriptionMongoRepo.priceVersionCalculator()
+                      console.log("AAA2", tempDog, priceVersion)
+                      const updateDogRecipes = await recipeMongoRepo.updateDogRecipes(tempDog, priceVersion);
+                      console.log("AAA3", tempDog, priceVersion)
+                      if (!updateDogRecipes.success) {
+                        console.log("Price Update failed: ", updateDogRecipes)
+                        res.status(500).send('Error updating stripe subscription price!')
+                        return;
+                      }
+
+                      let updatedDog = await dogRepo.findDogById(String(tempSub.dog))
+                      if (!updatedDog) {
+                        res.status(500).send('No Dog found!')
+                        return;
+                      }
+                      // console.log("reactivateSubscription updatedDog", updatedDog.subscription)
+                      if (updatedDog.subscription) {
+                        let items = [{
+                          price_data: {
+                            currency: "CAD",
+                            product: process.env['STRIPE_SUBSCRIPTION_PRODUCTION'],
+                            recurring: {
+                              interval: 'week',
+                              interval_count: updatedDog.subscription.recurring / 7,
+                            },
+                            unit_amount: Math.floor(updatedDog.subscription.dailyPrice * updatedDog.subscription.recurring * 100) //in cents
+                          },
+                          tax_rates: process.env['STRIPE_TAX_RATES']
+                        }];
+                        let stripeSubscription = {
+                          customer: sc.stripeCustomerId,
+                          metadata: { "dog_id": updatedDog.id, "dog_name": updatedDog.name },
+                          items,
+                          expand: ['latest_invoice.payment_intent'],
+                          trial_end: parseInt((trial_end.getTime() / 1000).toString()),
+                          proration_behavior: 'none'
+                        }
+                        try {
+                          console.log("debug 111")
+                          const subscription = await stripe.subscriptions.create(stripeSubscription)
+                          const sc = await stripeCustomerCollection.findOne({ userId: tempSub.userId });
+                          const tempSubs = await sc.subscriptions.map((s: StripeCustomerSubscriptionEntry) => {
+                            if (s.dogId.toString() == tempDog?.id.toString()) {
+                              s.subscriptionId = subscription.id
+                            }
+                            return s
+                          })
+                          await stripeCustomerCollection.updateOne({ userId: tempSub.userId }, { $set: { subscriptions: tempSubs } })
+
+                          console.log("debug 112")
+                          await dogRepo.checkAndUpdateDogLifeStage(tempDog.id)
+                          const subscriptionCollection = (subscriptionMongoRepo as any).subscriptionCollection;
+                          const dogCollection = (dogMongoRepo as any).dogCollection;
+                          tempSub = await subscriptionCollection.findOneAndUpdate({ dog: tempDog.id }, { $set: { status: "active" } })
+                          console.log("debug 113")
+                          tempDog = await dogCollection.findOneAndUpdate({ _id: tempDog.id }, { $set: { status: "active" } })
+                          console.log("debug 114")
+                          await orderRepo.addOrder({
+                            userId: tempSub.userId,
+                            dog: tempDog?.id ?? '',
+                            subscriptionId: tempSub.id,
+                            currentPeriodStart: trial_end,
+                            currentPeriodEnd: new Date(trial_end.getTime() + (tempDog?.subscription?.recurring ?? 28) * 24 * 60 * 60 * 1000),
+                            shippingAddress: tempSub.shippingAddress,
+                            shippingDate: new Date(trial_end.getTime() + 5 * 24 * 3600 * 1000),
+                            invoiceNumber: subscription.latest_invoice.id,
+                            price: (tempDog?.subscription?.dailyPrice ?? 0) * (tempDog?.subscription?.recurring ?? 28),
+                            status: OrderStatus.active,
+                            detail: {
+                              type: tempDog?.subscription?.type ?? subscriptionType.full,
+                              info: tempDog?.subscription?.info ?? [],
+                              promoCode: "",
+                              dailyPrice: tempDog?.subscription?.dailyPrice ?? 0,
+                              selectedRecipes: tempDog?.subscription?.selectedRecipes ?? [],
+                              recurring: tempDog?.subscription?.recurring ?? 28
+                            },
+                            id: new ObjectId().toString(),
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                            __v: 0
+                          })
+                          res.status(200).send({ 'status': 'success' })
+                        } catch (err) {
+                          console.log(err)
+                          res.status(500).send('Stripe Subscription Create Error: ' + err)
+                        }
+                      }
+                    } else {
+                      try {
+                        let subscription = await stripe.subscriptions.update(subscriptionId,
+                          {
+                            trial_end: trial_end,
+                            proration_behavior: 'none',
+                            pause_collection: '',
+                          }).catch(console.log)
+                        await dogRepo.checkAndUpdateDogLifeStage(tempDog.id)
+                        const subscriptionCollection = (subscriptionMongoRepo as any).subscriptionCollection;
+                        const dogCollection = (dogMongoRepo as any).dogCollection;
+                        tempSub = await subscriptionCollection.findOneAndUpdate({ dog: tempDog.id }, { $set: { status: "active" } })
+                        tempDog = await dogCollection.findOneAndUpdate({ _id: tempDog.id }, { $set: { status: "active" } })
+                        await orderRepo.addOrder({
+                          userId: tempSub.userId,
+                          dog: tempDog?.id ?? '',
+                          subscriptionId: tempSub.id,
+                          currentPeriodStart: trial_end,
+                          currentPeriodEnd: new Date(trial_end.getTime() + (tempDog?.subscription?.recurring ?? 28) * 24 * 60 * 60 * 1000),
+                          shippingAddress: tempSub.shippingAddress,
+                          shippingDate: new Date(trial_end.getTime() + 5 * 24 * 3600 * 1000),
+                          invoiceNumber: subscription.latest_invoice.id,
+                          price: (tempDog?.subscription?.dailyPrice ?? 0) * (tempDog?.subscription?.recurring ?? 28),
+                          status: OrderStatus.active,
+                          detail: {
+                            type: tempDog?.subscription?.type ?? subscriptionType.full,
+                            info: tempDog?.subscription?.info ?? [],
+                            promoCode: "",
+                            dailyPrice: tempDog?.subscription?.dailyPrice ?? 0,
+                            selectedRecipes: tempDog?.subscription?.selectedRecipes ?? [],
+                            recurring: tempDog?.subscription?.recurring ?? 28
+                          },
+                          id: new ObjectId().toString(),
+                          createdAt: new Date(),
+                          updatedAt: new Date(),
+                          __v: 0
+                        })
+                        res.status(200).send({ 'status': 'success' })
+                      } catch (err) {
+                        console.log(err)
+                        res.status(500).send('Stripe Subscription Resume Error: ' + err)
+                      }
+                    }
+
+                  } else {
+                    res.status(500).send('No dog subscription found!')
+                  }
+                } else {
+                  res.status(500).send('No Dog found!')
+                }
+              } else {
+                res.status(500).send('No stripe user found!')
+              }
+            } else {
+              res.status(500).send('No subscription found!')
+            }
+          } else {
+            res.status(500).send('No subscriptionId found!')
           }
         } catch (e: any) {
           console.log(e);

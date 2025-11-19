@@ -38,11 +38,11 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
 
     const db: Db = client.db(process.env["DB_NAME"] || "cola");
     const userRepo = new UserMongoRepository(db, MongoDBCollectionNames.USERS, MongoDBCollectionNames.FORGOT_PASSWORD);
-    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS);
-    const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
-    const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS);
     const breedRepo = new BreedMongoRepository(db, MongoDBCollectionNames.BREEDS);
     const promoCodeRepo = new PromoCodeMongoRepository(db, MongoDBCollectionNames.PROMOCODES);
+    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
+    const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS, dogRepo);
+    const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
     const stripeCustomerRepo = new StripeCustomerMongoRepository(db, "StripeCustomers");
     const subscriptionRepo = new SubscriptionMongoRepository(
       db,
@@ -57,6 +57,8 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       dogRepo,
       promoCodeRepo,
     );
+    dogRepo.setSubscriptionRepository(subscriptionRepo);
+    recipeRepo.setSubscriptionRepository(subscriptionRepo);
 
     return {
       // sampleModuleRepo: new SampleModuleMongoRepository(db, MongoDBCollectionNames.CLIMATE_ZONE),
@@ -78,11 +80,11 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
 
     const db: Db = client.db(process.env["DB_NAME"] || "cola");
     const userRepo = new UserMongoRepository(db, MongoDBCollectionNames.USERS, MongoDBCollectionNames.FORGOT_PASSWORD);
-    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS);
-    const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
-    const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS);
     const breedRepo = new BreedMongoRepository(db, MongoDBCollectionNames.BREEDS);
     const promoCodeRepo = new PromoCodeMongoRepository(db, MongoDBCollectionNames.PROMOCODES);
+    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
+    const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS, dogRepo);
+    const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
     const stripeCustomerRepo = new StripeCustomerMongoRepository(db, "StripeCustomers");
     const subscriptionRepo = new SubscriptionMongoRepository(
       db,
@@ -97,6 +99,8 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       dogRepo,
       promoCodeRepo,
     );
+    dogRepo.setSubscriptionRepository(subscriptionRepo);
+    recipeRepo.setSubscriptionRepository(subscriptionRepo);
 
     return {
       // sampleModuleRepo: new SampleModuleMongoRepository(db, MongoDBCollectionNames.CLIMATE_ZONE),

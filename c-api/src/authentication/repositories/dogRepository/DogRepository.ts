@@ -9,6 +9,8 @@ export abstract class DogRepository {
 
   abstract findDogsByOwner(ownerId: User['id']): Promise<Dog[]> | Promise<never>;
 
+  abstract checkAndUpdateDogLifeStage(dogId: string): Promise<void> | Promise<never>;
+
   // abstract updateUser(user: User): Promise<User | null> | Promise<never>;
 
   // abstract updateCustomer(state: User['state'], dogCount: User['dogCount']): Promise<User | null> | Promise<never>;

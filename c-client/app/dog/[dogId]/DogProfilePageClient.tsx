@@ -9,7 +9,7 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 import RadioGroup, { Option } from "@/components/radio-button/RadioGroup";
-import { activityLevel, allergy, gender, healthIssue, subscriptionInfo, subscriptionType } from "c-lib";
+import { activityLevel, allergy, gender, healthIssue, subscriptionInfo, subscriptionStatus, subscriptionType } from "c-lib";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 import FetchApi from "@/services/api";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
@@ -103,6 +103,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   console.log("registeredDog", registeredDog)
 
   const weeklyPrice = registeredDog?.subscription.weeklyPrices!.filter(p => p.week == registeredDog?.subscription.recurring / 7)[0].price.toFixed(2)
+  const [selectedNextWeek, setSelectedNextWeek] = useState('');
   const api = new FetchApi();
 
   const baseRecipes: Option[] = useMemo(() => [
@@ -328,7 +329,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     console.log("portionOptions", registeredDog?.subscription.type, option)
     return {
       cardImage: `${option}.svg`,
-      title: option + ` (${registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price.toFixed(2)})`,
+      title: option + ` (${registeredDog?.subscription.subscriptionTypePrices?.filter(p => p.type == option)[0].price?.toFixed(2) || 0})`,
       subtitle: `${option == 'Full' ? "Full daily portions" : option == 'Half' ? "Half daily portions." : option == 'Topper' ? "Quarter daily portions." : "Lean, simple & clean"}`,
       secondarySubtitle: `${option == 'Full' ? "No need to add anything else." : option == 'Half' ? "Mix with old diet to provide boost!" : option == 'Topper' ? "Perfect to enhance current diet." : "Lean, simple & clean"}`,
       selected: mealType?.toLowerCase() === option.toLowerCase(),
@@ -363,7 +364,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   // }
 
   return (
-    <ProcessLayout title={`*${dogData.name}*'s profile`} handleSubmit={(e) => { e.preventDefault(); setIsResumeSubscriptionPopupOpen(true); }} disabled={false} hasSubmit isPayment mainButtonText="Resume" nextArrow>
+    <ProcessLayout title={`*${dogData.name}*'s profile`} handleSubmit={(e) => { e.preventDefault(); setIsResumeSubscriptionPopupOpen(true); }} disabled={false} hasSubmit={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase() || registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase()} isPayment mainButtonText={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase()? "Resume": registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase() ? "Reactive" : "Resume"} nextArrow>
 
       <div className="w-full px-4 py-6 space-y-6 mb-8">
         <DogPopup
@@ -696,9 +697,10 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               <SearchableSelect
                 options={shortNextWeeks}
                 onSelect={function (value: string): void {
-                  throw new Error("Function not implemented." + value);
+                  setSelectedNextWeek(value)
                 }}
                 placeholder="CHOOSE YOUR NEXT DELIVERY"
+                selected={selectedNextWeek}
               ></SearchableSelect>
               <div className="text-xs">
                 <span>By resuming your subscription, you agree to our </span>
@@ -707,7 +709,28 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsResumeSubscriptionPopupOpen(false)}
-          onSubmit={() => setIsResumeSubscriptionPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              const until = new Date(selectedNextWeek)
+              const subscriptionId = registeredDog.subscription.id
+              console.log("until", until.getTime())
+
+              const result = await api.reactivateSubscription(subscriptionId, until.getTime());
+              if (result.status === "success") {
+                registeredDog.subscription.status = subscriptionStatus.active
+                setIsResumeSubscriptionPopupOpen(false);
+                window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                window.location.reload();
+              } else {
+                console.error("Failed to reactive dog subscription:", result.err);
+                alert("Failed to reactive dog subscription. Please try again.");
+              }
+
+            } catch (error) {
+              console.error("Error reactive dog subscription:", error);
+              alert("Failed to reactive dog subscription. Please try again.");
+            }
+          }}
           isOpen={isResumeSubscriptionPopupOpen}
         />
         <DogPopup

@@ -60,7 +60,7 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
         subscriptionObjectId = typeof subscriptionDocument._id === 'string' ? new ObjectId(subscriptionDocument._id) : subscriptionDocument._id;
       }
       const mongoSubscription = toMongo(subscription);
-      console.log("update" , mongoSubscription)
+      console.log("update", mongoSubscription)
       const { _id: _ignoredMongoId, ...subscriptionWithoutMongoId } = mongoSubscription;
       await this.subscriptionCollection.updateOne(
         { _id: subscriptionObjectId },
@@ -625,10 +625,10 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
       }
       dogPrice = validRecipeCount > 0 ? dogPrice / validRecipeCount : 0;
     }
-    // console.log("price model inputs", dogLifeStage, dogPrice, puppyPriceInfo)
+    console.log("price model inputs", lifeStage, dogPrice, puppyPriceInfo)
     await this.priceModelCollection.insertOne(
       {
-        dog: dog.id,
+        dog: new ObjectId(dog.id),
         dogLifeStage: lifeStage,
         dogWeight: dog.weight,
         // weightLog: weight ? weight.id : null,
@@ -662,8 +662,16 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     return list as unknown as Subscription[];
   }
 
-  // async checkAndupdateDogLifeStage(dogId:string) => {
-  //   let dog = await Dog.findById(dogId)
+  async findSubscriptionsById(id: Subscription['id']): Promise<Subscription> {
+    // Handle both string and ObjectId ids for backwards compatibility
+    const validObjectId = ObjectId.isValid(id as any) ? new ObjectId(id as any) : null;
+    const filter = validObjectId ? { _id: { $in: [id as any, validObjectId] } } : { _id: id };
+    const result = await this.subscriptionCollection.findOne(filter as any);
+    if (!result) throw new Error(`Subscription with id ${id} not found`);
+    // If necessary, you can map/convert result to Subscription type here
+    return result as unknown as Subscription;
+  }
+
   //   if (dog) {
   //     let priceModel = await PriceModel.findOne({ dog: dogId })
   //     if (priceModel) {

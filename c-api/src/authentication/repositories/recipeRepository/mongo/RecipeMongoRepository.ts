@@ -1,18 +1,27 @@
 import { RecipeRepository } from '../RecipeRepository';
-import { Dog, gender, Ingredient, protein, Recipe, RecipeIngredient, shape, User, } from 'c-lib';
+import { Dog, gender, Ingredient, protein, Recipe, RecipeIngredient, shape, Subscription, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
 import { fromMongo, mongoObj, toMongo } from "@utils/mongoUtils";
 import axios from 'axios';
+import { SubscriptionMongoRepository, SubscriptionRepository } from '@auth/repositories/subscriptionRepository';
+import { DogMongoRepository, DogRepository } from '@auth/repositories/dogRepository';
 const apikey = 'AF0hMb2j1mxyrXjhRKy4wRKu77iYdthDMFAVz5gEBebfhGniKeN4EK59XbKYG76xzA7T82iz9dZxyTwqwPE2H0AHEQziLI12dT3b'; //TODO env 
 
 export class RecipeMongoRepository extends RecipeRepository {
   private recipeCollection: Collection;
   private ingredientCollection: Collection;
-
-  constructor(db: Db, recipeCollectionName: string, ingredientCollectionName: string) {
+  private subscriptionRepo?: SubscriptionRepository;
+  private dogRepo: DogRepository;
+  constructor(db: Db, recipeCollectionName: string, ingredientCollectionName: string, dogRepo: DogRepository, subscriptionRepo?: SubscriptionRepository) {
     super();
     this.recipeCollection = db.collection(recipeCollectionName);
     this.ingredientCollection = db.collection(ingredientCollectionName);
+    this.dogRepo = dogRepo;
+    this.subscriptionRepo = subscriptionRepo;
+  }
+
+  setSubscriptionRepository(subscriptionRepo: SubscriptionRepository) {
+    this.subscriptionRepo = subscriptionRepo;
   }
 
   async findRecipeById(id: Recipe["id"]): Promise<Recipe> {
@@ -69,7 +78,7 @@ export class RecipeMongoRepository extends RecipeRepository {
     } else if (activityLevel === 'Low') {
       return 'Low activity'
     }
-    return 'low'
+    return 'Low activity'
   }
 
   shapeToClient = (tShape: string) => {
@@ -180,6 +189,60 @@ export class RecipeMongoRepository extends RecipeRepository {
     const cursor = this.recipeCollection.find(filter as any);
     const list = await cursor.toArray();
     return list as unknown as Recipe[];
+  }
+
+  async updateDogRecipes(dog: Dog, versionNumber: number): Promise<{ success: boolean, error?: string }> {
+    let apiResult = await this.generateRecipes(dog)
+    // console.log("updateDogRecipes2", dog.recipes)
+    const recipeIds = []
+    for (const recipe of apiResult) {
+      let r = toMongo(recipe)
+      // `_id` is immutable; ensure it never reaches the update payload
+      if ("_id" in r) {
+        delete (r as any)._id;
+      }
+      console.log("AAA4")
+      console.log(r)
+      const result = await this.recipeCollection.findOneAndUpdate(
+        { protein: recipe.protein, dog: recipe.dog, owner: recipe.owner },
+        { $set: r },
+        { returnDocument: "after", upsert: true }
+      );
+      // console.log("recipeId", result)
+      // The _id is located at result.value?._id after MongoDB update
+      // Filter out undefined ids to satisfy string[] type
+      recipeIds.push(result?.value?._id?.toString());
+    }
+    dog.recipes = recipeIds.filter((id): id is string => typeof id === 'string');
+    // console.log("updateDogRecipes2", dog.recipes)
+    if (!this.subscriptionRepo) {
+      throw new Error("Subscription repository not configured for RecipeMongoRepository");
+    }
+    const subscriptionMongoRepo = this.subscriptionRepo as unknown as SubscriptionMongoRepository;
+    const dogMongoRepo = this.dogRepo as unknown as DogMongoRepository;
+    const dogCollection = (dogMongoRepo as any).dogCollection;
+    const subscriptionCollection = (subscriptionMongoRepo as any).subscriptionCollection;
+    const dogPrice = await subscriptionMongoRepo.createDogDailyPrice(dog, versionNumber)
+
+    // let dogPrice = apiResult.recipes[0][0].dogPrice
+    // versionNumber = apiResult.recipes[0][0].priceVersion
+    // console.log("updateDogRecipes: ", dogPrice, subscription)
+    const dailyPrice = subscriptionMongoRepo.subscriptionPriceCalculator({ ...(dog.subscription as Subscription), dogPrice: dogPrice ?? 0 });
+    await dogCollection.findOneAndUpdate({ _id: new ObjectId(dog.id) }, {
+      $set: {
+        subscription: {
+          priceVersion: versionNumber,
+          dailyPrice: dailyPrice,
+          recurring: (dog.subscription as Subscription).recurring,
+          info: (dog.subscription as Subscription).info,
+          selectedRecipes: (dog.subscription as Subscription).selectedRecipes,
+          type: (dog.subscription as Subscription).type,
+          dogPrice: dogPrice,
+        }
+      }
+    })
+    await subscriptionCollection.findOneAndUpdate({ dog: new ObjectId(dog.id) }, { $set: { dailyPrice: dailyPrice, priceVersion: versionNumber } })
+    return { success: true };
   }
 
 }

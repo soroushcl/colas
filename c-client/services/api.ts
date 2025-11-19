@@ -385,6 +385,20 @@ export default class FetchApi {
         return res;
     };
 
+    reactivateSubscription = async (subscriptionId: string, until: number): Promise<{ status: string; err?: string }> => {
+        console.log("reactivateSubscription called", subscriptionId, until);
+        const res = await this.request<{ status: string; price?: string; err?: string }, { subscriptionId: string; until: number }>(`${this.baseUrl}/authentication/reactivate-subscription`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                subscriptionId,
+                until
+            },
+        });
+        console.log("reactivateSubscription res", res);
+        return res;
+    };
+
     updateDogSubscription = async (dogId: string, sub: { selectedRecipes: (number | string)[], sub: { recipeId: string | number, amount: number }[] }): Promise<{ status: string; price?: string; err?: string }> => {
         console.log("updateDogSubscription called", dogId, sub);
         const res = await this.request<{ status: string; price?: string; err?: string }, { dogId: string; sub: any }>(`${this.baseUrl}/authentication/update-dog-subscription`, {

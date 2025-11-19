@@ -28,6 +28,12 @@ export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
     });
   }
 
+  findSubscriptionsById(id: Subscription['id']): Promise<Subscription> | Promise<never> {
+    return new Promise((resolve) => {
+      resolve(this.db.filter(d => d.id === id)[0]);
+    });
+  }
+
   async subscriptionDiscountedPriceCalculator(subscription: Subscription): Promise<number> {
     // In-memory implementation: return the dailyPrice if available, otherwise return 0
     return subscription.dailyPrice || 0;
