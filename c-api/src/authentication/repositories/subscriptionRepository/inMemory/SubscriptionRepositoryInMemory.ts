@@ -1,7 +1,23 @@
 import { SubscriptionRepository } from '../SubscriptionRepository';
-import { Subscription, User } from 'c-lib';
+import { Dog, PriceVersion, Subscription, User } from 'c-lib';
 
 export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
+  updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+  subscriptionPriceCalculator(subscription: Subscription): number {
+    throw new Error('Method not implemented.');
+  }
+  findPriceVersionById(id: PriceVersion['id']): Promise<PriceVersion | null> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+  createDogDailyPrice(dog: Dog, priceVersion: number): Promise<number | undefined> {
+    throw new Error('Method not implemented.' + dog + priceVersion);
+  }
+  recurringCalculator(dog: Dog, subscription: Subscription): number {
+    console.log(dog, subscription)
+    throw new Error('Method not implemented.');
+  }
 
   generateSubscription(subscription: Subscription): Promise<Subscription> | Promise<never> {
     console.log('In Memory generateSubscriptions dog', subscription.id)

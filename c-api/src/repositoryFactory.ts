@@ -8,6 +8,7 @@ import { StripeCustomerMongoRepository } from "@auth/repositories/stripeCustomer
 import { BreedMongoRepository } from "./breeds/repositories/index.js";
 import { PromoCodeMongoRepository } from "./payment/repositories/index.js";
 import { repoMode, Repositories } from './types/serverTypes.js';
+import { WeightMongoRepository } from "@auth/repositories/weightRepository/index.js";
 // import {
 //   SampleModuleMongoRepository,
 // } from "./sampleModule";
@@ -15,6 +16,7 @@ import { repoMode, Repositories } from './types/serverTypes.js';
 export const MongoDBCollectionNames = {
   USERS: "Users",
   DOGS: "Dogs",
+  EDITDOGS: "EditDogs",
   ORDERS: "Orders",
   RECIPES: "Recipes",
   SUBSCRIPTIONS: "Subscriptions",
@@ -26,7 +28,8 @@ export const MongoDBCollectionNames = {
   BREEDS: "Breeds",
   GROWTHPATTERN: "GrowthPatterns",
   PRICEMODEL: "PriceModel",
-  PROMOCODES: "PromoCodes"
+  PROMOCODES: "PromoCodes",
+  WEIGHTS: "Weights",
 } as const;
 
 const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => {
@@ -40,9 +43,10 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
     const userRepo = new UserMongoRepository(db, MongoDBCollectionNames.USERS, MongoDBCollectionNames.FORGOT_PASSWORD);
     const breedRepo = new BreedMongoRepository(db, MongoDBCollectionNames.BREEDS);
     const promoCodeRepo = new PromoCodeMongoRepository(db, MongoDBCollectionNames.PROMOCODES);
-    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
+    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.EDITDOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
     const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS, dogRepo);
     const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
+    const weightRepo = new WeightMongoRepository(db, MongoDBCollectionNames.WEIGHTS);
     const stripeCustomerRepo = new StripeCustomerMongoRepository(db, "StripeCustomers");
     const subscriptionRepo = new SubscriptionMongoRepository(
       db,
@@ -65,6 +69,7 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       userRepo,
       dogRepo,
       orderRepo,
+      weightRepo,
       recipeRepo,
       breedRepo,
       promoCodeRepo,
@@ -82,9 +87,10 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
     const userRepo = new UserMongoRepository(db, MongoDBCollectionNames.USERS, MongoDBCollectionNames.FORGOT_PASSWORD);
     const breedRepo = new BreedMongoRepository(db, MongoDBCollectionNames.BREEDS);
     const promoCodeRepo = new PromoCodeMongoRepository(db, MongoDBCollectionNames.PROMOCODES);
-    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
+    const dogRepo = new DogMongoRepository(db, MongoDBCollectionNames.DOGS, MongoDBCollectionNames.EDITDOGS, MongoDBCollectionNames.PRICEMODEL, breedRepo);
     const recipeRepo = new RecipeMongoRepository(db, MongoDBCollectionNames.RECIPES, MongoDBCollectionNames.INGREDIENTS, dogRepo);
     const orderRepo = new OrderMongoRepository(db, MongoDBCollectionNames.ORDERS);
+    const weightRepo = new WeightMongoRepository(db, MongoDBCollectionNames.WEIGHTS);
     const stripeCustomerRepo = new StripeCustomerMongoRepository(db, "StripeCustomers");
     const subscriptionRepo = new SubscriptionMongoRepository(
       db,
@@ -107,6 +113,7 @@ const repositoryFactory = async (repoMode?: repoMode): Promise<Repositories> => 
       userRepo,
       dogRepo,
       orderRepo,
+      weightRepo,
       recipeRepo,
       breedRepo,
       promoCodeRepo,

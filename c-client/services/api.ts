@@ -34,6 +34,13 @@ import {
     paymentIntentResponseBody,
     paymentIntentRequestBody,
     subscriptionType,
+    editDogRecipesResponseBody,
+    editDogRecipesRequestBody,
+    EditDog,
+    editDogResponseBody,
+    editDogRequestBody,
+    subscriptionInfo,
+    protein,
 } from 'c-lib';
 
 if (typeof window === "undefined") {
@@ -397,6 +404,33 @@ export default class FetchApi {
         });
         console.log("reactivateSubscription res", res);
         return res;
+    };
+
+    editPoochRecipes = async (newDog: Dog): Promise<editDogRecipesResponseBody> => {
+        console.log("login called", newDog)
+        const res = await this.request<editDogRecipesResponseBody, editDogRecipesRequestBody>(`${this.baseUrl}/authentication/edit-pooch-recipes`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                newDog
+            },
+        });
+        console.log("edit-pooch-recipes res", res)
+        return res
+    };
+
+    editDog = async (newDogId: EditDog['id'], subscription: { protein: protein, amount: number }[]): Promise<editDogResponseBody> => {
+        console.log("editDog called", newDogId, subscription)
+        const res = await this.request<editDogResponseBody, editDogRequestBody>(`${this.baseUrl}/authentication/edit-dog`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                newDogId,
+                subscription
+            },
+        });
+        console.log("edit-pooch-recipes res", res)
+        return res
     };
 
     updateDogSubscription = async (dogId: string, sub: { selectedRecipes: (number | string)[], sub: { recipeId: string | number, amount: number }[] }): Promise<{ status: string; price?: string; err?: string }> => {

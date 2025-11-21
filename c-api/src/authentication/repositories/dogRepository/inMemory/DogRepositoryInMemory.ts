@@ -1,7 +1,19 @@
 import { DogRepository } from '../DogRepository';
-import { Dog, User } from 'c-lib';
+import { Dog, dogLifeStage, EditDog, User } from 'c-lib';
 
 export class DogRepositoryInMemory extends DogRepository {
+  editDogById(id: Dog['id'], dog: Dog): Promise<Dog> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+  calculateDogLifeStage(age: Date, breedName: string): Promise<dogLifeStage> | Promise<never> {
+    throw new Error('Method not implemented.' + age + breedName);
+  }
+  findEditDogById(id: EditDog['id']): Promise<EditDog | null> | Promise<never> {
+    throw new Error('Method not implemented.' + id);
+  }
+  addEditDog(dog: EditDog): Promise<EditDog> | Promise<never> {
+    throw new Error('Method not implemented.' + dog);
+  }
   findDogById(id: Dog['id']): Promise<Dog | null> | Promise<never> {
     throw new Error('Method not implemented.1');
   }

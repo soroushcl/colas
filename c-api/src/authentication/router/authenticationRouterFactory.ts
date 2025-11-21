@@ -28,6 +28,8 @@ export const authenticationRouterFactory = (authViews: AuthenticationRouterFacto
   router.post('/update-dog-subscription-foodType', authViews.updateDogSubscriptionFoodType);
   router.post('/reactivate-subscription', authViews.reactivateSubscription);
   router.post('/update-subscription-recurring', authViews.updateSubscriptionRecurring);
+  router.post('/edit-pooch-recipes', authViews.editDogRecipes);
+  router.post('/edit-dog', authViews.editDog);
   
   return router;
 };

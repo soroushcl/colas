@@ -2,4 +2,5 @@ export * from "./Dog.js";
 export * from "./Recipe.js";
 export * from "./Subscription.js";
 export * from "./Order.js";
+export * from "./Weight.js";
 //# sourceMappingURL=index.js.map

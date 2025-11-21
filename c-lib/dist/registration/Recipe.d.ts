@@ -3,6 +3,7 @@ import { Dog, protein } from "./Dog";
 export interface Recipe {
     id: string;
     protein: protein;
+    recipeId?: number;
     dog: Dog['id'];
     owner: User['id'];
     ingredients: RecipeIngredient[];

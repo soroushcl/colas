@@ -1,7 +1,7 @@
 import { SubscriptionRepository } from '../SubscriptionRepository';
-import { Dog, dogLifeStage, gender, PatternInfo, protein, Recipe, recurringType, shape, Subscription, subscriptionStatus, subscriptionType, User, } from 'c-lib';
+import { Dog, dogLifeStage, gender, OrderStatus, PatternInfo, PriceVersion, protein, Recipe, recurringType, shape, Subscription, subscriptionStatus, subscriptionType, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
-import { toMongo } from "@utils/mongoUtils";
+import { fromMongo, toMongo } from "@utils/mongoUtils";
 import { BreedRepository } from 'src/breeds/repositories';
 import axios from 'axios';
 import { RecipeRepository } from '@auth/repositories/recipeRepository';
@@ -16,6 +16,7 @@ const stripe = new Stripe(stripeSecretKey || '', { apiVersion: '2024-06-20' });
 
 
 export class SubscriptionMongoRepository extends SubscriptionRepository {
+
   private subscriptionCollection: Collection;
   private priceVersionCollection: Collection;
   private calorieRangeCollection: Collection;
@@ -42,6 +43,22 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
   }
 
   shippingPrice = 20;
+
+  async findPriceVersionById(id: PriceVersion['id']): Promise<PriceVersion | null> {
+    let dog: any | null = null;
+    if (ObjectId.isValid(id)) {
+      dog = await this.priceVersionCollection.findOne({ _id: new ObjectId(id) });
+    }
+    // Fallback: if not found or id not a valid ObjectId, try direct string match (legacy data)
+    if (!dog) {
+      dog = await this.priceVersionCollection.findOne({ _id: id as any });
+    }
+    if (!dog) {
+      return null;
+    }
+    return fromMongo(dog as any) as unknown as PriceVersion;
+  }
+
 
   async addSubscription(subscription: Subscription): Promise<Subscription> {
     console.log("addSubscription")
@@ -670,6 +687,15 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     if (!result) throw new Error(`Subscription with id ${id} not found`);
     // If necessary, you can map/convert result to Subscription type here
     return result as unknown as Subscription;
+  }
+
+  async updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> {
+    await this.subscriptionCollection.updateMany({ dog: dog, status: OrderStatus.active }, {
+      $set: {
+        dailyPrice: dailyPrice,
+      }
+    })
+    return true
   }
 
   //   if (dog) {

@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true, limit: '500mb' }))
 
 repositoryFactory().then(repositories => {
   // Authentication
-  const { authViews, authDependencies, authMiddleware } = authenticationHandlerFactory(repositories.userRepo, repositories.dogRepo, repositories.orderRepo, repositories.recipeRepo, repositories.subscriptionRepo, repositories.stripeCustomerRepo);
+  const { authViews, authDependencies, authMiddleware } = authenticationHandlerFactory(repositories.userRepo, repositories.dogRepo, repositories.orderRepo, repositories.weightRepo, repositories.recipeRepo, repositories.subscriptionRepo, repositories.stripeCustomerRepo);
 
   if (authDependencies) authDependencies
     .forEach(dep => app.use(dep));

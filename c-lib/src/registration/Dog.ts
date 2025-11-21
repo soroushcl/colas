@@ -28,6 +28,34 @@ export interface Dog {
     recipes: Recipe['id'][];
     subscription?: Subscription;
 }
+export interface EditDog {
+    mainDog: string;
+    id: string;
+    owner: string;
+    name: string;
+    weight: number;
+    breed: string;
+    age: Date;
+    gender: gender;
+    isNeutered: boolean;
+    isPregnant: boolean;
+    pregnancyDuration: number;
+    isNursing: boolean;
+    hasHealthIssue: boolean;
+    healthIssue: healthIssue[];
+    nursingPuppies: number;
+    activityLevel: activityLevel;
+    eating: eatingHabit;
+    shape: shape;
+    isAllergic: boolean;
+    allergies: allergy[];
+    proteins: protein[];
+    calorie?: number;
+    note?: string;
+    status?: dogStatus;
+    recipes: Recipe[];
+    subscription?: Subscription;
+}
 export enum gender {
     male = "Male",
     female = "Female",

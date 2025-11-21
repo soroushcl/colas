@@ -1,4 +1,4 @@
-import { Dog, Recipe, Subscription, Order } from 'src/registration';
+import { Dog, Recipe, Subscription, Order, EditDog, subscriptionInfo } from 'src/registration';
 import { AuthenticatedUser, ForgotPasswordUser, User } from '../../authentication';
 import { Fail, Success } from '../responseTypes';
 export interface loginRequestBody {
@@ -94,3 +94,15 @@ export type reactivateUserRequestBody = {
 };
 export type reactivateUserResponseBody = Success<true> | Fail;
 export type logoutResponseBody = Success<true> | Fail;
+export interface editDogRecipesRequestBody {
+    newDog: Dog;
+}
+export type editDogRecipesResponseBody = Success<{
+    dog: Dog;
+    recipes: Recipe[];
+}> | Fail;
+export interface editDogRequestBody {
+    newDogId: EditDog['id'];
+    subscription: subscriptionInfo[];
+}
+export type editDogResponseBody = Success<true> | Fail;

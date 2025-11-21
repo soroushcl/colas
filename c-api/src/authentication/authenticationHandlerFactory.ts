@@ -5,12 +5,13 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { TokenAuthenticationHandler } from "./authenticationHandlers/index";
 import { AuthenticatedUser } from "c-lib";
+import { WeightRepository } from './repositories/weightRepository';
 
-export const authenticationHandlerFactory = (userRepo: UserRepository, dogRepo: DogRepository, orderRepo: OrderRepository, recipeRepo: RecipeRepository, subscriptionRepo: SubscriptionRepository, stripeCustomerRepo?: StripeCustomerRepository, authMode: authMode = 'jwt'): AuthenticationHandler => {
+export const authenticationHandlerFactory = (userRepo: UserRepository, dogRepo: DogRepository, orderRepo: OrderRepository, weighRepo: WeightRepository, recipeRepo: RecipeRepository, subscriptionRepo: SubscriptionRepository, stripeCustomerRepo?: StripeCustomerRepository, authMode: authMode = 'jwt'): AuthenticationHandler => {
   switch (authMode) {
     case 'google': {
       // return GoogleAuthenticationHandler(userRepo)
-      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo);
+      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, weighRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo);
     }
     case 'jwt': {
       const jwtSecret = process.env['JWT_SECRET'] || 'AdApT!$g0ldF!$H123';
@@ -25,7 +26,7 @@ export const authenticationHandlerFactory = (userRepo: UserRepository, dogRepo: 
       const jwtSignFunction = (user: AuthenticatedUser, secret: string, options?: { expiresIn: string }) => jwt.sign(user, secret, options);
       const bcryptHash = async (raw: string) => bcrypt.hashSync(raw, bcrypt.genSaltSync(bcryptSalt));
       const bcryptCompare = async (raw: string, hashed: string) => bcrypt.compareSync(raw, hashed)
-      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo, jwtSecret, jwtVerifyFunction, jwtSignFunction, bcryptCompare, bcryptHash);
+      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, weighRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo, jwtSecret, jwtVerifyFunction, jwtSignFunction, bcryptCompare, bcryptHash);
     }
     default:
       const jwtSecret = process.env['JWT_SECRET'] || 'g0ldF!$H123';
@@ -34,6 +35,6 @@ export const authenticationHandlerFactory = (userRepo: UserRepository, dogRepo: 
       const jwtSignFunction = (user: AuthenticatedUser, secret: string, options?: { expiresIn: string }) => jwt.sign(user, secret, options);
       const bcryptHash = async (raw: string) => bcrypt.hashSync(raw, bcryptSalt);
       const bcryptCompare = async (raw: string, hashed: string) => bcrypt.compareSync(raw, hashed)
-      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo, jwtSecret, jwtVerifyFunction, jwtSignFunction, bcryptCompare, bcryptHash);
+      return TokenAuthenticationHandler(userRepo, dogRepo, orderRepo, weighRepo, recipeRepo, subscriptionRepo, stripeCustomerRepo, jwtSecret, jwtVerifyFunction, jwtSignFunction, bcryptCompare, bcryptHash);
   }
 };

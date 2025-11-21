@@ -9,7 +9,7 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 import RadioGroup, { Option } from "@/components/radio-button/RadioGroup";
-import { activityLevel, allergy, gender, healthIssue, subscriptionInfo, subscriptionStatus, subscriptionType } from "c-lib";
+import { activityLevel, allergy, gender, healthIssue, protein, subscriptionInfo, subscriptionStatus, subscriptionType } from "c-lib";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 import FetchApi from "@/services/api";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
@@ -53,6 +53,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   const [isPortionPopupOpen, setIsPortionPopupOpen] = useState(false);
   const [isFrequencyPopupOpen, setIsFrequencyPopupOpen] = useState(false);
   const [isRecipePopupOpen, setIsRecipePopupOpen] = useState(false);
+  const [isEditingDog, setIsEditingDog] = useState(false);
   const [isBreedPopupOpen, setIsBreedPopupOpen] = useState(false);
   const [isAgePopupOpen, setIsAgePopupOpen] = useState(false);
   const [isGenderPopupOpen, setIsGenderPopupOpen] = useState(false);
@@ -364,7 +365,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   // }
 
   return (
-    <ProcessLayout title={`*${dogData.name}*'s profile`} handleSubmit={(e) => { e.preventDefault(); setIsResumeSubscriptionPopupOpen(true); }} disabled={false} hasSubmit={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase() || registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase()} isPayment mainButtonText={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase()? "Resume": registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase() ? "Reactive" : "Resume"} nextArrow>
+    <ProcessLayout title={`*${dogData.name}*'s profile`} handleSubmit={(e) => { e.preventDefault(); setIsResumeSubscriptionPopupOpen(true); }} disabled={false} hasSubmit={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase() || registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase()} isPayment mainButtonText={registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.paused.toLocaleLowerCase() ? "Resume" : registeredDog?.subscription.status.toLocaleLowerCase() == subscriptionStatus.canceled.toLocaleLowerCase() ? "Reactive" : "Resume"} nextArrow>
 
       <div className="w-full px-4 py-6 space-y-6 mb-8">
         <DogPopup
@@ -392,73 +393,98 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
           onClose={() => setIsRecipePopupOpen(false)}
           onSubmit={async () => {
             try {
-              // Only call API if frequency has changed
-              // registeredDog?.subscription.info[0].amount += 1
-              if (deliveryFrequency !== registeredDog?.subscription.recurring / 7) {
-                const sub = {
-                  selectedRecipes: registeredDog?.subscription.selectedRecipes,
-                  recurring: deliveryFrequency * 7, // Convert weeks to days
-                  sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
-                    const recipeIdValue =
-                      info.recipeId;
-                    return {
-                      recipeId: recipeIdValue,
-                      amount: info.amount
-                    };
-                  })
-                };
-
-                const result = await api.updateDogRecurring(dogId, sub);
-                if (result.status === "success") {
+              if (isEditingDog) {
+                const info = registeredDog.dog.subscription!.info.map(r => {
+                  return {
+                    protein: registeredDog.recipes.filter(s => s.id == r.recipeId)[0].protein,
+                    amount: r.amount
+                  };
+                });
+                const result = await api.editDog(registeredDog.dog.id, info);
+                if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  registeredDog.subscription.recurring = deliveryFrequency * 7
-                  setIsFrequencyPopupOpen(false);
-                  setIsRecipePopupOpen(false);
-                  // Optionally refresh the page or update the store
+                  // const payload: any = (result as any).payload;
+                  // setDeliveryFrequency(payload.dog.subscription.recurring / 7)
                   window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
-                  window.location.reload();
-                } else {
-                  console.error("Failed to update dog recurring:", result.err);
-                  alert("Failed to update delivery frequency. Please try again.");
-                }
-              } else if ((chickenAmount !== registeredDog?.subscription.info[0]?.amount) || (salmonAmount !== registeredDog?.subscription.info[1]?.amount) || (BeefAmount !== registeredDog?.subscription.info[2]?.amount)) {
-                const sub = {
-                  selectedRecipes: registeredDog?.subscription.selectedRecipes,
-                  recurring: deliveryFrequency * 7, // Convert weeks to days
-                  sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
-                    // Handle both old format (recipeId as number) and new format (recipeId as object)
-                    // const recipeIdValue = typeof info.recipeId === 'object' && info.recipeId?.recipeId
-                    //   ? info.recipeId.recipeId
-                    //   : info.recipeId;
-                    const recipeIdValue = info.recipeId;
-
-                    return {
-                      recipeId: recipeIdValue,
-                      amount: info.amount
-                    };
-                  })
-                };
-
-                const result = await api.updateDogRecurring(dogId, sub);
-                if (result.status === "success") {
-                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  registeredDog.subscription.recurring = deliveryFrequency * 7
-                  setIsFrequencyPopupOpen(false);
+                  // window.location.reload();
+                  setIsEditingDog(false);
                   setIsRecipePopupOpen(false);
+                  // setIsBreedPopupOpen(false);
                   // Optionally refresh the page or update the store
-                  window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
-                  window.location.reload();
                 } else {
-                  console.error("Failed to update dog recurring:", result.err);
-                  alert("Failed to update delivery frequency. Please try again.");
+                  console.error("Failed to update dog:", result.error);
+                  alert("ailed to update dog. Please try again.");
                 }
               } else {
-                setIsFrequencyPopupOpen(false);
-                setIsRecipePopupOpen(false);
+
+                // Only call API if frequency has changed
+                // registeredDog?.subscription.info[0].amount += 1
+                if (deliveryFrequency !== registeredDog?.subscription.recurring / 7) {
+                  const sub = {
+                    selectedRecipes: registeredDog?.subscription.selectedRecipes,
+                    recurring: deliveryFrequency * 7, // Convert weeks to days
+                    sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
+                      const recipeIdValue =
+                        info.recipeId;
+                      return {
+                        recipeId: recipeIdValue,
+                        amount: info.amount
+                      };
+                    })
+                  };
+
+                  const result = await api.updateDogRecurring(dogId, sub);
+                  if (result.status === "success") {
+                    // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                    registeredDog.subscription.recurring = deliveryFrequency * 7
+                    setIsFrequencyPopupOpen(false);
+                    setIsRecipePopupOpen(false);
+                    // Optionally refresh the page or update the store
+                    window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                    window.location.reload();
+                  } else {
+                    console.error("Failed to update dog recurring:", result.err);
+                    alert("Failed to update delivery frequency. Please try again.");
+                  }
+                } else if ((chickenAmount !== registeredDog?.subscription.info[0]?.amount) || (salmonAmount !== registeredDog?.subscription.info[1]?.amount) || (BeefAmount !== registeredDog?.subscription.info[2]?.amount)) {
+                  const sub = {
+                    selectedRecipes: registeredDog?.subscription.selectedRecipes,
+                    recurring: deliveryFrequency * 7, // Convert weeks to days
+                    sub: registeredDog?.subscription.info.map((info: subscriptionInfo) => {
+                      // Handle both old format (recipeId as number) and new format (recipeId as object)
+                      // const recipeIdValue = typeof info.recipeId === 'object' && info.recipeId?.recipeId
+                      //   ? info.recipeId.recipeId
+                      //   : info.recipeId;
+                      const recipeIdValue = info.recipeId;
+
+                      return {
+                        recipeId: recipeIdValue,
+                        amount: info.amount
+                      };
+                    })
+                  };
+
+                  const result = await api.updateDogRecurring(dogId, sub);
+                  if (result.status === "success") {
+                    // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                    registeredDog.subscription.recurring = deliveryFrequency * 7
+                    setIsFrequencyPopupOpen(false);
+                    setIsRecipePopupOpen(false);
+                    // Optionally refresh the page or update the store
+                    window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+                    window.location.reload();
+                  } else {
+                    console.error("Failed to update dog recurring:", result.err);
+                    alert("Failed to update delivery frequency. Please try again.");
+                  }
+                } else {
+                  setIsFrequencyPopupOpen(false);
+                  setIsRecipePopupOpen(false);
+                }
+                console.log(chickenAmount, registeredDog?.subscription.info[0]?.amount)
+                console.log(salmonAmount, registeredDog?.subscription.info[1]?.amount)
+                console.log(BeefAmount, registeredDog?.subscription.info[2]?.amount)
               }
-              console.log(chickenAmount, registeredDog?.subscription.info[0]?.amount)
-              console.log(salmonAmount, registeredDog?.subscription.info[1]?.amount)
-              console.log(BeefAmount, registeredDog?.subscription.info[2]?.amount)
             } catch (error) {
               console.error("Error updating dog recurring:", error);
               alert("An error occurred while updating delivery frequency. Please try again.");
@@ -650,7 +676,35 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsBreedPopupOpen(false)}
-          onSubmit={() => setIsBreedPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (breed !== dogData.breed) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, breed: breed });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.breed = breed
+                  dogData.breed = breed
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsBreedPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsBreedPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog subscription type:", error);
+              alert("An error occurred while updating subscription type. Please try again.");
+            }
+          }}
           isOpen={isBreedPopupOpen}
         />
         <DogPopup

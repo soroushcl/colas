@@ -5,6 +5,7 @@ import {PromoCodeRepository} from '../payment/repositories/index.js';
 import {
 
 } from "../sampleModule/index.js";
+import { WeightMongoRepository } from '@auth/repositories/weightRepository/index.js';
 // import {SampleModuleRepository} from "../sampleModule/";
 
 export type repoMode = 'inMemory' | 'mongo';
@@ -16,6 +17,7 @@ export interface Repositories {
   userRepo: UserRepository;
   dogRepo: DogRepository;
   orderRepo: OrderRepository;
+  weightRepo: WeightMongoRepository;
   recipeRepo: RecipeRepository;
   subscriptionRepo: SubscriptionRepository;
   breedRepo: BreedRepository;

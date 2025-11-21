@@ -1,6 +1,6 @@
 import { createMongoId, toMongo } from '@utils/mongoUtils';
 import { OrderRepository } from '../OrderRepository';
-import { Order, User, } from 'c-lib';
+import { Dog, Order, OrderDetail, OrderStatus, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
 // import { toMongo } from "@utils/mongoUtils";
 // import { BreedRepository } from 'src/breeds/repositories';
@@ -53,11 +53,29 @@ export class OrderMongoRepository extends OrderRepository {
     return list as unknown as Order[];
   }
 
+  async findActiveOrder(userId: User['id'], dog: Dog['id']): Promise<Order> {
+    // Support both legacy string owner ids and ObjectId-based owner refs
+    const filter = ObjectId.isValid(userId as any)
+      ? { userId: { $in: [userId as any, new ObjectId(userId as any)] }, dog: { $in: [dog as any, new ObjectId(dog as any)] }, status: OrderStatus.active }
+      : { userId: userId, dog: dog, status: OrderStatus.active };
+    const cursor = this.orderCollection.findOne(filter as any);
+    return cursor as unknown as Order;
+  }
+
   async addOrder(order: Order): Promise<Order> {
     const normalizedOrder = this.ensureValidOrderId(order);
     const inserted = await this.orderCollection.insertOne(toMongo(normalizedOrder));
     const newOrder = await this.orderCollection.findOne({ _id: inserted.insertedId });
     return newOrder as unknown as Order;
+  }
+
+  async updateActiveOrderInfo(dog: Dog['id'], detail: OrderDetail, price: number, currentPeriodEnd: Date): Promise<Order> {
+    const filter = ObjectId.isValid(dog as any)
+      ? { dog: { $in: [dog as any, new ObjectId(dog as any)] }, status: OrderStatus.active }
+      : { dog: dog, status: OrderStatus.active };
+    const updatedOrder = await this.orderCollection.updateMany(filter, { $set: { detail, price, currentPeriodEnd } })
+    return updatedOrder as unknown as Order;
+
   }
 
   private ensureValidOrderId(order: Order): Order {
