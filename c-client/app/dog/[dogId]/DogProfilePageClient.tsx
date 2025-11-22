@@ -9,7 +9,7 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
 import RadioGroup, { Option } from "@/components/radio-button/RadioGroup";
-import { activityLevel, allergy, gender, healthIssue, protein, subscriptionInfo, subscriptionStatus, subscriptionType } from "c-lib";
+import { activityLevel, allergy, gender, healthIssue, subscriptionInfo, subscriptionStatus, subscriptionType } from "c-lib";
 import CustomNumberComponent from "@/components/CustomNumberComponent";
 import FetchApi from "@/services/api";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
@@ -47,7 +47,7 @@ const nextWeeksCalculator = (weeks?: number) => {
 }
 
 export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientProps) => {
-  const { userStore, dogStore } = useStores();
+  const { userStore } = useStores();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isResumeSubscriptionPopupOpen, setIsResumeSubscriptionPopupOpen] = useState(false);
   const [isPortionPopupOpen, setIsPortionPopupOpen] = useState(false);
@@ -531,8 +531,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, isAllergic: isAllergic, allergies: allergies });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload = (result as Success).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.isAllergic = isAllergic
                   registeredDog.dog.allergies = allergies
                   dogData.isAllergic = isAllergic
@@ -585,8 +585,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, hasHealthIssue: hasIssue, healthIssue: issues });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.hasHealthIssue = hasIssue
                   registeredDog.dog.healthIssue = issues
                   dogData.hasHealthIssue = hasIssue
@@ -635,8 +635,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, activityLevel: activity });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.activityLevel = activity
                   dogData.activity = activity
                   setIsEditingDog(true);
@@ -683,8 +683,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, isNeutered: isNeutered });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.isNeutered = isNeutered
                   dogData.isNeutered = isNeutered
                   setIsEditingDog(true);
@@ -767,8 +767,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, gender: gen });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.gender = gen
                   dogData.gender = gen
                   setIsEditingDog(true);
@@ -826,8 +826,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, age: new Date(age) });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.age = new Date(age)
                   dogData.age = age
                   setIsEditingDog(true);
@@ -877,8 +877,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 const result = await api.editPoochRecipes({ ...registeredDog.dog, breed: breed });
                 if (result.success) {
                   // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
-                  const payload: any = (result as any).payload;
-                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  // const payload: any = (result as any).payload;
+                  setDeliveryFrequency(result.payload.dog.subscription.recurring / 7)
                   registeredDog.dog.breed = breed
                   dogData.breed = breed
                   setIsEditingDog(true);
