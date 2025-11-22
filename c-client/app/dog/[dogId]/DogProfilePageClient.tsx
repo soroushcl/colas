@@ -86,10 +86,10 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     name: registeredDog?.dog.name.charAt(0).toUpperCase() + registeredDog?.dog.name.slice(1),
     breed: registeredDog?.dog.breed,
     age: new Date(registeredDog?.dog.age).toDateString(),
-    gender: registeredDog?.dog.gender,
-    neutered: registeredDog?.dog.isNeutered,
-    activity: registeredDog?.dog.activityLevel,
+    gender: (registeredDog?.dog.gender.toLowerCase() == 'female') ? gender.female : gender.male,
+    activity: registeredDog?.dog.activityLevel.toLowerCase() == 'low' ? activityLevel.low : registeredDog?.dog.activityLevel.toLowerCase() == 'high' ? activityLevel.high : activityLevel.normal,
     isAllergic: registeredDog?.dog.isAllergic,
+    isNeutered: registeredDog?.dog.isNeutered,
     allergies: registeredDog?.dog.allergies,
     hasHealthIssue: registeredDog?.dog.hasHealthIssue,
     healthIssue: registeredDog?.dog.healthIssue,
@@ -153,6 +153,15 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
   const [breeds, setBreeds] = useState<string[]>([]);
   const [breed, setBreed] = useState(dogData.breed);
+  const [age, setAge] = useState(dogData.age);
+  const [gen, setGender] = useState(dogData.gender);
+  const [isNeutered, setIsNeutered] = useState(dogData.isNeutered);
+  const [activity, setActivity] = useState(dogData.activity);
+  const [isAllergic, setIsAllergic] = useState(dogData.isAllergic);
+  const [allergies, setAllergies] = useState(dogData.allergies);
+  const [hasIssue, setHasIssue] = useState(dogData.hasHealthIssue);
+  const [issues, setIssues] = useState(dogData.healthIssue);
+
 
   useEffect(() => {
     const fetchBreeds = async () => {
@@ -182,23 +191,26 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
   const options: Option[] = [
     {
       title: "Yes",
-      subtitle: `${dogData.name} is ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
-      selected: dogStore.dog.isNeutered,
+      subtitle: `${dogData.name} is ${dogData.gender == gender.male ? "Neutered" : "Spayed"}`,
+      selected: isNeutered,
     },
     {
       title: "No",
-      subtitle: `${dogData.name} isn't ${dogStore.dog.gender == gender.male ? "Neutered" : "Spayed"}`,
-      selected: !dogStore.dog.isNeutered,
+      subtitle: `${dogData.name} isn't ${dogData.gender == gender.male ? "Neutered" : "Spayed"}`,
+      selected: !isNeutered,
     },
   ];
 
-  const handleSelect = (updatedOptions: number) => {
-    console.log(updatedOptions)
+  const handleSelect = (selected: number) => {
+    console.log(selected)
+
     // Sync selected values back to MobX store
     // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    // if (isNursingOption) {
-    //   dogStore.dog.isNeutered = isNursingOption.selected;
-    // }
+    if (selected) {
+      setIsNeutered(false);
+    } else {
+      setIsNeutered(true)
+    }
   };
 
   const activityOptions: Option[] = [
@@ -206,60 +218,51 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       cardImage: 'activity-low.svg',
       title: "Low",
       secondarySubtitle: `Sleepy Guy`,
-      selected: dogData.activity == activityLevel.low,
+      selected: activity == activityLevel.low,
     },
     {
       cardImage: 'activity-medium.svg',
       title: "Normal",
       secondarySubtitle: `Fetches The Paper`,
-      selected: dogData.activity == activityLevel.normal,
+      selected: activity == activityLevel.normal,
     },
     {
       cardImage: 'activity-high.svg',
       title: "High",
       secondarySubtitle: `Won’t Fall Asleep`,
-      selected: dogData.activity == activityLevel.high,
+      selected: activity == activityLevel.high,
     },
   ];
 
-  const handleActivitySelect = (updatedOptions: number) => {
-    console.log(updatedOptions)
+  const handleActivitySelect = (selected: number) => {
+    console.log(selected)
+
     // Sync selected values back to MobX store
-    // const lowOption = updatedOptions.find((opt) => opt.title === "Low");
-    // if (lowOption) {
-    //   if (lowOption.selected) {
-    //     dogData.activity = activityLevel.low;
-    //   }
-    // }
-    // const normalOption = updatedOptions.find((opt) => opt.title === "Normal");
-    // if (normalOption) {
-    //   if (normalOption.selected) {
-    //     dogData.activity = activityLevel.normal;
-    //   }
-    // }
-    // const highOption = updatedOptions.find((opt) => opt.title === "High");
-    // if (highOption) {
-    //   if (highOption.selected) {
-    //     dogData.activity = activityLevel.high;
-    //   }
-    // }
+    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
+    if (selected == 0) {
+      setActivity(activityLevel.low);
+    } else if (selected == 1) {
+      setActivity(activityLevel.normal);
+    } else {
+      setActivity(activityLevel.high);
+    }
   };
 
   const allergyOptions: Option[] = [
     {
       title: "Yes",
       secondarySubtitle: `we want to avoid...`,
-      selected: dogData.isAllergic,
+      selected: isAllergic,
     },
     {
       title: "No",
       secondarySubtitle: `Not any known allergies!`,
-      selected: !dogData.isAllergic,
+      selected: !isAllergic,
     },
   ];
 
-  const chipOptions: ChipOption[] = dogData.isAllergic ? Object.values(allergy).map(option => {
-    const isSelected = dogData.allergies && dogData.allergies.some(
+  const chipOptions: ChipOption[] = isAllergic ? Object.values(allergy).map(option => {
+    const isSelected = allergies && allergies.some(
       issueKey => allergy[issueKey as unknown as keyof typeof allergy] === option // Compare using enum value
     );
     return {
@@ -268,52 +271,57 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     };
   }) : [];
 
-  const handleAllergySelect = (updatedOptions: number) => {
-    console.log(updatedOptions)
-    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    // if (isNursingOption) {
-    //   dogData.isAllergic = isNursingOption.selected;
-    // }
+  const handleAllergySelect = (selected: number) => {
+    console.log(selected)
+
+    if (selected == 0) {
+      setIsAllergic(true);
+    } else if (selected == 1) {
+      setIsAllergic(false);
+    }
   };
 
-  const handleHealthSelect = (updatedOptions: ChipOption[]) => {
+  const handleAllergiesSelect = (updatedOptions: ChipOption[]) => {
     const selectedIssues = updatedOptions
       .filter(option => option.selected)
       .map(option => getEnumKeyByValue(allergy, option.title))
       .filter((key): key is keyof typeof allergy => !!key);
 
-    dogData.allergies = selectedIssues as unknown as allergy[];
+    setAllergies(selectedIssues as unknown as allergy[])
   };
 
   const healthIssueOptions: Option[] = [
     {
       title: "Yes",
       secondarySubtitle: `We're dealing with...`,
-      selected: dogData.hasHealthIssue,
+      selected: hasIssue,
     },
     {
       title: "No",
       secondarySubtitle: `A poster child for health!`,
-      selected: !dogData.hasHealthIssue,
+      selected: !hasIssue,
     },
   ];
 
-  const healthIssueChipOptions: ChipOption[] = dogData.hasHealthIssue ? Object.values(healthIssue).map(option => {
-    const isSelected = dogData.healthIssue && dogData.healthIssue.some(
+  const healthIssueChipOptions: ChipOption[] = hasIssue ? Object.values(healthIssue).map(option => {
+    const isSelected = issues && issues.some(
       issueKey => healthIssue[issueKey as unknown as keyof typeof healthIssue] === option // Compare using enum value
     );
+    console.log('healthIssueChipOptions', option)
     return {
       title: option, // Use enum value (display text)
       selected: isSelected,
     };
   }) : [];
 
-  const handleHealthIssueSelect = (updatedOptions: number) => {
-    console.log(updatedOptions)
-    // const isNursingOption = updatedOptions.find((opt) => opt.title === "Yes");
-    // if (isNursingOption) {
-    //   dogData.hasHealthIssue = isNursingOption.selected;
-    // }
+  const handleHealthIssueSelect = (selected: number) => {
+    console.log(selected)
+
+    if (selected == 0) {
+      setHasIssue(true);
+    } else if (selected == 1) {
+      setHasIssue(false);
+    }
   };
 
   const handleHealthIssuesSelect = (updatedOptions: ChipOption[]) => {
@@ -322,7 +330,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
       .map(option => getEnumKeyByValue(healthIssue, option.title))
       .filter((key): key is keyof typeof healthIssue => !!key);
 
-    dogData.healthIssue = selectedIssues as unknown as healthIssue[];
+    setIssues(selectedIssues as unknown as healthIssue[])
   };
 
 
@@ -505,8 +513,8 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                     multiSelect={false}
                   />
                   {
-                    dogStore.dog.isAllergic &&
-                    <RadioChips chipOptions={chipOptions} onSelect={handleHealthSelect} multiSelect={true} />
+                    isAllergic &&
+                    <RadioChips chipOptions={chipOptions} onSelect={handleAllergiesSelect} multiSelect={true} />
                   }
                 </div>
               }
@@ -514,7 +522,37 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsAllergyPopupOpen(false)}
-          onSubmit={() => setIsAllergyPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if ((isAllergic !== dogData.isAllergic) || (allergies !== dogData.allergies)) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, isAllergic: isAllergic, allergies: allergies });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.isAllergic = isAllergic
+                  registeredDog.dog.allergies = allergies
+                  dogData.isAllergic = isAllergic
+                  dogData.allergies = allergies
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsAllergyPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsAllergyPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog Allergy:", error);
+              alert("An error occurred while updating Allergy. Please try again.");
+            }
+          }}
           isOpen={isAllergyPopupOpen}
         />
         <DogPopup
@@ -529,7 +567,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                     multiSelect={false}
                   />
                   {
-                    dogStore.dog.hasHealthIssue &&
+                    hasIssue &&
                     <RadioChips chipOptions={healthIssueChipOptions} onSelect={handleHealthIssuesSelect} multiSelect={true} />
                   }
                 </div>
@@ -538,7 +576,37 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsHealthPopupOpen(false)}
-          onSubmit={() => setIsHealthPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (hasIssue !== dogData.hasHealthIssue || issues !== dogData.healthIssue) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, hasHealthIssue: hasIssue, healthIssue: issues });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.hasHealthIssue = hasIssue
+                  registeredDog.dog.healthIssue = issues
+                  dogData.hasHealthIssue = hasIssue
+                  dogData.healthIssue = issues
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsHealthPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsHealthPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog Health:", error);
+              alert("An error occurred while updating Health. Please try again.");
+            }
+          }}
           isOpen={isHealthPopupOpen}
         />
         <DogPopup
@@ -558,7 +626,35 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsActivityPopupOpen(false)}
-          onSubmit={() => setIsActivityPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (activity !== dogData.activity) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, activityLevel: activity });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.activityLevel = activity
+                  dogData.activity = activity
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsActivityPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsActivityPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog Activity:", error);
+              alert("An error occurred while updating Activity Level. Please try again.");
+            }
+          }}
           isOpen={isActivityPopupOpen}
         />
         <DogPopup
@@ -578,7 +674,35 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsNeuteredPopupOpen(false)}
-          onSubmit={() => setIsNeuteredPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (isNeutered !== dogData.isNeutered) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, isNeutered: isNeutered });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.isNeutered = isNeutered
+                  dogData.isNeutered = isNeutered
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsNeuteredPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsNeuteredPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog age:", error);
+              alert("An error occurred while updating age. Please try again.");
+            }
+          }}
           isOpen={isNeuteredPopupOpen}
         />
         <DogPopup
@@ -588,13 +712,14 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
               {
                 <div className='flex flex-row gap-6 md:gap-10'>
                   {[0, 1].map(dogGender => {
+                    console.log(dogGender, gen, (gen == gender.female), (gen == gender.male))
                     return <div
                       className='flex flex-col items-center gap-2 cursor-pointer'
                       key={dogGender}
-                      onClick={() => dogGender == 1 ? dogStore.dog.gender = gender.male : dogStore.dog.gender = gender.female}
+                      onClick={() => dogGender == 1 ? setGender(gender.male) : setGender(gender.female)}
                     >
                       <Image
-                        src={`/images/${(dogGender == 0) ? (dogStore.dog.gender == gender.female) ? "selected-female.svg" : "female.svg" : (dogStore.dog.gender == gender.male) ? "selected-male.svg" : "male.svg"}`}
+                        src={`/images/${(dogGender == 0) ? (gen == gender.female) ? "selected-female.svg" : "female.svg" : (gen == gender.male) ? "selected-male.svg" : "male.svg"}`}
                         width={200}
                         height={200}
                         className="object-fit grow"
@@ -608,10 +733,10 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                         <div className='flex flex-row gap-2 text-label_primary text-xl items-center'>
 
                           <div
-                            className={`w-5 h-5 flex items-center justify-center rounded-full ${((dogStore.dog.gender == gender.male && dogGender == 1) || (dogStore.dog.gender == gender.female && dogGender == 0)) ? "border-3 border-system_primary" : "border-2 border-gray_icon"
+                            className={`w-5 h-5 flex items-center justify-center rounded-full ${((gen == gender.male && dogGender == 1) || (gen == gender.female && dogGender == 0)) ? "border-3 border-system_primary" : "border-2 border-gray_icon"
                               }`}
                           >
-                            {((dogStore.dog.gender == gender.male && dogGender == 1) || (dogStore.dog.gender == gender.female && dogGender == 0)) && (
+                            {((gen == gender.male && dogGender == 1) || (gen == gender.female && dogGender == 0)) && (
                               <Image
                                 src={`/images/selected.svg`}
                                 width={20}
@@ -633,7 +758,35 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             </div>
           }
           onClose={() => setIsGenderPopupOpen(false)}
-          onSubmit={() => setIsGenderPopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (gen !== dogData.gender) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, gender: gen });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.gender = gen
+                  dogData.gender = gen
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsGenderPopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsGenderPopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog age:", error);
+              alert("An error occurred while updating age. Please try again.");
+            }
+          }}
           isOpen={isGenderPopupOpen}
         />
         <DogPopup
@@ -644,16 +797,55 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
                 <LargeInput
                   type="date"
                   placeholder={`Birthday`}
-                  // value={userStore.currentRegisteringDog == index ? dogStore.dog.name : ""}
-                  onChange={(e) => { dogStore.dog.age = new Date(e.target.value) }}
-                // key={index}
+                  onChange={(e) => {
+                    const dateValue = e.target.value;
+                    if (dateValue) {
+                      const date = new Date(dateValue);
+                      setAge(date.toDateString());
+                    }
+                  }}
+                  value={age ? (() => {
+                    const date = new Date(age);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                  })() : ''}
                 />
               }
 
             </div>
           }
           onClose={() => setIsAgePopupOpen(false)}
-          onSubmit={() => setIsAgePopupOpen(false)}
+          onSubmit={async () => {
+            try {
+              // Only call API if frequency has changed
+              // registeredDog?.subscription.info[0].amount += 1
+              if (age !== dogData.age) {
+
+                const result = await api.editPoochRecipes({ ...registeredDog.dog, age: new Date(age) });
+                if (result.success) {
+                  // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+                  const payload: any = (result as any).payload;
+                  setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+                  registeredDog.dog.age = new Date(age)
+                  dogData.age = age
+                  setIsEditingDog(true);
+                  setIsRecipePopupOpen(true);
+                  setIsAgePopupOpen(false);
+                  // Optionally refresh the page or update the store
+                } else {
+                  console.error("Failed to update dog breed:", result.error);
+                  alert("Failed to update delivery subscription type. Please try again.");
+                }
+              } else {
+                setIsAgePopupOpen(false);
+              }
+            } catch (error) {
+              console.error("Error updating dog age:", error);
+              alert("An error occurred while updating age. Please try again.");
+            }
+          }}
           isOpen={isAgePopupOpen}
         />
         <DogPopup
@@ -883,7 +1075,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
             { label: "Breed", value: dogData.breed, type: "value", onClick: () => setIsBreedPopupOpen(true) },
             { label: "Age", value: dogData.age, type: "value", onClick: () => setIsAgePopupOpen(true) },
             { label: "Gender", value: dogData.gender, type: "value", onClick: () => setIsGenderPopupOpen(true) },
-            { label: "Neutered", value: dogData.neutered ? "Yes" : "No", type: "value", onClick: () => setIsNeuteredPopupOpen(true) },
+            { label: "Neutered", value: dogData.isNeutered ? "Yes" : "No", type: "value", onClick: () => setIsNeuteredPopupOpen(true) },
             { label: "Activity level", value: dogData.activity, type: "value", onClick: () => setIsActivityPopupOpen(true) },
             { label: "Food allergies", value: dogData.allergies, type: "value", onClick: () => setIsAllergyPopupOpen(true) },
             { label: "Health issues", value: dogData.healthIssue, type: "value", onClick: () => setIsHealthPopupOpen(true) },
