@@ -29,7 +29,6 @@ export interface Address {
     city: string;
     state: string;
     country: string;
-    phoneNumber: string;
 }
 export interface PromoCode {
     id: string;

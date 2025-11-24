@@ -1,7 +1,10 @@
 import { SubscriptionRepository } from '../SubscriptionRepository';
-import { Dog, PriceVersion, Subscription, User } from 'c-lib';
+import { Address, Dog, PriceVersion, Subscription, User } from 'c-lib';
 
 export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
+  updateUserShipping(userId: User['id'], shippingAddress: Address): Promise<true> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
   updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> | Promise<never> {
     throw new Error('Method not implemented.');
   }

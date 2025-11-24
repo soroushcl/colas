@@ -73,6 +73,8 @@ import {
   EditDog,
   Dog,
   dogLifeStage,
+  editShippingRequestBody,
+  editShippingResponseBody,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -1711,7 +1713,7 @@ const TokenAuthenticationHandler = (
             return {
               recipeId: dog.recipes.filter(r => {
                 console.log(r.protein, s.protein, r.protein == s.protein)
-                return (r.protein == s.protein) 
+                return (r.protein == s.protein)
               })[0].id,
               amount: s.amount
             }
@@ -1752,9 +1754,45 @@ const TokenAuthenticationHandler = (
           await updateSubscriptionItems(dogToInsert.owner, dogToInsert.id)
 
         } else {
-        res.status(401).json(Fail(new Error('No dog found').toString()))
-      }
+          res.status(401).json(Fail(new Error('No dog found').toString()))
+        }
         res.json(Success(true));
+      },
+
+      changeShippingAddress: async (req: Request<{}, {}, editShippingRequestBody>, res: Response<editShippingResponseBody>) => {
+        let { shippingAddress } = req.body;
+        console.log("change-shipping-address: ", shippingAddress)
+        shippingAddress.postal_code = shippingAddress.postalCode;
+        delete shippingAddress.postalCode
+        const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+        const stripe = (stripeCustomerMongoRepo as any).stripe;
+
+        let sc = await stripeCustomerRepo?.getCustomerByUserId(req.user.id);
+
+        if (sc) {
+          try {
+            let customer = await stripe.customers.retrieve(sc.stripeCustomer.stripeCustomerId)
+            customer = await stripe.customers.update(
+              sc.stripeCustomer.stripeCustomerId,
+              {
+                shipping: {
+                  name: customer.shipping.name,
+                  address: { ...shippingAddress, postal_code: shippingAddress.postalCode },
+                },
+              }
+            );
+            // shippingAddress.postalCode = shippingAddress.postal_code;
+            await subscriptionRepo.updateUserShipping(req.user.id, shippingAddress);
+            await orderRepo.updateUserShipping(req.user.id, shippingAddress);
+            res.json(Success(true));
+          } catch (err) {
+            console.log(err)
+            res.status(500).json(Fail(new Error('Stripe Order Update Error: ' + err).toString()))
+          }
+        } else {
+          res.status(500).json(Fail(new Error('No stripe user found!').toString()))
+        }
+
       },
       authGuard: async (req: Request, res: Response, next: NextFunction) => {
         if (req.isAuthenticated && req.isAuthenticated()) {

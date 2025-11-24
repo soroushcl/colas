@@ -1,4 +1,4 @@
-import { Dog, PriceVersion, Subscription, User} from 'c-lib';
+import { Address, Dog, PriceVersion, Subscription, User} from 'c-lib';
 
 export abstract class SubscriptionRepository {
   abstract addSubscription(subscription: Subscription): Promise<Subscription> | Promise<never>;
@@ -11,5 +11,6 @@ export abstract class SubscriptionRepository {
   abstract findPriceVersionById(id: PriceVersion['id']): Promise<PriceVersion | null> | Promise<never>;
   abstract subscriptionPriceCalculator(subscription: Subscription): number;
   abstract updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> | Promise<never>;
+  abstract updateUserShipping(userId: User['id'], shippingAddress: Address): Promise<true> | Promise<never>;
 
 }

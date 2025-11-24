@@ -1,7 +1,10 @@
 import { OrderRepository } from '../OrderRepository';
-import { Dog, Order, OrderDetail, OrderStatus, User } from 'c-lib';
+import { Address, Dog, Order, OrderDetail, OrderStatus, User } from 'c-lib';
 
 export class OrderRepositoryInMemory extends OrderRepository {
+  updateUserShipping(userId: User['id'], shippingAddress: Address): Promise<true> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
   updateActiveOrderInfo(dog: Dog['id'], detail: OrderDetail, price: number, currentPeriodEnd: Date): Promise<Order> | Promise<never> {
     throw new Error('Method not implemented.');
   }

@@ -1,6 +1,6 @@
 import { createMongoId, toMongo } from '@utils/mongoUtils';
 import { OrderRepository } from '../OrderRepository';
-import { Dog, Order, OrderDetail, OrderStatus, User, } from 'c-lib';
+import { Address, Dog, Order, OrderDetail, OrderStatus, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
 // import { toMongo } from "@utils/mongoUtils";
 // import { BreedRepository } from 'src/breeds/repositories';
@@ -77,6 +77,16 @@ export class OrderMongoRepository extends OrderRepository {
     return updatedOrder as unknown as Order;
 
   }
+
+  async updateUserShipping(userId: User['id'], shipping: Address): Promise<true> {
+    await this.orderCollection.updateMany({ userId: userId, $or: [{ status: 'active' }, { status: 'trialing' }, { status: 'aggregation' }] }, {
+      $set: {
+        shipping: shipping,
+      }
+    })
+    return true
+  }
+
 
   private ensureValidOrderId(order: Order): Order {
     if (order.id && ObjectId.isValid(order.id)) {

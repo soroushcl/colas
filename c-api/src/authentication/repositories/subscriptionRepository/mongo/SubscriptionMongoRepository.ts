@@ -1,5 +1,5 @@
 import { SubscriptionRepository } from '../SubscriptionRepository';
-import { Dog, dogLifeStage, gender, OrderStatus, PatternInfo, PriceVersion, protein, Recipe, recurringType, shape, Subscription, subscriptionStatus, subscriptionType, User, } from 'c-lib';
+import { Address, Dog, dogLifeStage, gender, PatternInfo, PriceVersion, protein, Recipe, recurringType, shape, Subscription, subscriptionStatus, subscriptionType, User, } from 'c-lib';
 import { Collection, Db, ObjectId } from "mongodb";
 import { fromMongo, toMongo } from "@utils/mongoUtils";
 import { BreedRepository } from 'src/breeds/repositories';
@@ -690,9 +690,18 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
   }
 
   async updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> {
-    await this.subscriptionCollection.updateMany({ dog: dog, status: OrderStatus.active }, {
+    await this.subscriptionCollection.updateMany({ dog: dog, status: subscriptionStatus.active }, {
       $set: {
         dailyPrice: dailyPrice,
+      }
+    })
+    return true
+  }
+
+  async updateUserShipping(userId: User['id'], shipping: Address): Promise<true> {
+    await this.subscriptionCollection.updateMany({ userId: userId }, {
+      $set: {
+        shipping: shipping,
       }
     })
     return true

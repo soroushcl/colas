@@ -1,4 +1,4 @@
-import { Dog, Recipe, Subscription, Order, EditDog, subscriptionInfo } from 'src/registration';
+import { Dog, Recipe, Subscription, Order, EditDog, subscriptionInfo, Address } from 'src/registration';
 import { AuthenticatedUser, ForgotPasswordUser, User } from '../../authentication';
 import { Fail, Success } from '../responseTypes';
 
@@ -130,3 +130,11 @@ export interface editDogRequestBody {
 }
 
 export type editDogResponseBody = Success<true> | Fail;
+
+
+export interface editShippingRequestBody {
+  shippingAddress: Address,
+  
+}
+
+export type editShippingResponseBody = Success<true> | Fail;

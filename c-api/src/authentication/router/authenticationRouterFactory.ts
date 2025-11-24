@@ -30,6 +30,7 @@ export const authenticationRouterFactory = (authViews: AuthenticationRouterFacto
   router.post('/update-subscription-recurring', authViews.updateSubscriptionRecurring);
   router.post('/edit-pooch-recipes', authViews.editDogRecipes);
   router.post('/edit-dog', authViews.editDog);
+  router.post('/change-shipping-address', authViews.changeShippingAddress);
   
   return router;
 };

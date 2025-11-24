@@ -26,6 +26,7 @@ export interface AuthenticationHandler {
     reactivateSubscription: RequestHandler;
     editDogRecipes: RequestHandler;
     editDog: RequestHandler;
+    changeShippingAddress: RequestHandler;
     // updateCustomer: RequestHandler;
     // deactivateUser: RequestHandler;
     // reactivateUser: RequestHandler;
@@ -53,6 +54,7 @@ export interface AuthenticationRouterFactoryViews {
   updateSubscriptionRecurring: RequestHandler;
   editDogRecipes: RequestHandler;
   editDog: RequestHandler;
+  changeShippingAddress: RequestHandler;
   // updateCustomer: RequestHandler;
   // deactivateUser: RequestHandler;
   // reactivateUser: RequestHandler;

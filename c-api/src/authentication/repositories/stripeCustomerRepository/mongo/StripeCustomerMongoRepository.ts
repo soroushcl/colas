@@ -23,9 +23,9 @@ export class StripeCustomerMongoRepository extends StripeCustomerRepository {
         const pm = await this.stripe.paymentMethods.list({
           customer: stripeCustomerId,
           type: 'card',
-        }).catch((err:any) => console.log(err))
+        }).catch((err: any) => console.log(err))
         if (pm) {
-        return { cards: pm.data, billingAddress }
+          return { cards: pm.data, billingAddress }
         }
       }
       return { cards: [], billingAddress: null }
@@ -33,8 +33,31 @@ export class StripeCustomerMongoRepository extends StripeCustomerRepository {
     return { cards: [], billingAddress: null }
   }
 
+  async getCustomerByUserId(id: string): Promise<{ stripeCustomer: StripeCustomerDocument }> {
+    if (!id) {
+      throw new Error('Stripe customer not found for user');
+    }
 
-  
+    const userId = new ObjectId(id);
+    const doc = await this.collection.findOne({ userId });
+
+    if (!doc) {
+      throw new Error('Stripe customer not found for user');
+    }
+
+    const { _id, userId: mongoUserId, ...rest } = doc;
+
+    return {
+      stripeCustomer: {
+        ...rest,
+        id: _id.toHexString(),
+        userId: mongoUserId.toHexString(),
+      },
+    };
+  }
+
+
+
 
   async upsertStripeCustomer(doc: StripeCustomerDocument): Promise<StripeCustomerDocument> {
     const now = new Date();

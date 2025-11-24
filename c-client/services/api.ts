@@ -41,6 +41,9 @@ import {
     editDogRequestBody,
     subscriptionInfo,
     protein,
+    Address,
+    editShippingResponseBody,
+    editShippingRequestBody,
 } from 'c-lib';
 
 if (typeof window === "undefined") {
@@ -427,6 +430,19 @@ export default class FetchApi {
             body: {
                 newDogId,
                 subscription
+            },
+        });
+        console.log("edit-pooch-recipes res", res)
+        return res
+    };
+
+    changeShippingAddress = async (shippingAddress: Address): Promise<editDogResponseBody> => {
+        console.log("editDog called", shippingAddress)
+        const res = await this.request<editShippingResponseBody, editShippingRequestBody>(`${this.baseUrl}/authentication/change-shipping-address`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                shippingAddress,
             },
         });
         console.log("edit-pooch-recipes res", res)

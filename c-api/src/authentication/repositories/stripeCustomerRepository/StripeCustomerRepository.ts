@@ -31,6 +31,7 @@ export interface StripeCustomerDocument {
 export abstract class StripeCustomerRepository {
   abstract upsertStripeCustomer(doc: StripeCustomerDocument): Promise<StripeCustomerDocument> | Promise<never>;
   abstract getPaymentMethod(uId: string): Promise<{ cards: any[]; billingAddress: any; }>;
+  abstract getCustomerByUserId(id: string): Promise<{ stripeCustomer: StripeCustomerDocument }>;
 }
 
 

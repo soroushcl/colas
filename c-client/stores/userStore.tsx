@@ -1,6 +1,6 @@
 'use client'
 import { makeAutoObservable, reaction } from 'mobx';
-import { googleLoginRequestBody, Order, OrderStatus, protein, Recipe, resetPasswordRequestBody, Subscription, subscriptionType, User, userStatus } from 'c-lib';
+import { Address, googleLoginRequestBody, Order, OrderStatus, protein, Recipe, resetPasswordRequestBody, Subscription, subscriptionType, User, userStatus } from 'c-lib';
 import FetchApi from '../services/api';
 import { Dog } from 'c-lib';
 import { DogStore } from './dogStore';
@@ -19,36 +19,22 @@ export class UserStore {
   }
   upcomingOrders: Order[] = []
   card: number = 0
-  billingAddress: {
-    line1: string,
-    line2: string,
-    city: string,
-    state: string,
-    country: string,
-    postalCode: string
-  } = {
-      line1: '',
-      line2: '',
-      city: '',
-      state: '',
-      country: 'CA',
-      postalCode: ''
-    }
-  shippingAddress: {
-    line1: string,
-    line2: string,
-    city: string,
-    state: string,
-    country: string,
-    postalCode: string
-  } = {
-      line1: '',
-      line2: '',
-      city: '',
-      state: '',
-      country: 'CA',
-      postalCode: ''
-    }
+  billingAddress: Address = {
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    country: 'CA',
+    postalCode: '',
+  }
+  shippingAddress: Address = {
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    country: 'CA',
+    postalCode: '',
+  }
   user: User = {
     email: "",
     password: '',
