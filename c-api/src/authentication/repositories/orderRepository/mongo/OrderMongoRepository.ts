@@ -87,6 +87,37 @@ export class OrderMongoRepository extends OrderRepository {
     return true
   }
 
+  async findOrderByInvoiceNumber(userId: User['id'], invoiceNumber: string): Promise<Order | null> {
+    const filter = ObjectId.isValid(userId as any)
+      ? { userId: { $in: [userId as any, new ObjectId(userId as any)] }, invoiceNumber: invoiceNumber }
+      : { userId: userId, invoiceNumber: invoiceNumber };
+    const order = await this.orderCollection.findOne(filter as any);
+    return order as unknown as Order | null;
+  }
+
+  async findOrderByUserIdAndDogIdAndStatus(userId: User['id'], dogId: Dog['id'], statuses: string[]): Promise<Order | null> {
+    const filter = ObjectId.isValid(userId as any)
+      ? { 
+          userId: { $in: [userId as any, new ObjectId(userId as any)] }, 
+          dog: { $in: [dogId as any, new ObjectId(dogId as any)] }, 
+          status: { $in: statuses } 
+        }
+      : { userId: userId, dog: dogId, status: { $in: statuses } };
+    const order = await this.orderCollection.findOne(filter as any);
+    return order as unknown as Order | null;
+  }
+
+  async updateOrder(userId: User['id'], filter: any, update: any): Promise<Order | null> {
+    const baseFilter = ObjectId.isValid(userId as any)
+      ? { userId: { $in: [userId as any, new ObjectId(userId as any)] }, ...filter }
+      : { userId: userId, ...filter };
+    const result = await this.orderCollection.findOneAndUpdate(
+      baseFilter,
+      { $set: update },
+      { returnDocument: 'after' }
+    );
+    return result as unknown as Order | null;
+  }
 
   private ensureValidOrderId(order: Order): Order {
     if (order.id && ObjectId.isValid(order.id)) {

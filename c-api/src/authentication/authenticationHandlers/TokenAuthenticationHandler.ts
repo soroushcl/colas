@@ -75,6 +75,8 @@ import {
   dogLifeStage,
   editShippingRequestBody,
   editShippingResponseBody,
+  editBillingRequestBody,
+  editBillingResponseBody,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -1777,13 +1779,50 @@ const TokenAuthenticationHandler = (
               {
                 shipping: {
                   name: customer.shipping.name,
-                  address: { ...shippingAddress, postal_code: shippingAddress.postalCode },
+                  address: shippingAddress,
                 },
               }
             );
-            // shippingAddress.postalCode = shippingAddress.postal_code;
+            shippingAddress.postalCode = shippingAddress.postal_code;
+            delete shippingAddress.postal_code
             await subscriptionRepo.updateUserShipping(req.user.id, shippingAddress);
             await orderRepo.updateUserShipping(req.user.id, shippingAddress);
+            res.json(Success(true));
+          } catch (err) {
+            console.log(err)
+            res.status(500).json(Fail(new Error('Stripe Order Update Error: ' + err).toString()))
+          }
+        } else {
+          res.status(500).json(Fail(new Error('No stripe user found!').toString()))
+        }
+
+      },
+      changeBillingAddress: async (req: Request<{}, {}, editBillingRequestBody>, res: Response<editBillingResponseBody>) => {
+        let { billingAddress } = req.body;
+        console.log("change-shipping-address: ", billingAddress)
+        billingAddress.postal_code = billingAddress.postalCode;
+        delete billingAddress.postalCode
+        const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+        const stripe = (stripeCustomerMongoRepo as any).stripe;
+
+        let sc = await stripeCustomerRepo?.getCustomerByUserId(req.user.id);
+
+        if (sc) {
+          try {
+            let customer = await stripe.customers.retrieve(sc.stripeCustomer.stripeCustomerId)
+            customer = await stripe.customers.update(
+              sc.stripeCustomer.stripeCustomerId,
+              {
+                shipping: {
+                  name: customer.shipping.name,
+                  address: billingAddress,
+                },
+              }
+            );
+            // billingAddress.postalCode = billingAddress.postal_code;
+            // delete billingAddress.postal_code
+            // await subscriptionRepo.updateUserShipping(req.user.id, billingAddress);
+            // await orderRepo.updateUserShipping(req.user.id, billingAddress);
             res.json(Success(true));
           } catch (err) {
             console.log(err)

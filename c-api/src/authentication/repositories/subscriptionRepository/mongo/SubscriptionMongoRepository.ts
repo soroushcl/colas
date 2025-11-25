@@ -707,6 +707,31 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     return true
   }
 
+  async updateUserBilling(userId: User['id'], billing: Address): Promise<true> {
+    await this.subscriptionCollection.updateMany({ userId: userId }, {
+      $set: {
+        billing: billing,
+      }
+    })
+    return true
+  }
+
+  async findSubscriptionByUserIdAndDogId(userId: User['id'], dogId: Dog['id']): Promise<Subscription | null> {
+    const filter = ObjectId.isValid(userId as any)
+      ? { userId: { $in: [userId as any, new ObjectId(userId as any)] }, dog: { $in: [dogId as any, new ObjectId(dogId as any)] } }
+      : { userId: userId, dog: dogId };
+    const subscription = await this.subscriptionCollection.findOne(filter as any);
+    return subscription as unknown as Subscription | null;
+  }
+
+  async updateSubscriptionStatus(userId: User['id'], dogId: Dog['id'], status: string): Promise<true> {
+    const filter = ObjectId.isValid(userId as any)
+      ? { userId: { $in: [userId as any, new ObjectId(userId as any)] }, dog: { $in: [dogId as any, new ObjectId(dogId as any)] } }
+      : { userId: userId, dog: dogId };
+    await this.subscriptionCollection.updateOne(filter as any, { $set: { status: status } });
+    return true;
+  }
+
   //   if (dog) {
   //     let priceModel = await PriceModel.findOne({ dog: dogId })
   //     if (priceModel) {

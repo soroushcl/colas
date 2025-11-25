@@ -449,6 +449,19 @@ export default class FetchApi {
         return res
     };
 
+    changeBillingAddress = async (shippingAddress: Address): Promise<editDogResponseBody> => {
+        console.log("editDog called", shippingAddress)
+        const res = await this.request<editShippingResponseBody, editShippingRequestBody>(`${this.baseUrl}/authentication/change-shipping-address`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                shippingAddress,
+            },
+        });
+        console.log("edit-pooch-recipes res", res)
+        return res
+    };
+
     updateDogSubscription = async (dogId: string, sub: { selectedRecipes: (number | string)[], sub: { recipeId: string | number, amount: number }[] }): Promise<{ status: string; price?: string; err?: string }> => {
         console.log("updateDogSubscription called", dogId, sub);
         const res = await this.request<{ status: string; price?: string; err?: string }, { dogId: string; sub: any }>(`${this.baseUrl}/authentication/update-dog-subscription`, {

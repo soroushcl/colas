@@ -2,6 +2,9 @@ import { SubscriptionRepository } from '../SubscriptionRepository';
 import { Address, Dog, PriceVersion, Subscription, User } from 'c-lib';
 
 export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
+  updateUserBilling(userId: User['id'], billingAddress: Address): Promise<true> | Promise<never> {
+    throw new Error('Method not implemented.');
+  }
   updateUserShipping(userId: User['id'], shippingAddress: Address): Promise<true> | Promise<never> {
     throw new Error('Method not implemented.');
   }
@@ -56,6 +59,23 @@ export class SubscriptionRepositoryInMemory extends SubscriptionRepository {
   async subscriptionDiscountedPriceCalculator(subscription: Subscription): Promise<number> {
     // In-memory implementation: return the dailyPrice if available, otherwise return 0
     return subscription.dailyPrice || 0;
+  }
+
+  findSubscriptionByUserIdAndDogId(userId: User['id'], dogId: Dog['id']): Promise<Subscription | null> | Promise<never> {
+    return new Promise((resolve) => {
+      const subscription = this.db.find(d => d.userId === userId && d.dog === dogId);
+      resolve(subscription || null);
+    });
+  }
+
+  updateSubscriptionStatus(userId: User['id'], dogId: Dog['id'], status: string): Promise<true> | Promise<never> {
+    return new Promise((resolve) => {
+      const subscription = this.db.find(d => d.userId === userId && d.dog === dogId);
+      if (subscription) {
+        subscription.status = status as any;
+      }
+      resolve(true);
+    });
   }
 
 }

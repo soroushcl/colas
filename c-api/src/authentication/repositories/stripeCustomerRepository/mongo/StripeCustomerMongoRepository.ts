@@ -102,6 +102,20 @@ export class StripeCustomerMongoRepository extends StripeCustomerRepository {
       __v: typeof doc.__v === 'number' ? doc.__v : 1,
     };
   }
+
+  async findStripeCustomerByStripeCustomerId(stripeCustomerId: string): Promise<StripeCustomerDocument | null> {
+    const doc = await this.collection.findOne({ stripeCustomerId });
+    if (!doc) {
+      return null;
+    }
+
+    const { _id, userId: mongoUserId, ...rest } = doc;
+    return {
+      ...rest,
+      id: _id.toHexString(),
+      userId: mongoUserId.toHexString(),
+    };
+  }
 }
 
 

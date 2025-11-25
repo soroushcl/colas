@@ -138,3 +138,10 @@ export interface editShippingRequestBody {
 }
 
 export type editShippingResponseBody = Success<true> | Fail;
+
+export interface editBillingRequestBody {
+  billingAddress: Address,
+  
+}
+
+export type editBillingResponseBody = Success<true> | Fail;

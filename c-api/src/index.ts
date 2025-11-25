@@ -50,7 +50,15 @@ repositoryFactory().then(repositories => {
     console.warn(`NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
   } else {
     const paymentRepo = new StripePaymentRepository(stripeSecret);
-    app.use('/stripe', paymentRouterFactory(paymentRepo, repositories.promoCodeRepo, stripeSecret));
+    app.use('/stripe', paymentRouterFactory(
+      paymentRepo, 
+      repositories.promoCodeRepo, 
+      stripeSecret,
+      repositories.orderRepo,
+      repositories.dogRepo,
+      repositories.subscriptionRepo,
+      repositories.stripeCustomerRepo
+    ));
   }
 
   // const {sampleModuleViews} = sampleModuleViewsHandler(repositories.sampleModuleRepo);

@@ -48,4 +48,40 @@ export class OrderRepositoryInMemory extends OrderRepository {
     });
   }
 
+  findOrderByInvoiceNumber(userId: User['id'], invoiceNumber: string): Promise<Order | null> | Promise<never> {
+    return new Promise((resolve) => {
+      const order = this.db.find(d => d.userId === userId && d.invoiceNumber === invoiceNumber);
+      resolve(order || null);
+    });
+  }
+
+  findOrderByUserIdAndDogIdAndStatus(userId: User['id'], dogId: Dog['id'], statuses: string[]): Promise<Order | null> | Promise<never> {
+    return new Promise((resolve) => {
+      const order = this.db.find(d => 
+        d.userId === userId && 
+        d.dog === dogId && 
+        statuses.includes(d.status)
+      );
+      resolve(order || null);
+    });
+  }
+
+  updateOrder(userId: User['id'], filter: any, update: any): Promise<Order | null> | Promise<never> {
+    return new Promise((resolve) => {
+      const order = this.db.find(d => {
+        if (d.userId !== userId) return false;
+        for (const key in filter) {
+          if (d[key as keyof Order] !== filter[key]) return false;
+        }
+        return true;
+      });
+      if (order) {
+        Object.assign(order, update);
+        resolve(order);
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
 }

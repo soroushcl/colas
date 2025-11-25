@@ -49,7 +49,6 @@ export class DogStore {
       city: '',
       state: '',
       country: '',
-      phoneNumber: ''
     },
     discounts: [],
     dailyPrice: 0,
@@ -192,7 +191,6 @@ export class DogStore {
         city: '',
         state: '',
         country: '',
-        phoneNumber: ''
       },
       discounts: [],
       dailyPrice: 0,

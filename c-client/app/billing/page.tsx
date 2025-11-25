@@ -59,10 +59,10 @@ export default function BillingPage() {
               // registeredDog?.subscription.info[0].amount += 1
               if (billing !== userStore.billingAddress) {
 
-                const result = await api.changeShippingAddress(shipping);
+                const result = await api.changeBillingAddress(billing);
                 if (result.success) {
-                  userStore.shippingAddress = shipping
-                  window.localStorage.setItem('userStore:shippingAddress', JSON.stringify(userStore.shippingAddress));
+                  userStore.billingAddress = billing
+                  window.localStorage.setItem('userStore:billingAddress', JSON.stringify(userStore.billingAddress));
                   setIsBillingPopupOpen(false);
                 } else {
                   console.error("Failed to update Billing:", result.error);

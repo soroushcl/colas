@@ -31,6 +31,7 @@ export const authenticationRouterFactory = (authViews: AuthenticationRouterFacto
   router.post('/edit-pooch-recipes', authViews.editDogRecipes);
   router.post('/edit-dog', authViews.editDog);
   router.post('/change-shipping-address', authViews.changeShippingAddress);
+  router.post('/change-billing-address', authViews.changeBillingAddress);
   
   return router;
 };
