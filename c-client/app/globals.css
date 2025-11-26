@@ -28,6 +28,8 @@
   --semantic-red: #F23030;
   --semantic-blue: #1A8CFF;
   --system-disable-primary: #55715C;
+  --semantic-green: #12B247;
+  --semantic-green-light: rgba(71, 255, 148, 0.16);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -54,5 +56,16 @@ body {
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

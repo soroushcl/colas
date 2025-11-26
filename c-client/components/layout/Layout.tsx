@@ -7,6 +7,7 @@ import FetchApi from '@/services/api';
 // import Header from '../header/Header';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Image from 'next/image';
+import { ToastProvider } from '@/components/popups/ToastContext';
 
 const api = new FetchApi();
 
@@ -20,8 +21,9 @@ export default function Layout({
             <GoogleOAuthProvider clientId='698941654245-kqd42a2aqdi8ooet57fk8vfjbq6dlm4o.apps.googleusercontent.com'>
 
                 <ServiceProvider api={api}>
-                    <StoreProvider >
-                        <div className='my-0 mx-auto min-h-screen flex flex-col justify-between relative bg-background'>
+                    <StoreProvider>
+                        <ToastProvider>
+                            <div className='my-0 mx-auto min-h-screen flex flex-col justify-between relative bg-background'>
                             <Image
                                 src={`/images/bg-protein.png`}
                                 width={200}
@@ -75,6 +77,7 @@ export default function Layout({
                             </div>
                             {children}
                         </div >
+                        </ToastProvider>
                     </StoreProvider>
                 </ServiceProvider>
             </GoogleOAuthProvider>

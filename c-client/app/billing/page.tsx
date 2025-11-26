@@ -8,13 +8,15 @@ import { useStores } from "@/stores/StoreContext";
 import DogPopup from "@/components/popups/DogPopup";
 import LargeInput from "@/components/inputs/largeInput/LargeInput";
 import FetchApi from "@/services/api";
+import { useToast } from "@/components/popups/ToastContext";
 
 export default function BillingPage() {
   const { userStore } = useStores();
+  const { showSuccess, showError } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isBillingPopupOpen, setIsBillingPopupOpen] = useState(false);
   const [billing, setBilling] = useState(userStore.billingAddress);
-  const [isShippingPopupOpen, setIsShippingPopupOpen] = useState(false);
+  const [isShippingPopupOpen, setIsShippingPopupOpen] = useState(true);
   const [shipping, setShipping] = useState(userStore.shippingAddress);
   const router = useRouter();
   const api = new FetchApi();
@@ -64,16 +66,17 @@ export default function BillingPage() {
                   userStore.billingAddress = billing
                   window.localStorage.setItem('userStore:billingAddress', JSON.stringify(userStore.billingAddress));
                   setIsBillingPopupOpen(false);
+                  showSuccess("Billing address updated successfully!");
                 } else {
                   console.error("Failed to update Billing:", result.error);
-                  alert("Failed to update Billing. Please try again.");
+                  showError("Failed to update Billing. Please try again.");
                 }
               } else {
                 setIsBillingPopupOpen(false);
               }
             } catch (error) {
               console.error("Error updating dog Billing:", error);
-              alert("An error occurred while updating Billing. Please try again.");
+              showError("An error occurred while updating Billing. Please try again.");
             }
           }}
           isOpen={isBillingPopupOpen}
@@ -103,16 +106,17 @@ export default function BillingPage() {
                   userStore.shippingAddress = shipping
                   window.localStorage.setItem('userStore:shippingAddress', JSON.stringify(userStore.shippingAddress));
                   setIsShippingPopupOpen(false);
+                  showSuccess("Shipping address updated successfully!");
                 } else {
                   console.error("Failed to update Shipping:", result.error);
-                  alert("Failed to update Shipping. Please try again.");
+                  showError("Failed to update Shipping. Please try again.");
                 }
               } else {
                 setIsShippingPopupOpen(false);
               }
             } catch (error) {
               console.error("Error updating dog Shipping:", error);
-              alert("An error occurred while updating Shipping. Please try again.");
+              showError("An error occurred while updating Shipping. Please try again.");
             }
           }}
           isOpen={isShippingPopupOpen}

@@ -42,6 +42,8 @@ const config: Config = {
         semantic_red: "var(--semantic-red)",
         semantic_blue: "var(--semantic-blue)",
         system_disable_primary: "var(--system-disable-primary)",
+        semantic_green: "var(--semantic-green)",
+        semantic_green_light: "var(--semantic-green-light)",
         cream: {
           50: '#fefcf9',
           100: '#fdf8f0',
