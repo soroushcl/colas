@@ -12,7 +12,6 @@ export abstract class SubscriptionRepository {
   abstract subscriptionPriceCalculator(subscription: Subscription): number;
   abstract updateDogSubscriptions(dog: Dog['id'], dailyPrice: number): Promise<true> | Promise<never>;
   abstract updateUserShipping(userId: User['id'], shippingAddress: Address): Promise<true> | Promise<never>;
-  abstract updateUserBilling(userId: User['id'], billingAddress: Address): Promise<true> | Promise<never>;
   abstract findSubscriptionByUserIdAndDogId(userId: User['id'], dogId: Dog['id']): Promise<Subscription | null> | Promise<never>;
   abstract updateSubscriptionStatus(userId: User['id'], dogId: Dog['id'], status: string): Promise<true> | Promise<never>;
 

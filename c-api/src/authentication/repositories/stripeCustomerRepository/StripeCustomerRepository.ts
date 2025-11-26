@@ -1,3 +1,4 @@
+import { Address, User } from "c-lib";
 
 export interface BillingAddress {
   line1: string;
@@ -33,6 +34,8 @@ export abstract class StripeCustomerRepository {
   abstract getPaymentMethod(uId: string): Promise<{ cards: any[]; billingAddress: any; }>;
   abstract getCustomerByUserId(id: string): Promise<{ stripeCustomer: StripeCustomerDocument }>;
   abstract findStripeCustomerByStripeCustomerId(stripeCustomerId: string): Promise<StripeCustomerDocument | null> | Promise<never>;
+  abstract updateUserBilling(userId: User['id'], billingAddress: Address): Promise<true> | Promise<never>;
+
 }
 
 

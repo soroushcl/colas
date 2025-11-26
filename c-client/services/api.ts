@@ -46,6 +46,8 @@ import {
     editShippingRequestBody,
     changeCardResponseBody,
     changeCardRequestBody,
+    editBillingResponseBody,
+    editBillingRequestBody,
 } from 'c-lib';
 
 if (typeof window === "undefined") {
@@ -439,7 +441,7 @@ export default class FetchApi {
     };
 
     changeShippingAddress = async (shippingAddress: Address): Promise<editDogResponseBody> => {
-        console.log("editDog called", shippingAddress)
+        console.log("changeShippingAddress called", shippingAddress)
         const res = await this.request<editShippingResponseBody, editShippingRequestBody>(`${this.baseUrl}/authentication/change-shipping-address`, {
             method: "POST",
             credentials: "include",
@@ -451,13 +453,13 @@ export default class FetchApi {
         return res
     };
 
-    changeBillingAddress = async (shippingAddress: Address): Promise<editDogResponseBody> => {
-        console.log("editDog called", shippingAddress)
-        const res = await this.request<editShippingResponseBody, editShippingRequestBody>(`${this.baseUrl}/authentication/change-billing-address`, {
+    changeBillingAddress = async (billingAddress: Address): Promise<editBillingResponseBody> => {
+        console.log("changeBillingAddress called", billingAddress)
+        const res = await this.request<editBillingResponseBody, editBillingRequestBody>(`${this.baseUrl}/authentication/change-billing-address`, {
             method: "POST",
             credentials: "include",
             body: {
-                shippingAddress,
+                billingAddress,
             },
         });
         console.log("edit-pooch-recipes res", res)

@@ -1812,19 +1812,18 @@ const TokenAuthenticationHandler = (
         if (sc) {
           try {
             let customer = await stripe.customers.retrieve(sc.stripeCustomer.stripeCustomerId)
-            customer = await stripe.customers.update(
-              sc.stripeCustomer.stripeCustomerId,
+             await stripe.paymentMethods.update(
+              customer.invoice_settings.default_payment_method,
               {
-                shipping: {
-                  name: customer.shipping.name,
+                billing_details: {
+                  email : customer.email,
                   address: billingAddress,
                 },
               }
             );
-            // billingAddress.postalCode = billingAddress.postal_code;
-            // delete billingAddress.postal_code
-            // await subscriptionRepo.updateUserShipping(req.user.id, billingAddress);
-            // await orderRepo.updateUserShipping(req.user.id, billingAddress);
+            billingAddress.postalCode = billingAddress.postal_code;
+            delete billingAddress.postal_code
+            await stripeCustomerRepo?.updateUserBilling(req.user.id, billingAddress);
             res.json(Success(true));
           } catch (err) {
             console.log(err)

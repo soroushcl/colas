@@ -1,6 +1,7 @@
 import { Collection, Db, ObjectId } from 'mongodb';
 import { StripeCustomerDocument, StripeCustomerRepository } from '../StripeCustomerRepository.js';
 import Stripe from 'stripe';
+import { Address, User } from 'c-lib';
 
 type MongoDoc = Omit<StripeCustomerDocument, 'id' | 'userId'> & { _id: ObjectId; userId: ObjectId };
 
@@ -56,7 +57,14 @@ export class StripeCustomerMongoRepository extends StripeCustomerRepository {
     };
   }
 
-
+  async updateUserBilling(userId: User['id'], billing: Address): Promise<true> {
+    await this.collection.updateOne({ userId: new ObjectId(userId) }, {
+      $set: {
+        billingAddress: billing,
+      }
+    })
+    return true
+  }
 
 
   async upsertStripeCustomer(doc: StripeCustomerDocument): Promise<StripeCustomerDocument> {

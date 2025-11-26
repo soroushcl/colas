@@ -327,7 +327,7 @@ export class UserStore {
         this.upcomingOrders = upcomingOrders
         this.card = payload.cards[0] ? payload.cards[0].card.last4 : 0
         this.billingAddress = payload.billingAddress
-        this.shippingAddress = payload.billingAddress
+        this.shippingAddress = this.registeredDogs[0].subscription.shippingAddress
         console.log("login completed registeredDogs", this.registeredDogs)
         console.log("login completed upcomingOrder", this.upcomingOrder)
         console.log("login completed upcomingOrder", this.upcomingOrder.date)

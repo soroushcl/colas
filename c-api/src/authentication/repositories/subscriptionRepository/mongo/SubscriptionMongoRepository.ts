@@ -707,14 +707,6 @@ export class SubscriptionMongoRepository extends SubscriptionRepository {
     return true
   }
 
-  async updateUserBilling(userId: User['id'], billing: Address): Promise<true> {
-    await this.subscriptionCollection.updateMany({ userId: userId }, {
-      $set: {
-        billing: billing,
-      }
-    })
-    return true
-  }
 
   async findSubscriptionByUserIdAndDogId(userId: User['id'], dogId: Dog['id']): Promise<Subscription | null> {
     const filter = ObjectId.isValid(userId as any)
