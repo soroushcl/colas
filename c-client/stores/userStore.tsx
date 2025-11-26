@@ -18,7 +18,7 @@ export class UserStore {
     date: ''
   }
   upcomingOrders: Order[] = []
-  card: number = 0
+  card: string = ''
   billingAddress: Address = {
     line1: '',
     line2: '',
@@ -96,7 +96,7 @@ export class UserStore {
         }
         if (persistedCard) {
           const parsedCard = JSON.parse(persistedCard);
-          if (parsedCard && typeof parsedCard === 'number') {
+          if (parsedCard && typeof parsedCard === 'string') {
             this.card = parsedCard;
           }
         }

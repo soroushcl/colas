@@ -4,3 +4,10 @@ import { paymentIntentResponseBody, paymentIntentRequestBody } from '../../payme
 export type createPaymentIntentResponseBody = Success<paymentIntentResponseBody> | Fail;
 
 export interface createPaymentIntentRequestBody extends paymentIntentRequestBody {}
+
+
+export interface changeCardRequestBody {
+    paymentMethodId: string,
+  }
+  
+  export type changeCardResponseBody = Success<true> | Fail;

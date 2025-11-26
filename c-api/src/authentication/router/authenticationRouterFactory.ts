@@ -32,6 +32,7 @@ export const authenticationRouterFactory = (authViews: AuthenticationRouterFacto
   router.post('/edit-dog', authViews.editDog);
   router.post('/change-shipping-address', authViews.changeShippingAddress);
   router.post('/change-billing-address', authViews.changeBillingAddress);
+  router.post('/change-card', authViews.changeCard);
   
   return router;
 };

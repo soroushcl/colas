@@ -23,16 +23,24 @@ export async function POST(request: Request) {
 
         const body = await request.json().catch(() => ({}));
         const amount: number = typeof body.amount === 'number' ? body.amount : 20416; // in smallest currency unit
-        const currency: string = typeof body.currency === 'string' ? body.currency : 'usd';
+        const currency: string = typeof body.currency === 'string' ? body.currency : 'cad';
 
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount,
-            currency,
-            automatic_payment_methods: { enabled: true },
-            setup_future_usage: 'off_session',
-        });
+        if (amount === 0) {
+            const setupIntent = await stripe.setupIntents.create({
+                automatic_payment_methods: { enabled: true },
+            });
+            return NextResponse.json({ clientSecret: setupIntent.client_secret });
+        } else {
 
-        return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount,
+                currency,
+                automatic_payment_methods: { enabled: true },
+                setup_future_usage: 'off_session',
+            });
+            return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+        }
+
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to create PaymentIntent';
         return NextResponse.json(

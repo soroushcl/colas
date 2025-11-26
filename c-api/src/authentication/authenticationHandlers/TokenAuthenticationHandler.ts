@@ -77,6 +77,8 @@ import {
   editShippingResponseBody,
   editBillingRequestBody,
   editBillingResponseBody,
+  changeCardRequestBody,
+  changeCardResponseBody,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -1799,7 +1801,7 @@ const TokenAuthenticationHandler = (
       },
       changeBillingAddress: async (req: Request<{}, {}, editBillingRequestBody>, res: Response<editBillingResponseBody>) => {
         let { billingAddress } = req.body;
-        console.log("change-shipping-address: ", billingAddress)
+        console.log("change-billing-address: ", billingAddress)
         billingAddress.postal_code = billingAddress.postalCode;
         delete billingAddress.postalCode
         const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
@@ -1823,6 +1825,39 @@ const TokenAuthenticationHandler = (
             // delete billingAddress.postal_code
             // await subscriptionRepo.updateUserShipping(req.user.id, billingAddress);
             // await orderRepo.updateUserShipping(req.user.id, billingAddress);
+            res.json(Success(true));
+          } catch (err) {
+            console.log(err)
+            res.status(500).json(Fail(new Error('Stripe Order Update Error: ' + err).toString()))
+          }
+        } else {
+          res.status(500).json(Fail(new Error('No stripe user found!').toString()))
+        }
+
+      },
+      changeCard: async (req: Request<{}, {}, changeCardRequestBody>, res: Response<changeCardResponseBody>) => {
+        const { paymentMethodId } = req.body;
+        console.log("change-card: ", paymentMethodId)
+        
+        const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+        const stripe = (stripeCustomerMongoRepo as any).stripe;
+
+        let sc = await stripeCustomerRepo?.getCustomerByUserId(req.user.id);
+
+        if (sc) {
+          try {
+            await stripe.paymentMethods.attach(
+              paymentMethodId,  // <-- your payment method ID collected via Stripe.js
+              { customer: sc.stripeCustomer.stripeCustomerId, } // <-- your customer id from the request body
+            )
+            await stripe.customers.update(
+              sc.stripeCustomer.stripeCustomerId,
+              {
+                invoice_settings: {
+                  default_payment_method: paymentMethodId,
+                },
+              }
+            );
             res.json(Success(true));
           } catch (err) {
             console.log(err)
