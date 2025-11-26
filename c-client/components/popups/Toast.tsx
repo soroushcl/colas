@@ -29,11 +29,11 @@ const Toast: React.FC<ToastProps> = ({
         }
     }, [isOpen, duration, onClose]);
 
-    // if (!isOpen) return null;
+    if (!isOpen) return null;
 
     const bgColor = type === 'success'
         ? 'bg-semantic_green_light'
-        : 'bg-red-500';
+        : 'bg-semantic_accent';
 
     return ReactDOM.createPortal(
         // <div>
@@ -53,7 +53,7 @@ const Toast: React.FC<ToastProps> = ({
                 `}
                 >
                     
-                    <p className='text-sm text-semantic_green font-medium flex-1'>{message}</p>
+                    <p className={`text-sm ${type === 'success' ? "text-semantic_green" : "text-semantic_red"} font-medium flex-1`}>{message}</p>
                     <button
                         onClick={onClose}
                         className="flex-shrink-0 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-1 transition-colors"
