@@ -48,6 +48,8 @@ import {
     changeCardRequestBody,
     editBillingResponseBody,
     editBillingRequestBody,
+    getInvoiceResponseBody,
+    getInvoiceRequestBody,
 } from 'c-lib';
 
 if (typeof window === "undefined") {
@@ -437,6 +439,19 @@ export default class FetchApi {
             },
         });
         console.log("edit-pooch-recipes res", res)
+        return res
+    };
+
+    getInvoice = async (invoiceNumber: string): Promise<getInvoiceResponseBody> => {
+        console.log("getInvoice called", invoiceNumber)
+        const res = await this.request<getInvoiceResponseBody, getInvoiceRequestBody>(`${this.baseUrl}/authentication/get-invoice`, {
+            method: "POST",
+            credentials: "include",
+            body: {
+                invoiceNumber,
+            },
+        });
+        console.log("getInvoice res", res)
         return res
     };
 

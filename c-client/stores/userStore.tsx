@@ -266,7 +266,7 @@ export class UserStore {
             return (obj.dog == dogs[i].id)
           })
           let dogOldOrders = orders.filter(obj => {
-            return (obj.dog == dogs[i].id && obj.status == OrderStatus.delivered)
+            return (obj.dog == dogs[i].id && (obj.status !== OrderStatus.active) && (obj.status !== OrderStatus.skipped) && (obj.status !== OrderStatus.canceled) && obj.invoiceNumber)
           })
           let activeOldOrders = orders.filter(obj => {
             return (obj.dog == dogs[i].id && obj.status == OrderStatus.active)

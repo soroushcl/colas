@@ -79,6 +79,8 @@ import {
   editBillingResponseBody,
   changeCardRequestBody,
   changeCardResponseBody,
+  getInvoiceRequestBody,
+  getInvoiceResponseBody,
 } from 'c-lib';
 import cookieParser from 'cookie-parser';
 import { colaURL, forgotPasswordExpirationTimer } from "@utils/constants";
@@ -1812,11 +1814,11 @@ const TokenAuthenticationHandler = (
         if (sc) {
           try {
             let customer = await stripe.customers.retrieve(sc.stripeCustomer.stripeCustomerId)
-             await stripe.paymentMethods.update(
+            await stripe.paymentMethods.update(
               customer.invoice_settings.default_payment_method,
               {
                 billing_details: {
-                  email : customer.email,
+                  email: customer.email,
                   address: billingAddress,
                 },
               }
@@ -1837,7 +1839,7 @@ const TokenAuthenticationHandler = (
       changeCard: async (req: Request<{}, {}, changeCardRequestBody>, res: Response<changeCardResponseBody>) => {
         const { paymentMethodId } = req.body;
         console.log("change-card: ", paymentMethodId)
-        
+
         const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
         const stripe = (stripeCustomerMongoRepo as any).stripe;
 
@@ -1864,6 +1866,24 @@ const TokenAuthenticationHandler = (
           }
         } else {
           res.status(500).json(Fail(new Error('No stripe user found!').toString()))
+        }
+
+      },
+      getInvoice: async (req: Request<{}, {}, getInvoiceRequestBody>, res: Response<getInvoiceResponseBody>) => {
+        const { invoiceNumber } = req.body;
+        console.log("getInvoice: ", invoiceNumber)
+        const stripeCustomerMongoRepo = stripeCustomerRepo as unknown as StripeCustomerMongoRepository;
+        const stripe = (stripeCustomerMongoRepo as any).stripe;
+
+
+        try {
+          const invoice = await stripe.invoices.retrieve(invoiceNumber)
+          const price = (invoice.amount_paid / 100).toLocaleString("en-US", { style: "currency", currency: "USD" }).substring(1)
+          // console.log("getInvoice: ", invoice)
+          res.json(Success({ price: price, url: invoice.invoice_pdf }));
+        } catch (err) {
+          console.log(err)
+          res.status(500).json(Fail(new Error('Stripe Order Update Error: ' + err).toString()))
         }
 
       },

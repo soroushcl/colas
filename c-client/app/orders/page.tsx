@@ -11,6 +11,7 @@ import { subscriptionInfo } from "c-lib";
 import DogPopup from "@/components/popups/DogPopup";
 // import CustomNumberComponent from "@/components/CustomNumberComponent";
 import SearchableSelect from "@/components/inputs/serchableSelectInput/SerchableSelectInput";
+import FetchApi from "@/services/api";
 
 const nextWeeksCalculator = (weeks?: number) => {
   if (!weeks) {
@@ -43,6 +44,9 @@ export default function OrderPage() {
   const router = useRouter();
   const [isUpcomingOrderPopupOpen, setIsUpcomingOrderPopupOpen] = useState(false);
   const [isDeliveryDatePopupOpen, setIsDeliveryDatePopupOpen] = useState(false);
+  const temOldOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string, price: string, url: string }[] = []
+  const [oldOrders, setOldOrders] = useState(temOldOrders)
+  const api = new FetchApi();
 
   const nextWeeks = nextWeeksCalculator();
   // const [deliveryFrequency, setDeliveryFrequency] = useState(8);
@@ -63,6 +67,37 @@ export default function OrderPage() {
       if (tab === "history" || tab === "orders") {
         setActiveTab(tab as "orders" | "history");
       }
+    }
+  }, []);
+
+  useEffect(() => {
+    for (let i = 0; i < userStore.registeredDogs.length; i++) {
+      userStore.registeredDogs[i].oldOrders.map(async r => {
+        let dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
+        dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
+        const status = r.status
+        const portions = r.detail.type
+        const recipeNames = r.detail.selectedRecipes.map((r: number | string) => {
+          // Handle both old format (numbers) and new format (protein enum strings)
+          if (typeof r === 'number') {
+            // Old format: numbers
+            return r == 1 ? ' Beef' : r == 2 ? ' Chicken' : r == 3 ? ' Salmon' : r == 4 ? ' Turkey' : ' ' + r
+          } else {
+            // New format: protein enum strings
+            return ' ' + r
+          }
+        })
+        const recipes = recipeNames.toString().substring(0, recipeNames.toString().length)
+        const deliveryDate = new Date(r.shippingDate!).toDateString()
+        const result = await api.getInvoice(r.invoiceNumber!)
+        console.log("success", result)
+        if (result.success) {
+          console.log("success true", )
+          const invoice = result.payload
+          temOldOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes, deliveryDate: deliveryDate, price: invoice.price, url: invoice.url })
+        }
+      })
+      setOldOrders(temOldOrders)
     }
   }, []);
 
@@ -93,28 +128,7 @@ export default function OrderPage() {
     })
   }
 
-  const oldOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string }[] = []
-  for (let i = 0; i < userStore.registeredDogs.length; i++) {
-    userStore.registeredDogs[i].oldOrders.map(r => {
-      let dogName = userStore.registeredDogs.filter(d => r.dog == d.dog.id)[0].dog.name
-      dogName = dogName.charAt(0).toUpperCase() + dogName.slice(1);
-      const status = r.status
-      const portions = r.detail.type
-      const recipeNames = r.detail.selectedRecipes.map((r: number | string) => {
-        // Handle both old format (numbers) and new format (protein enum strings)
-        if (typeof r === 'number') {
-          // Old format: numbers
-          return r == 1 ? ' Beef' : r == 2 ? ' Chicken' : r == 3 ? ' Salmon' : r == 4 ? ' Turkey' : ' ' + r
-        } else {
-          // New format: protein enum strings
-          return ' ' + r
-        }
-      })
-      const recipes = recipeNames.toString().substring(0, recipeNames.toString().length)
-      const deliveryDate = new Date(r.shippingDate!).toDateString()
-      oldOrders.push({ dogName: dogName, status: status, portions: portions, recipes: recipes, deliveryDate: deliveryDate })
-    })
-  }
+  
   const upcomingOrders: { dogName: string, status: string, portions: string, recipes: string, deliveryDate: string, id: string }[] = []
   for (let i = 0; i < userStore.upcomingOrders.length; i++) {
     let dogName = userStore.registeredDogs.filter(d => userStore.upcomingOrders[i].dog == d.dog.id)[0].dog.name
@@ -168,7 +182,34 @@ export default function OrderPage() {
             </div>
           }
           onClose={() => setIsDeliveryDatePopupOpen(false)}
-          onSubmit={() => setIsDeliveryDatePopupOpen(false)}
+          onSubmit={async () => {
+            // try {
+            //   const info = registeredDog.dog.subscription!.info.map(r => {
+            //     return {
+            //       protein: registeredDog.recipes.filter(s => s.id == r.recipeId)[0].protein,
+            //       amount: r.amount
+            //     };
+            //   });
+            //   const result = await api.editDog(registeredDog.dog.id, info);
+            //   if (result.success) {
+            //     // setDeliveryFrequency(registeredDog?.subscription.recurring / 7)
+            //     // const payload: any = (result as any).payload;
+            //     // setDeliveryFrequency(payload.dog.subscription.recurring / 7)
+            //     window.localStorage.setItem('userStore:registeredDogs', JSON.stringify(userStore.registeredDogs));
+            //     // window.location.reload();
+            //     setIsEditingDog(false);
+            //     setIsRecipePopupOpen(false);
+            //     // setIsBreedPopupOpen(false);
+            //     // Optionally refresh the page or update the store
+            //   } else {
+            //     console.error("Failed to update dog:", result.error);
+            //     alert("ailed to update dog. Please try again.");
+            //   }
+            // } catch (error) {
+            //   console.error("Error updating dog recurring:", error);
+            //   alert("An error occurred while updating delivery frequency. Please try again.");
+            // }
+          }}
           isOpen={isDeliveryDatePopupOpen}
         />
         {/* Segmented Switch */}
@@ -226,7 +267,7 @@ export default function OrderPage() {
 
         {activeTab === "history" && (
           <div className="space-y-3">
-            <p className="text-sm text-label_tertiary">Purchase History:</p>
+            <p className="text-sm text-label_tertiary">Delivered orders:</p>
             {oldOrders.map((o, idx) => (
               <div key={`${o.dogName}-${idx}`} className="">
                 <InfoTable
@@ -242,7 +283,13 @@ export default function OrderPage() {
                     },
                     { label: "Portions:", value: o.portions, type: "text" },
                     { label: "Recipes", value: o.recipes, type: "text" },
-                    { label: "Delivery date:", value: o.deliveryDate, type: "value" }
+                    { label: "Delivery date:", value: o.deliveryDate, type: "value" },
+                    { 
+                      label: o.price, 
+                      value: 'Download pdf', 
+                      type: "value", 
+                      onClick: () => { window.location.href = o.url; }
+                    }
                   ]}
                 />
               </div>

@@ -29,6 +29,7 @@ export interface AuthenticationHandler {
     changeShippingAddress: RequestHandler;
     changeBillingAddress: RequestHandler;
     changeCard: RequestHandler;
+    getInvoice: RequestHandler;
     // updateCustomer: RequestHandler;
     // deactivateUser: RequestHandler;
     // reactivateUser: RequestHandler;
@@ -56,6 +57,7 @@ export interface AuthenticationRouterFactoryViews {
   updateSubscriptionRecurring: RequestHandler;
   editDogRecipes: RequestHandler;
   editDog: RequestHandler;
+  getInvoice: RequestHandler;
   changeShippingAddress: RequestHandler;
   changeBillingAddress: RequestHandler;
   changeCard: RequestHandler;

@@ -7,3 +7,10 @@ export interface changeCardRequestBody {
     paymentMethodId: string;
 }
 export type changeCardResponseBody = Success<true> | Fail;
+export interface getInvoiceRequestBody {
+    invoiceNumber: string;
+}
+export type getInvoiceResponseBody = Success<{
+    price: string;
+    url: string;
+}> | Fail;
