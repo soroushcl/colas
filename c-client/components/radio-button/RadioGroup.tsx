@@ -26,7 +26,7 @@ interface MultiSelectRadioGroupProps {
 const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
   options,
   onSelect,
-  multiSelect = false,
+  // multiSelect = false,
   type = 'default',
 }) => {
   const handleSelect = (index: number) => {
