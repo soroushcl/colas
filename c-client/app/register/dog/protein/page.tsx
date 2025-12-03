@@ -30,9 +30,12 @@ const Home: React.FC = observer(() => {
     })
 
     const handleSelect = (selected: number) => {
+        
         const selectedIssues = Object.values(protein).map((option, index) => {
-            const isSelected = dogStore.dog.proteins.some(
-                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+            const isSelected = selected !== index ? dogStore.dog.proteins.some(
+                issueKey =>  protein[issueKey as unknown as keyof typeof protein] === option 
+            ): !dogStore.dog.proteins.some(
+                issueKey =>  protein[issueKey as unknown as keyof typeof protein] === option 
             )
             return {
                 selected: isSelected,

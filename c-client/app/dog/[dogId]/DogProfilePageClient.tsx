@@ -97,7 +97,7 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
     portions: registeredDog?.subscription.type,
     frequency: `${deliveryFrequency} Week${deliveryFrequency > 1 ? "s" : ""}`,
     recipe: recipe,
-    favoriteProtein: registeredDog?.dog.proteins,
+    favoriteProteins: registeredDog?.dog.proteins,
     price: `$${(registeredDog?.subscription.dailyPrice * registeredDog?.subscription.recurring).toFixed(2)} + Tax`
   });
   console.log("dogData", dogData)
@@ -1045,18 +1045,18 @@ export const DogProfilePageClient = observer(({ dogId }: DogProfilePageClientPro
 
         {/* Subscriptions Section */}
         <h3 className="text-sm text-label_tertiary mb-3">Subscriptions:</h3>
-        {dogData.favoriteProtein && <InfoTable
+        {dogData.favoriteProteins && <InfoTable
           rows={[
             { label: "Status", value: dogData.status, type: "badge" },
             { label: "Portions", value: dogData.portions, type: "value", onClick: () => setIsPortionPopupOpen(true) },
             { label: "Frequency", value: deliveryFrequency, type: "value", onClick: () => setIsFrequencyPopupOpen(true) },
             { label: "Recipe", value: dogData.recipe, type: "value", onClick: () => setIsRecipePopupOpen(true) },
-            { label: "Favorite protein", value: dogData.favoriteProtein, type: "value" },
+            { label: "Favorite proteins", value: dogData.favoriteProteins, type: "value" },
             { label: "Price:", value: dogData.price, type: "text" }
           ]}
         />
         }
-        {!dogData.favoriteProtein && <InfoTable
+        {!dogData.favoriteProteins && <InfoTable
           rows={[
             { label: "Status", value: dogData.status, type: "badge" },
             { label: "Portions", value: dogData.portions, type: "value", onClick: () => setIsPortionPopupOpen(true) },

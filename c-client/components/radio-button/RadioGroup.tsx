@@ -30,16 +30,16 @@ const RadioGroup: React.FC<MultiSelectRadioGroupProps> = ({
   type = 'default',
 }) => {
   const handleSelect = (index: number) => {
-    console.log("index", index)
-    const updatedOptions = options.map((option, i) => ({
-      ...option,
-      selected: multiSelect
-        ? i === index
-          ? !option.selected // Toggle selection in multi-select
-          : option.selected
-        : i === index, // Single select
-    }));
-    console.log("updatedOptions", updatedOptions)
+    // console.log("index", index)
+    // const updatedOptions = options.map((option, i) => ({
+    //   ...option,
+    //   selected: multiSelect
+    //     ? i === index
+    //       ? !option.selected // Toggle selection in multi-select
+    //       : option.selected
+    //     : i === index, // Single select
+    // }));
+    // console.log("updatedOptions", updatedOptions)
     if (onSelect) {
       onSelect(index); // Trigger callback with updated options
     }

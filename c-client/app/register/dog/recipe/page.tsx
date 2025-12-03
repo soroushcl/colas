@@ -9,15 +9,15 @@ import RadioGroup, { Option } from '@/components/radio-button/RadioGroup';
 // import { getEnumKeyByValue } from '@/utils/enumHelper';
 import { protein, Recipe } from 'c-lib';
 import RecipePopup from '@/components/popups/RecipePopup';
+import { getEnumKeyByValue } from '@/utils/enumHelper';
 
 
 const Home: React.FC = observer(() => {
     const { dogStore, userStore } = useStores();
-    // const { mainButtondisabled } = regStore;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const router = useRouter();
-    
+
     const baseRecipes: Option[] = [
         {
             title: 'Hearty Beef',
@@ -26,7 +26,9 @@ const Home: React.FC = observer(() => {
             cardImage: '/images/recipe_Beef.png',
             selectedCardImage: '/images/recipe_Beef.png',
             value: 'Beef',
-            selected: true,
+            selected: dogStore.subscription.selectedRecipes.some(
+                issueKey => protein[issueKey as unknown as keyof typeof protein] === protein['beef']
+            ),
             handleSecondarySelect: () => handleSecondary(dogStore.recipes[0])
         },
         {
@@ -36,7 +38,9 @@ const Home: React.FC = observer(() => {
             cardImage: '/images/recipe_Chicken.png',
             selectedCardImage: '/images/recipe_Chicken.png',
             value: 'Chicken',
-            selected: false,
+            selected: dogStore.subscription.selectedRecipes.some(
+                issueKey => protein[issueKey as unknown as keyof typeof protein] === protein['chicken']
+            ),
             handleSecondarySelect: () => handleSecondary(dogStore.recipes[1])
         },
         {
@@ -46,7 +50,9 @@ const Home: React.FC = observer(() => {
             cardImage: '/images/recipe_Salmon.png',
             selectedCardImage: '/images/recipe_Salmon.png',
             value: 'Salmon',
-            selected: true,
+            selected: dogStore.subscription.selectedRecipes.some(
+                issueKey => protein[issueKey as unknown as keyof typeof protein] === protein['salmon']
+            ),
 
             handleSecondarySelect: () => handleSecondary(dogStore.recipes[2])
         },
@@ -62,7 +68,6 @@ const Home: React.FC = observer(() => {
         // },
     ];
 
-    const [recipes, setRecipes] = useState<Option[]>(baseRecipes);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -75,9 +80,11 @@ const Home: React.FC = observer(() => {
     };
 
     const handleSelect = (selected: number) => {
-        const selectedRecipes = Object.values(protein).map((option, index) => {
-            const isSelected = dogStore.dog.proteins.some(
-                issueKey => selected !== index ? protein[issueKey as unknown as keyof typeof protein] === option : protein[issueKey as unknown as keyof typeof protein] !== option
+        const selectedIssues = Object.values(protein).map((option, index) => {
+            const isSelected = selected !== index ? dogStore.subscription.selectedRecipes.some(
+                issueKey =>  protein[issueKey as unknown as keyof typeof protein] === option 
+            ): !dogStore.subscription.selectedRecipes.some(
+                issueKey =>  protein[issueKey as unknown as keyof typeof protein] === option 
             )
             return {
                 selected: isSelected,
@@ -85,10 +92,10 @@ const Home: React.FC = observer(() => {
             }
         })
             .filter(option => option.selected)
-            .map(option => option.title)
-            .filter((v): v is protein => !!v) as unknown as protein[];
+            .map(option => getEnumKeyByValue(protein, option.title))
+            .filter((key): key is keyof typeof protein => !!key);
 
-        dogStore.subscription.selectedRecipes = selectedRecipes as unknown as protein[];
+        dogStore.subscription.selectedRecipes = selectedIssues as unknown as protein[];
         console.log("selectedRecipes", dogStore.subscription.selectedRecipes)
     };
     const handleSecondary = (selected: Recipe) => {
@@ -113,32 +120,15 @@ const Home: React.FC = observer(() => {
     }, [router]);
 
     useEffect(() => {
-        const proteinValues = new Set(
-            (dogStore.dog.proteins || [])
-                .map(key => (protein as unknown as Record<string, string>)[key as unknown as string])
-                .filter((v): v is string => !!v)
-                .map(v => v.toLowerCase() === 'beef' ? 'beef' : v.toLowerCase())
-        );
-        const initialized = baseRecipes.map(r => ({
-            ...r,
-            selected: r.value ? proteinValues.has(r.value) : false
-        }));
-        setRecipes(initialized);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        dogStore.subscription.selectedRecipes = dogStore.dog.proteins
     }, []);
     if (isAuthenticated) {
         return <p>Redirecting to home...</p>;
     }
-    // useEffect(() => {
-    //     if (dogStore.currentStep < dogStore.genderStep) {
-    //         router.push('/register/customer');
-    //     } else {
-    //         setIsAuthenticated(false);
-    //     }
-    // }, [router, dogStore.currentStep, dogStore.genderStep]);
+    
     return (
         <ProcessLayout title={`*${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s* custom meals`} subTitle={`We have adjusted these recipes based on your pup’s needs`} handleSubmit={handleSubmit} disabled={dogStore.subscription.selectedRecipes.length === 0} nextArrow mainButtonText={"Next"} registeredDogs={userStore.registeredDogs}>
-            <RadioGroup type='card' options={recipes} multiSelect onSelect={handleSelect} />
+            <RadioGroup type='card' options={baseRecipes} multiSelect onSelect={handleSelect} />
             {isPopupOpen && <RecipePopup
                 title={`${dogStore.dog.name.charAt(0).toUpperCase() + dogStore.dog.name.slice(1)}’s Health Needs`}
                 // onOpen={handleOpenPopup}
